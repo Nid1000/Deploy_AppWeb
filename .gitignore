@@ -1,0 +1,17 @@
+﻿node_modules/
+.next/
+out/
+next-env.d.ts
+*.log
+.phpunit.cache/
+.env
+.env.*
+vendor/
+public/error_log
+public/build.zip
+app.zip
+storage/*.key
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
