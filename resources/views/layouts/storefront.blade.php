@@ -27,7 +27,7 @@
         <div class="topbar">
             <div class="container flex h-9 items-center justify-between gap-4 text-xs text-stone-700">
                 <div class="flex flex-wrap items-center gap-3">
-                    <span>Envio gratis en compras desde S/ 80</span>
+                    <span>Envio gratis , pero te tienes que ir a la mrd</span>
                     <a href="tel:993560096" class="hover:text-stone-950">993560096</a>
                 </div>
                 <div class="hidden items-center gap-3 sm:flex">
