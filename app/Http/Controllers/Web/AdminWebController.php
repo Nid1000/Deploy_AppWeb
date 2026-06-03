@@ -803,104 +803,184 @@ class AdminWebController extends Controller
             fn ($value) => $this->normalizeReportCell($value),
             $headers
         );
-        $colspan = max(1, count($headers));
+        $colCount = max(1, count($headers));
 
         $safeTitle = htmlspecialchars((string) ($report['title'] ?? 'REPORTE'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $accent = htmlspecialchars((string) ($report['accent'] ?? '#334155'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $accentDark = htmlspecialchars((string) ($report['accent_dark'] ?? '#1e293b'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $accentSoft = htmlspecialchars((string) ($report['accent_soft'] ?? '#e2e8f0'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $generatedAt = htmlspecialchars(now()->format('d/m/Y H:i'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $brandName = htmlspecialchars((string) (SiteSettings::get()['branding'] ?? 'Delicias'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $logoDataUri = $this->reportLogoDataUri();
+        $instructions = htmlspecialchars((string) $this->reportInstructions($report['key'] ?? 'ventas'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $context = $this->reportContext($report['key'] ?? 'ventas', $brandName, $generatedAt);
         $summary = $this->buildReportSummary($report['key'] ?? 'ventas', $headers, $rows);
+        $widths = $this->calculateReportColumnWidths($headers, $rows);
 
-        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
-        $html .= '<style>
-            body{font-family:Arial,Helvetica,sans-serif;background:#f7f7f7;color:#111;margin:0;padding:24px}
-            .sheet{max-width:1400px;margin:0 auto;background:#fff;padding:24px;border:1px solid #d1d5db}
-            .brand-table{width:100%;border-collapse:collapse;margin-bottom:14px}
-            .brand-top{padding:14px 16px;border:2px solid #000;background:linear-gradient(135deg,' . $accentSoft . ',#ffffff)}
-            .brand-inner{display:flex;align-items:center;gap:14px}
-            .brand-logo{width:52px;height:52px;object-fit:cover;border-radius:14px;border:2px solid ' . $accentDark . ';background:#fff}
-            .brand-name{font-size:15px;font-weight:700;color:' . $accentDark . ';text-transform:uppercase;letter-spacing:.12em}
-            .brand-title{margin-top:3px;font-size:24px;font-weight:700;color:' . $accentDark . ';line-height:1.1}
-            .brand-subtitle{margin-top:4px;font-size:12px;color:#475569}
-            .title-row td,.subtitle-row td,.meta-row td{border:1px solid #000}
-            .title-cell{padding:14px 12px;text-align:center;font-size:24px;font-weight:700;color:' . $accentDark . ';letter-spacing:.5px;background:#f8fafc;white-space:nowrap}
-            .subtitle-cell{padding:8px 12px;text-align:center;font-size:12px;color:#6b7280;background:#fff}
-            .meta-cell{padding:8px 12px;text-align:center;font-size:12px;color:#374151;background:#f9fafb}
-            .summary-table{width:100%;border-collapse:collapse;margin:14px 0 18px}
-            .summary-title{padding:10px 12px;border:2px solid #000;background:' . $accentSoft . ';color:' . $accentDark . ';font-weight:700;text-transform:uppercase}
-            .summary-grid{width:100%;border-collapse:collapse}
-            .summary-grid td{border:1px solid #000;padding:10px 12px;background:#fff}
-            .summary-label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em}
-            .summary-value{margin-top:4px;font-size:18px;font-weight:700;color:' . $accentDark . '}
-            table{width:100%;border-collapse:collapse;border:2px solid #000;background:#fff}
-            th,td{border:1px solid #000;padding:8px 10px;font-size:12px;vertical-align:top}
-            thead th{background:' . $accentDark . ';color:#fff;font-weight:700;text-transform:uppercase;text-align:center}
-            tbody td{background:#fffdf8}
-            tbody tr:nth-child(even) td{background:#f6f7f9}
-        </style></head><body><div class="sheet">';
-        $html .= '<table class="brand-table">';
-        $html .= '<tr><td class="brand-top">';
-        $html .= '<div class="brand-inner">';
-        if ($logoDataUri !== '') {
-            $html .= '<img src="' . $logoDataUri . '" class="brand-logo" alt="Logo">';
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<?mso-application progid="Excel.Sheet"?>';
+        $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ';
+        $xml .= 'xmlns:o="urn:schemas-microsoft-com:office:office" ';
+        $xml .= 'xmlns:x="urn:schemas-microsoft-com:office:excel" ';
+        $xml .= 'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" ';
+        $xml .= 'xmlns:html="http://www.w3.org/TR/REC-html40">';
+        $xml .= '<Styles>';
+        $xml .= '<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Arial" ss:Size="10"/></Style>';
+        $xml .= '<Style ss:ID="Brand"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="11" ss:Bold="1" ss:Color="' . $accentDark . '"/><Interior ss:Color="' . $accentSoft . '" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Title"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="16" ss:Bold="1" ss:Color="' . $accentDark . '"/><Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Subtitle"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10" ss:Color="#475569"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Instructions"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="9" ss:Italic="1" ss:Color="#334155"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Context"><Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10" ss:Color="#334155"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="SummaryBand"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:FontName="Arial" ss:Size="11" ss:Bold="1" ss:Color="' . $accentDark . '"/><Interior ss:Color="' . $accentSoft . '" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="SummaryLabel"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10" ss:Bold="1" ss:Color="#334155"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="SummaryValue"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="13" ss:Bold="1" ss:Color="' . $accentDark . '"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Header"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="' . $accentDark . '" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="Cell"><Alignment ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10"/><Interior ss:Color="#FFFDF8" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '<Style ss:ID="CellAlt"><Alignment ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="10"/><Interior ss:Color="#F6F7F9" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>';
+        $xml .= '</Styles>';
+        $xml .= '<Worksheet ss:Name="' . $safeTitle . '">';
+        $xml .= '<Table ss:DefaultColumnWidth="120" ss:DefaultRowHeight="20">';
+
+        foreach ($widths as $width) {
+            $xml .= '<Column ss:Width="' . (float) $width . '"/>';
         }
-        $html .= '<div>';
-        $html .= '<div class="brand-name">' . $brandName . '</div>';
-        $html .= '<div class="brand-title">' . $safeTitle . '</div>';
-        $html .= '<div class="brand-subtitle">Reporte generado el ' . $generatedAt . '</div>';
-        $html .= '</div></div></td></tr>';
-        $html .= '</table>';
+
+        $xml .= '<Row ss:Height="24">';
+        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Brand"><Data ss:Type="String">' . $brandName . '</Data></Cell>';
+        $xml .= '</Row>';
+        $xml .= '<Row ss:Height="30">';
+        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Title"><Data ss:Type="String">' . $safeTitle . '</Data></Cell>';
+        $xml .= '</Row>';
+        $xml .= '<Row ss:Height="24">';
+        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Instructions"><Data ss:Type="String">' . $instructions . '</Data></Cell>';
+        $xml .= '</Row>';
+        $xml .= '<Row ss:Height="20">';
+        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Subtitle"><Data ss:Type="String">Reporte generado el ' . $generatedAt . '</Data></Cell>';
+        $xml .= '</Row>';
+
+        if (!empty($context)) {
+            $xml .= '<Row ss:Height="22">';
+            foreach ($context as $cell) {
+                $span = max(1, (int) ($cell['span'] ?? 1));
+                $type = (string) ($cell['type'] ?? 'Context');
+                $value = htmlspecialchars((string) ($cell['value'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $xml .= '<Cell ss:MergeAcross="' . ($span - 1) . '" ss:StyleID="' . $type . '"><Data ss:Type="String">' . $value . '</Data></Cell>';
+            }
+            $xml .= '</Row>';
+        }
 
         if (!empty($summary)) {
-            $html .= '<table class="summary-table">';
-            $html .= '<tr><td colspan="' . $colspan . '" class="summary-title">Resumen general</td></tr>';
-            $html .= '<tr><td>';
-            $html .= '<table class="summary-grid"><tr>';
-            foreach ($summary as $item) {
-                $html .= '<td><div class="summary-label">' . htmlspecialchars($item['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
-                $html .= '<div class="summary-value">' . htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div></td>';
+            $xml .= '<Row ss:Height="20">';
+            $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="SummaryBand"><Data ss:Type="String">Resumen general</Data></Cell>';
+            $xml .= '</Row>';
+            $perItem = max(1, intdiv($colCount, max(1, count($summary))));
+            $used = 0;
+            $xml .= '<Row ss:Height="26">';
+            foreach ($summary as $index => $item) {
+                $span = $index === array_key_last($summary)
+                    ? max(1, $colCount - $used)
+                    : max(1, $perItem);
+                $used += $span;
+                $xml .= '<Cell ss:MergeAcross="' . ($span - 1) . '" ss:StyleID="SummaryLabel"><Data ss:Type="String">' . htmlspecialchars($item['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</Data></Cell>';
             }
-            $html .= '</tr></table>';
-            $html .= '</td></tr>';
-            $html .= '</table>';
+            $xml .= '</Row>';
+            $used = 0;
+            $xml .= '<Row ss:Height="30">';
+            foreach ($summary as $index => $item) {
+                $span = $index === array_key_last($summary)
+                    ? max(1, $colCount - $used)
+                    : max(1, $perItem);
+                $used += $span;
+                $xml .= '<Cell ss:MergeAcross="' . ($span - 1) . '" ss:StyleID="SummaryValue"><Data ss:Type="String">' . htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</Data></Cell>';
+            }
+            $xml .= '</Row>';
         }
 
-        $html .= '<table><thead><tr>';
-
+        $xml .= '<Row>';
         foreach ($headers as $header) {
-            $html .= '<th>' . htmlspecialchars((string) $header, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</th>';
+            $xml .= '<Cell ss:StyleID="Header"><Data ss:Type="String">' . htmlspecialchars((string) $header, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</Data></Cell>';
         }
+        $xml .= '</Row>';
 
-        $html .= '</tr></thead><tbody>';
-
-        foreach ($rows as $row) {
-            $html .= '<tr>';
+        foreach ($rows as $rowIndex => $row) {
+            $xml .= '<Row>';
             foreach ($headers as $index => $header) {
                 $value = $this->normalizeReportCell($row[$index] ?? '');
-                $html .= '<td>' . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</td>';
+                $style = $rowIndex % 2 === 0 ? 'Cell' : 'CellAlt';
+                $type = is_numeric($value) && !preg_match('/^0\d+$/', (string) $value) ? 'Number' : 'String';
+                $xml .= '<Cell ss:StyleID="' . $style . '"><Data ss:Type="' . $type . '">' . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</Data></Cell>';
             }
-            $html .= '</tr>';
+            $xml .= '</Row>';
         }
 
-        $html .= '</tbody></table></div></body></html>';
+        $xml .= '</Table>';
+        $xml .= '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">';
+        $xml .= '<Selected/>';
+        $freezeRow = !empty($context) ? 10 : 8;
+        $xml .= '<FreezePanes/>';
+        $xml .= '<FrozenNoSplit/>';
+        $xml .= '<SplitHorizontal>' . $freezeRow . '</SplitHorizontal>';
+        $xml .= '<TopRowBottomPane>' . $freezeRow . '</TopRowBottomPane>';
+        $xml .= '<ActivePane>2</ActivePane>';
+        $xml .= '<ProtectObjects>False</ProtectObjects>';
+        $xml .= '<ProtectScenarios>False</ProtectScenarios>';
+        $xml .= '</WorksheetOptions>';
+        $xml .= '</Worksheet>';
+        $xml .= '</Workbook>';
 
-        return $html;
+        return $xml;
     }
 
-    private function reportLogoDataUri(): string
+    private function calculateReportColumnWidths(array $headers, array $rows): array
     {
-        $path = public_path('images/logos/logo 1.png');
-        if (!is_file($path)) {
-            return '';
+        $widths = [];
+        foreach ($headers as $index => $header) {
+            $maxLen = mb_strlen((string) $header);
+            foreach ($rows as $row) {
+                $maxLen = max($maxLen, mb_strlen((string) ($row[$index] ?? '')));
+            }
+
+            $width = min(35, max(12, $maxLen * 1.3));
+            $widths[] = $width * 7.5;
         }
 
-        $mime = mime_content_type($path) ?: 'image/png';
-        $data = base64_encode((string) file_get_contents($path));
+        return $widths ?: [120];
+    }
 
-        return 'data:' . $mime . ';base64,' . $data;
+    private function reportInstructions(string $reportKey): string
+    {
+        return match ($reportKey) {
+            'ventas' => 'Plantilla de informe de ventas diarias basicas. Revise los totales y el detalle por pedido.',
+            'pedidos' => 'Reporte de pedidos organizado para seguimiento y revision de estados.',
+            'productos' => 'Catalogo de productos con informacion para analisis y control.',
+            'almacen' => 'Movimientos de almacen ordenados por fecha, producto y tipo.',
+            'reservas' => 'Listado de reservas con control visual para gestion diaria.',
+            default => 'Reporte general listo para revision e impresion.',
+        };
+    }
+
+    private function reportContext(string $reportKey, string $brandName, string $generatedAt): array
+    {
+        return match ($reportKey) {
+            'ventas' => [
+                ['type' => 'Context', 'span' => 2, 'value' => 'Vendedor: ' . $brandName],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Fecha: ' . $generatedAt],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Moneda: S/.'],
+            ],
+            'pedidos' => [
+                ['type' => 'Context', 'span' => 2, 'value' => 'Responsable: ' . $brandName],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Periodo: ' . $generatedAt],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Estado: pendiente/listo/entregado'],
+            ],
+            'productos' => [
+                ['type' => 'Context', 'span' => 2, 'value' => 'Categoria: general'],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Fecha: ' . $generatedAt],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Inventario: activo'],
+            ],
+            default => [
+                ['type' => 'Context', 'span' => 2, 'value' => 'Marca: ' . $brandName],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Fecha: ' . $generatedAt],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Tipo: ' . strtoupper($reportKey)],
+            ],
+        };
     }
 
     private function buildReportSummary(string $reportKey, array $headers, array $rows): array
