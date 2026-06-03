@@ -745,6 +745,7 @@ class AdminWebController extends Controller
             return [];
         }
 
+        $delimiter = $this->detectReportDelimiter($csv);
         $handle = fopen('php://temp', 'r+');
         if ($handle === false) {
             return [];
@@ -754,7 +755,7 @@ class AdminWebController extends Controller
         rewind($handle);
 
         $rows = [];
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
             if ($row === [null] || $row === false) {
                 continue;
             }
@@ -766,8 +767,22 @@ class AdminWebController extends Controller
         return $rows;
     }
 
+    private function detectReportDelimiter(string $csv): string
+    {
+        $firstLine = strtok($csv, "\n") ?: '';
+        $semicolonCount = substr_count($firstLine, ';');
+        $commaCount = substr_count($firstLine, ',');
+
+        if ($semicolonCount > $commaCount) {
+            return ';';
+        }
+
+        return ',';
+    }
+
     private function renderExcelHtmlReport(string $title, string $accent, array $rows): string
     {
+        $rows = $this->normalizeReportRows($rows);
         $headers = array_shift($rows) ?? [];
         $headers = array_map(
             fn ($value) => $this->normalizeReportCell($value),
@@ -814,6 +829,39 @@ class AdminWebController extends Controller
         $html .= '</tbody></table></div></body></html>';
 
         return $html;
+    }
+
+    private function normalizeReportRows(array $rows): array
+    {
+        $normalized = [];
+        $headerFound = false;
+
+        foreach ($rows as $row) {
+            $row = array_map(
+                fn ($value) => $this->normalizeReportCell($value),
+                is_array($row) ? $row : [$row]
+            );
+
+            $cells = array_values(array_filter($row, fn ($value) => trim((string) $value) !== ''));
+
+            if (!$headerFound) {
+                if (count($cells) <= 1) {
+                    continue;
+                }
+
+                $headerFound = true;
+                $normalized[] = $row;
+                continue;
+            }
+
+            if (count($cells) <= 1) {
+                continue;
+            }
+
+            $normalized[] = $row;
+        }
+
+        return $normalized;
     }
 
     private function normalizeReportCell(mixed $value): string
