@@ -699,7 +699,7 @@ class AdminWebController extends Controller
             return back()->with('error', 'El archivo exportado esta vacio.');
         }
 
-        $html = $this->renderExcelHtmlReport($report['title'], $report['accent'], $rows);
+        $html = $this->renderExcelHtmlReport($report, $rows);
 
         return response($html, 200, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
@@ -711,28 +711,43 @@ class AdminWebController extends Controller
     {
         return match ($path) {
             'reservas/admin/exportar' => [
+                'key' => 'reservas',
                 'title' => 'REPORTE DE RESERVAS',
                 'accent' => '#7c3aed',
+                'accent_dark' => '#5b21b6',
+                'accent_soft' => '#f3e8ff',
                 'filename' => 'reporte-reservas-' . now()->format('Y-m-d') . '.xls',
             ],
             'almacen/admin/exportar' => [
+                'key' => 'almacen',
                 'title' => 'REPORTE DE ALMACEN',
                 'accent' => '#334155',
+                'accent_dark' => '#1e293b',
+                'accent_soft' => '#e2e8f0',
                 'filename' => 'reporte-almacen-' . now()->format('Y-m-d') . '.xls',
             ],
             'reportes/admin/exportar/pedidos' => [
+                'key' => 'pedidos',
                 'title' => 'REPORTE DE PEDIDOS',
                 'accent' => '#2563eb',
+                'accent_dark' => '#1d4ed8',
+                'accent_soft' => '#dbeafe',
                 'filename' => 'reporte-pedidos-' . now()->format('Y-m-d') . '.xls',
             ],
             'reportes/admin/exportar/productos' => [
+                'key' => 'productos',
                 'title' => 'REPORTE DE PRODUCTOS',
                 'accent' => '#16a34a',
+                'accent_dark' => '#15803d',
+                'accent_soft' => '#dcfce7',
                 'filename' => 'reporte-productos-' . now()->format('Y-m-d') . '.xls',
             ],
             default => [
+                'key' => 'ventas',
                 'title' => 'REPORTE DE VENTAS',
                 'accent' => '#f97316',
+                'accent_dark' => '#ea580c',
+                'accent_soft' => '#ffedd5',
                 'filename' => 'reporte-ventas-' . now()->format('Y-m-d') . '.xls',
             ],
         };
@@ -780,7 +795,7 @@ class AdminWebController extends Controller
         return ',';
     }
 
-    private function renderExcelHtmlReport(string $title, string $accent, array $rows): string
+    private function renderExcelHtmlReport(array $report, array $rows): string
     {
         $rows = $this->normalizeReportRows($rows);
         $headers = array_shift($rows) ?? [];
@@ -788,27 +803,71 @@ class AdminWebController extends Controller
             fn ($value) => $this->normalizeReportCell($value),
             $headers
         );
+        $colspan = max(1, count($headers));
 
-        $safeTitle = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $accent = htmlspecialchars($accent, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeTitle = htmlspecialchars((string) ($report['title'] ?? 'REPORTE'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accent = htmlspecialchars((string) ($report['accent'] ?? '#334155'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accentDark = htmlspecialchars((string) ($report['accent_dark'] ?? '#1e293b'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accentSoft = htmlspecialchars((string) ($report['accent_soft'] ?? '#e2e8f0'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $generatedAt = htmlspecialchars(now()->format('d/m/Y H:i'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $brandName = htmlspecialchars((string) (SiteSettings::get()['branding'] ?? 'Delicias'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $logoDataUri = $this->reportLogoDataUri();
+        $summary = $this->buildReportSummary($report['key'] ?? 'ventas', $headers, $rows);
 
         $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
         $html .= '<style>
             body{font-family:Arial,Helvetica,sans-serif;background:#f7f7f7;color:#111;margin:0;padding:24px}
             .sheet{max-width:1400px;margin:0 auto;background:#fff;padding:24px;border:1px solid #d1d5db}
-            .title{margin:0 0 8px;text-align:center;font-size:24px;font-weight:700;color:' . $accent . ';letter-spacing:.5px}
-            .subtitle{margin:0 0 18px;text-align:center;font-size:12px;color:#6b7280}
+            .brand-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+            .brand-top{padding:14px 16px;border:2px solid #000;background:linear-gradient(135deg,' . $accentSoft . ',#ffffff)}
+            .brand-inner{display:flex;align-items:center;gap:14px}
+            .brand-logo{width:52px;height:52px;object-fit:cover;border-radius:14px;border:2px solid ' . $accentDark . ';background:#fff}
+            .brand-name{font-size:15px;font-weight:700;color:' . $accentDark . ';text-transform:uppercase;letter-spacing:.12em}
+            .brand-title{margin-top:3px;font-size:24px;font-weight:700;color:' . $accentDark . ';line-height:1.1}
+            .brand-subtitle{margin-top:4px;font-size:12px;color:#475569}
+            .title-row td,.subtitle-row td,.meta-row td{border:1px solid #000}
+            .title-cell{padding:14px 12px;text-align:center;font-size:24px;font-weight:700;color:' . $accentDark . ';letter-spacing:.5px;background:#f8fafc;white-space:nowrap}
+            .subtitle-cell{padding:8px 12px;text-align:center;font-size:12px;color:#6b7280;background:#fff}
+            .meta-cell{padding:8px 12px;text-align:center;font-size:12px;color:#374151;background:#f9fafb}
+            .summary-table{width:100%;border-collapse:collapse;margin:14px 0 18px}
+            .summary-title{padding:10px 12px;border:2px solid #000;background:' . $accentSoft . ';color:' . $accentDark . ';font-weight:700;text-transform:uppercase}
+            .summary-grid{width:100%;border-collapse:collapse}
+            .summary-grid td{border:1px solid #000;padding:10px 12px;background:#fff}
+            .summary-label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em}
+            .summary-value{margin-top:4px;font-size:18px;font-weight:700;color:' . $accentDark . '}
             table{width:100%;border-collapse:collapse;border:2px solid #000;background:#fff}
             th,td{border:1px solid #000;padding:8px 10px;font-size:12px;vertical-align:top}
-            thead th{background:' . $accent . ';color:#fff;font-weight:700;text-transform:uppercase;text-align:center}
+            thead th{background:' . $accentDark . ';color:#fff;font-weight:700;text-transform:uppercase;text-align:center}
             tbody td{background:#fffdf8}
             tbody tr:nth-child(even) td{background:#f6f7f9}
-            .meta{display:flex;justify-content:space-between;gap:16px;margin-bottom:12px;font-size:12px;color:#374151}
         </style></head><body><div class="sheet">';
-        $html .= '<h1 class="title">' . $safeTitle . '</h1>';
-        $html .= '<p class="subtitle">Reporte generado el ' . $generatedAt . '</p>';
-        $html .= '<div class="meta"><span>Formato listo para imprimir y revisar</span><span>Bordes negros y celdas claras</span></div>';
+        $html .= '<table class="brand-table">';
+        $html .= '<tr><td class="brand-top">';
+        $html .= '<div class="brand-inner">';
+        if ($logoDataUri !== '') {
+            $html .= '<img src="' . $logoDataUri . '" class="brand-logo" alt="Logo">';
+        }
+        $html .= '<div>';
+        $html .= '<div class="brand-name">' . $brandName . '</div>';
+        $html .= '<div class="brand-title">' . $safeTitle . '</div>';
+        $html .= '<div class="brand-subtitle">Reporte generado el ' . $generatedAt . '</div>';
+        $html .= '</div></div></td></tr>';
+        $html .= '</table>';
+
+        if (!empty($summary)) {
+            $html .= '<table class="summary-table">';
+            $html .= '<tr><td colspan="' . $colspan . '" class="summary-title">Resumen general</td></tr>';
+            $html .= '<tr><td>';
+            $html .= '<table class="summary-grid"><tr>';
+            foreach ($summary as $item) {
+                $html .= '<td><div class="summary-label">' . htmlspecialchars($item['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
+                $html .= '<div class="summary-value">' . htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div></td>';
+            }
+            $html .= '</tr></table>';
+            $html .= '</td></tr>';
+            $html .= '</table>';
+        }
+
         $html .= '<table><thead><tr>';
 
         foreach ($headers as $header) {
@@ -829,6 +888,61 @@ class AdminWebController extends Controller
         $html .= '</tbody></table></div></body></html>';
 
         return $html;
+    }
+
+    private function reportLogoDataUri(): string
+    {
+        $path = public_path('images/logos/logo 1.png');
+        if (!is_file($path)) {
+            return '';
+        }
+
+        $mime = mime_content_type($path) ?: 'image/png';
+        $data = base64_encode((string) file_get_contents($path));
+
+        return 'data:' . $mime . ';base64,' . $data;
+    }
+
+    private function buildReportSummary(string $reportKey, array $headers, array $rows): array
+    {
+        $summary = [
+            [
+                'label' => 'Registros',
+                'value' => number_format(count($rows)),
+            ],
+        ];
+
+        $numericColumns = [];
+        foreach ($headers as $index => $header) {
+            $normalized = mb_strtolower(trim((string) $header));
+            if (preg_match('/(total|subtotal|cantidad|stock|importe|monto|ventas)/u', $normalized)) {
+                $numericColumns[] = $index;
+            }
+        }
+
+        foreach (array_slice($numericColumns, 0, 3) as $index) {
+            $sum = 0.0;
+            foreach ($rows as $row) {
+                $value = $row[$index] ?? '';
+                if (is_numeric($value)) {
+                    $sum += (float) $value;
+                }
+            }
+
+            $summary[] = [
+                'label' => (string) ($headers[$index] ?? 'Valor'),
+                'value' => 'S/ ' . number_format($sum, 2),
+            ];
+        }
+
+        if ($reportKey === 'reservas') {
+            $summary[] = [
+                'label' => 'Nota',
+                'value' => 'Reporte de reservas',
+            ];
+        }
+
+        return array_slice($summary, 0, 4);
     }
 
     private function normalizeReportRows(array $rows): array
