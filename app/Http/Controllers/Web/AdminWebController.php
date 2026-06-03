@@ -699,10 +699,10 @@ class AdminWebController extends Controller
             return back()->with('error', 'El archivo exportado esta vacio.');
         }
 
-        $xml = $this->renderSpreadsheetXmlReport($report['title'], $report['accent'], $rows);
+        $html = $this->renderExcelHtmlReport($report['title'], $report['accent'], $rows);
 
-        return response($xml, 200, [
-            'Content-Type' => 'application/xml; charset=UTF-8',
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $report['filename'] . '"',
         ]);
     }
@@ -713,27 +713,27 @@ class AdminWebController extends Controller
             'reservas/admin/exportar' => [
                 'title' => 'REPORTE DE RESERVAS',
                 'accent' => '#7c3aed',
-                'filename' => 'reporte-reservas-' . now()->format('Y-m-d') . '.xml',
+                'filename' => 'reporte-reservas-' . now()->format('Y-m-d') . '.xls',
             ],
             'almacen/admin/exportar' => [
                 'title' => 'REPORTE DE ALMACEN',
                 'accent' => '#334155',
-                'filename' => 'reporte-almacen-' . now()->format('Y-m-d') . '.xml',
+                'filename' => 'reporte-almacen-' . now()->format('Y-m-d') . '.xls',
             ],
             'reportes/admin/exportar/pedidos' => [
                 'title' => 'REPORTE DE PEDIDOS',
                 'accent' => '#2563eb',
-                'filename' => 'reporte-pedidos-' . now()->format('Y-m-d') . '.xml',
+                'filename' => 'reporte-pedidos-' . now()->format('Y-m-d') . '.xls',
             ],
             'reportes/admin/exportar/productos' => [
                 'title' => 'REPORTE DE PRODUCTOS',
                 'accent' => '#16a34a',
-                'filename' => 'reporte-productos-' . now()->format('Y-m-d') . '.xml',
+                'filename' => 'reporte-productos-' . now()->format('Y-m-d') . '.xls',
             ],
             default => [
                 'title' => 'REPORTE DE VENTAS',
                 'accent' => '#f97316',
-                'filename' => 'reporte-ventas-' . now()->format('Y-m-d') . '.xml',
+                'filename' => 'reporte-ventas-' . now()->format('Y-m-d') . '.xls',
             ],
         };
     }
@@ -766,7 +766,7 @@ class AdminWebController extends Controller
         return $rows;
     }
 
-    private function renderSpreadsheetXmlReport(string $title, string $accent, array $rows): string
+    private function renderExcelHtmlReport(string $title, string $accent, array $rows): string
     {
         $headers = array_shift($rows) ?? [];
         $headers = array_map(
@@ -774,114 +774,46 @@ class AdminWebController extends Controller
             $headers
         );
 
-        $safeTitle = $this->xmlEscape($title);
-        $accent = $this->xmlEscape($accent);
-        $generatedAt = $this->xmlEscape(now()->format('d/m/Y H:i'));
-        $colCount = max(1, count($headers));
-        $lastColumn = $this->excelColumnName($colCount);
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accent = htmlspecialchars($accent, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $generatedAt = htmlspecialchars(now()->format('d/m/Y H:i'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-        $styles = '
-            <Styles>
-                <Style ss:ID="Default" ss:Name="Normal">
-                    <Alignment ss:Vertical="Center"/>
-                    <Font ss:FontName="Arial" ss:Size="10"/>
-                </Style>
-                <Style ss:ID="Title">
-                    <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-                    <Font ss:FontName="Arial" ss:Size="16" ss:Bold="1" ss:Color="' . $accent . '"/>
-                    <Interior ss:Color="#F7F7F7" ss:Pattern="Solid"/>
-                    <Borders>
-                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-                    </Borders>
-                </Style>
-                <Style ss:ID="Subtitle">
-                    <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-                    <Font ss:FontName="Arial" ss:Size="10" ss:Color="#666666"/>
-                </Style>
-                <Style ss:ID="TableHeader">
-                    <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
-                    <Font ss:FontName="Arial" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>
-                    <Interior ss:Color="' . $accent . '" ss:Pattern="Solid"/>
-                    <Borders>
-                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                    </Borders>
-                </Style>
-                <Style ss:ID="TableCell">
-                    <Alignment ss:Vertical="Center" ss:WrapText="1"/>
-                    <Font ss:FontName="Arial" ss:Size="10"/>
-                    <Interior ss:Color="#FFFDF8" ss:Pattern="Solid"/>
-                    <Borders>
-                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                    </Borders>
-                </Style>
-                <Style ss:ID="TableCellAlt">
-                    <Alignment ss:Vertical="Center" ss:WrapText="1"/>
-                    <Font ss:FontName="Arial" ss:Size="10"/>
-                    <Interior ss:Color="#F6F7F9" ss:Pattern="Solid"/>
-                    <Borders>
-                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                    </Borders>
-                </Style>
-            </Styles>';
+        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        $html .= '<style>
+            body{font-family:Arial,Helvetica,sans-serif;background:#f7f7f7;color:#111;margin:0;padding:24px}
+            .sheet{max-width:1400px;margin:0 auto;background:#fff;padding:24px;border:1px solid #d1d5db}
+            .title{margin:0 0 8px;text-align:center;font-size:24px;font-weight:700;color:' . $accent . ';letter-spacing:.5px}
+            .subtitle{margin:0 0 18px;text-align:center;font-size:12px;color:#6b7280}
+            table{width:100%;border-collapse:collapse;border:2px solid #000;background:#fff}
+            th,td{border:1px solid #000;padding:8px 10px;font-size:12px;vertical-align:top}
+            thead th{background:' . $accent . ';color:#fff;font-weight:700;text-transform:uppercase;text-align:center}
+            tbody td{background:#fffdf8}
+            tbody tr:nth-child(even) td{background:#f6f7f9}
+            .meta{display:flex;justify-content:space-between;gap:16px;margin-bottom:12px;font-size:12px;color:#374151}
+        </style></head><body><div class="sheet">';
+        $html .= '<h1 class="title">' . $safeTitle . '</h1>';
+        $html .= '<p class="subtitle">Reporte generado el ' . $generatedAt . '</p>';
+        $html .= '<div class="meta"><span>Formato listo para imprimir y revisar</span><span>Bordes negros y celdas claras</span></div>';
+        $html .= '<table><thead><tr>';
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<?mso-application progid="Excel.Sheet"?>';
-        $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ';
-        $xml .= 'xmlns:o="urn:schemas-microsoft-com:office:office" ';
-        $xml .= 'xmlns:x="urn:schemas-microsoft-com:office:excel" ';
-        $xml .= 'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" ';
-        $xml .= 'xmlns:html="http://www.w3.org/TR/REC-html40">';
-        $xml .= $styles;
-        $xml .= '<Worksheet ss:Name="' . $safeTitle . '">';
-        $xml .= '<Table ss:ExpandedColumnCount="' . $colCount . '" ss:ExpandedRowCount="' . (count($rows) + 3) . '" x:FullColumns="1" x:FullRows="1">';
-        $xml .= '<Column ss:AutoFitWidth="1" ss:Width="130"/>';
-        for ($i = 2; $i <= $colCount; $i++) {
-            $xml .= '<Column ss:AutoFitWidth="1" ss:Width="120"/>';
-        }
-
-        $xml .= '<Row ss:Height="26">';
-        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Title"><Data ss:Type="String">' . $safeTitle . '</Data></Cell>';
-        $xml .= '</Row>';
-        $xml .= '<Row ss:Height="18">';
-        $xml .= '<Cell ss:MergeAcross="' . ($colCount - 1) . '" ss:StyleID="Subtitle"><Data ss:Type="String">Reporte generado el ' . $generatedAt . '</Data></Cell>';
-        $xml .= '</Row>';
-
-        $xml .= '<Row>';
         foreach ($headers as $header) {
-            $xml .= '<Cell ss:StyleID="TableHeader"><Data ss:Type="String">' . $this->xmlEscape((string) $header) . '</Data></Cell>';
+            $html .= '<th>' . htmlspecialchars((string) $header, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</th>';
         }
-        $xml .= '</Row>';
 
-        foreach ($rows as $rowIndex => $row) {
-            $xml .= '<Row>';
+        $html .= '</tr></thead><tbody>';
+
+        foreach ($rows as $row) {
+            $html .= '<tr>';
             foreach ($headers as $index => $header) {
                 $value = $this->normalizeReportCell($row[$index] ?? '');
-                $styleId = $rowIndex % 2 === 0 ? 'TableCell' : 'TableCellAlt';
-                $dataType = is_numeric($value) && !preg_match('/^0\d+$/', (string) $value) ? 'Number' : 'String';
-                $xml .= '<Cell ss:StyleID="' . $styleId . '"><Data ss:Type="' . $dataType . '">' . $this->xmlEscape((string) $value) . '</Data></Cell>';
+                $html .= '<td>' . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</td>';
             }
-            $xml .= '</Row>';
+            $html .= '</tr>';
         }
 
-        $xml .= '</Table>';
-        $xml .= '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">';
-        $xml .= '<Selected/>';
-        $xml .= '<ProtectObjects>False</ProtectObjects>';
-        $xml .= '<ProtectScenarios>False</ProtectScenarios>';
-        $xml .= '</WorksheetOptions>';
-        $xml .= '</Worksheet>';
-        $xml .= '</Workbook>';
+        $html .= '</tbody></table></div></body></html>';
 
-        return $xml;
+        return $html;
     }
 
     private function normalizeReportCell(mixed $value): string
@@ -907,23 +839,6 @@ class AdminWebController extends Controller
         }
 
         return $text;
-    }
-
-    private function xmlEscape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
-
-    private function excelColumnName(int $index): string
-    {
-        $name = '';
-        while ($index > 0) {
-            $index--;
-            $name = chr(65 + ($index % 26)) . $name;
-            $index = intdiv($index, 26);
-        }
-
-        return $name;
     }
 
     private function mapCategories(Collection $categories): Collection
