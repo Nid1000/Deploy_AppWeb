@@ -42,7 +42,7 @@
                 <a href="{{ route('web.home') }}" class="navbar-brand">
                     <img src="{{ asset('images/logos/logo 1.png') }}" alt="Delicias" class="h-12 w-12 rounded-[1.25rem] object-cover ring-1 ring-amber-200 shadow-md shadow-amber-100/50">
                     <div>
-                        <h1 class="text-xl font-semibold text-stone-900">Delicias del</h1>
+                        <h1 class="text-xl font-semibold text-stone-900">Delicias del centro</h1>
                     </div>
                 </a>
 
