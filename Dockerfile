@@ -77,9 +77,9 @@ ENV APP_ENV=production \
     LOG_CHANNEL=stderr \
     DB_CONNECTION=sqlite \
     DB_DATABASE=/var/www/html/database/database.sqlite \
-    PORT=8000
+    PORT=6000
 
-EXPOSE 8000
+EXPOSE 6000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-6000}"]

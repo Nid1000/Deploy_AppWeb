@@ -54,13 +54,13 @@ php artisan serve --host=0.0.0.0 --port=3000
 
 ## Despliegue con Docker en Coolify
 
-El proyecto incluye un `Dockerfile` listo para construir la aplicacion Laravel, compilar los assets de Vite y exponer el servicio por el puerto `8000`.
+El proyecto incluye un `Dockerfile` listo para construir la aplicacion Laravel, compilar los assets de Vite y exponer el servicio por el puerto `6000`.
 
 En Coolify:
 
 1. Crea un nuevo recurso desde tu repositorio de GitHub.
 2. Selecciona despliegue con `Dockerfile`.
-3. Usa el puerto `8000` o define la variable `PORT=8000`.
+3. Usa el puerto `6000` o define la variable `PORT=6000`.
 4. Configura las variables de entorno tomando como base `.env.example`.
 5. Genera `APP_KEY` localmente con:
 
