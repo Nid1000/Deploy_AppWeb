@@ -6,6 +6,7 @@ next-env.d.ts
 .phpunit.cache/
 .env
 .env.*
+!.env.example
 vendor/
 public/error_log
 public/build.zip
