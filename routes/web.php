@@ -24,6 +24,10 @@ Route::post('/carrito/vaciar', [CartWebController::class, 'clear'])->name('web.c
 Route::get('/login', [AuthWebController::class, 'showLogin'])->name('web.login');
 Route::post('/login', [AuthWebController::class, 'login'])->name('web.login.submit');
 Route::get('/register', [AuthWebController::class, 'showRegister'])->name('web.register');
+Route::post('/register/email/send-code', [AuthWebController::class, 'sendRegistrationCode'])->name('web.register.email.send-code');
+Route::post('/register/email/verify-code', [AuthWebController::class, 'verifyRegistrationCode'])->name('web.register.email.verify-code');
+Route::get('/register/google', [AuthWebController::class, 'redirectToGoogle'])->name('web.register.google.redirect');
+Route::get('/register/google/callback', [AuthWebController::class, 'handleGoogleCallback'])->name('web.register.google.callback');
 Route::post('/register', [AuthWebController::class, 'register'])->name('web.register.submit');
 Route::post('/logout', [AuthWebController::class, 'logout'])->name('web.logout');
 

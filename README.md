@@ -15,6 +15,20 @@ La interfaz Blade usa:
 - `resources/css/app.css` para estilos
 - `app/Services/BackendApiClient.php` para consumir el backend
 
+## Registro con correo real
+
+El frontend ahora puede:
+
+- enviar un codigo de verificacion por correo antes del alta
+- validar cuentas Gmail reales usando Google OAuth
+- completar el registro web solo cuando el correo ya fue verificado
+
+Importante:
+
+- esta validacion ocurre en el `frontend`
+- la creacion final del usuario sigue delegada al backend en `auth/register`
+- el login completo con Google como reemplazo de password requerira tambien soporte equivalente en el backend API
+
 ## Puertos
 
 - Frontend Laravel: `http://127.0.0.1:3000`
@@ -70,6 +84,22 @@ php artisan key:generate --show
 
 6. Ajusta `APP_URL` al dominio publico de Coolify.
 7. Ajusta `BACKEND_API_BASE_URL` a la URL accesible de tu backend API. No uses `127.0.0.1` si el backend esta en otro contenedor o servicio.
+8. Si usaras Resend para correos reales, configura:
+
+```env
+MAIL_MAILER=resend
+MAIL_FROM_ADDRESS=no-reply@tudominio.com
+MAIL_FROM_NAME="${APP_NAME}"
+RESEND_API_KEY=re_xxx
+```
+
+9. Si usaras Google para traer un Gmail verificado, configura:
+
+```env
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=https://tu-dominio.com/register/google/callback
+```
 
 Si vas a usar SQLite, crea un volumen persistente para `/var/www/html/database` y deja:
 

@@ -27,6 +27,10 @@
             <button type="submit" class="w-full rounded-2xl bg-stone-900 px-4 py-3 font-semibold text-white">Ingresar</button>
         </form>
 
+        <a href="{{ route('web.register.google.redirect') }}" class="mt-4 inline-flex w-full items-center justify-center rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm font-semibold text-stone-800 transition hover:border-stone-400 hover:bg-stone-100">
+            Crear cuenta con Google
+        </a>
+
         <p class="mt-5 text-sm text-stone-600">
             No tienes cuenta?
             <a href="{{ route('web.register') }}" class="font-semibold text-amber-700 underline underline-offset-4">Registrate</a>
