@@ -37,6 +37,9 @@
                 <div>
                     <label for="verification_email" class="mb-1 block text-sm font-medium text-stone-700">Tu correo real</label>
                     <input id="verification_email" name="email" type="email" value="{{ $prefillEmail }}" required class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-amber-500" @disabled($isVerified) placeholder="tu@email.com">
+                    @error('email')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <button type="submit" class="w-full rounded-2xl border border-amber-300 bg-white px-4 py-3 font-semibold text-amber-800 @if($isVerified) opacity-60 @endif" @disabled($isVerified)>
                     {{ $isVerified ? 'Correo ya verificado' : 'Enviar codigo por correo' }}
@@ -48,6 +51,9 @@
                 <div>
                     <label for="verification_code" class="mb-1 block text-sm font-medium text-stone-700">Codigo de verificacion</label>
                     <input id="verification_code" name="verification_code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-amber-500" placeholder="123456" @disabled($isVerified)>
+                    @error('verification_code')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <input type="hidden" name="email" value="{{ $prefillEmail }}">
                 <button type="submit" class="w-full rounded-2xl bg-stone-900 px-4 py-3 font-semibold text-white @if($isVerified) opacity-60 @endif" @disabled($isVerified)>
