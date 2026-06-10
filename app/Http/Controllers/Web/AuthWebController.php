@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Mail\RegistroCodigoVerificacionMail;
 use App\Services\BackendApiClient;
 use App\Support\PasswordRules;
+use Throwable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -134,10 +136,44 @@ class AuthWebController extends Controller
             'email.email' => 'Ingresa un email valido.',
         ]);
 
+        $mailer = (string) config('mail.default');
+        $fromAddress = (string) config('mail.from.address');
+
+        if (in_array($mailer, ['log', 'array'], true)) {
+            return back()
+                ->withInput($request->except('_token'))
+                ->withErrors(['email' => 'El servidor sigue usando un mailer de prueba. Configura MAIL_MAILER=resend y limpia la cache de configuracion.']);
+        }
+
+        if ($fromAddress === '' || str_contains($fromAddress, 'example.com')) {
+            return back()
+                ->withInput($request->except('_token'))
+                ->withErrors(['email' => 'La direccion remitente del servidor no esta configurada correctamente. Revisa MAIL_FROM_ADDRESS.']);
+        }
+
         $code = (string) random_int(100000, 999999);
         $expiresAt = now()->addMinutes(15);
 
-        Mail::to($data['email'])->send(new RegistroCodigoVerificacionMail($code, $expiresAt));
+        try {
+            Mail::to($data['email'])->send(new RegistroCodigoVerificacionMail($code, $expiresAt));
+        } catch (Throwable $exception) {
+            Log::error('No se pudo enviar el codigo de verificacion por correo.', [
+                'mailer' => $mailer,
+                'from_address' => $fromAddress,
+                'to' => $data['email'],
+                'error' => $exception->getMessage(),
+            ]);
+
+            return back()
+                ->withInput($request->except('_token'))
+                ->withErrors(['email' => 'No se pudo enviar el correo de verificacion. Revisa la configuracion del mailer o los logs del servidor.']);
+        }
+
+        Log::info('Codigo de verificacion enviado.', [
+            'mailer' => $mailer,
+            'from_address' => $fromAddress,
+            'to' => $data['email'],
+        ]);
 
         $request->session()->put(self::EMAIL_VERIFICATION_SESSION_KEY, [
             'email' => $data['email'],
