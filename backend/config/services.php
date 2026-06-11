@@ -39,4 +39,16 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
     ],
 
+    'jwt' => [
+        'secret' => env('JWT_SECRET'),
+    ],
+
+    'frontend' => [
+        'url' => env('FRONTEND_URL', 'https://delicias.saborcentral.com'),
+    ],
+
+    'password_reset' => [
+        'ttl_minutes' => (int) env('PASSWORD_RESET_TTL_MINUTES', 30),
+    ],
+
 ];

@@ -110,6 +110,93 @@ class AuthWebController extends Controller
         return redirect()->route('web.home')->with('success', 'Bienvenido de nuevo.');
     }
 
+    public function showForgotPassword(Request $request): View|RedirectResponse
+    {
+        if ($request->session()->has('web_user')) {
+            return redirect()->route('web.home');
+        }
+
+        return view('web.auth.forgot-password');
+    }
+
+    public function sendPasswordResetLink(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'max:191'],
+        ], [
+            'email.required' => 'El email es obligatorio.',
+            'email.email' => 'Ingresa un email valido.',
+        ]);
+
+        try {
+            $response = $this->api->post('auth/password/forgot', $data);
+        } catch (Throwable $exception) {
+            Log::error('No se pudo solicitar el enlace de recuperacion.', [
+                'error' => $exception->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['email' => 'No se pudo conectar con el servidor. Intenta nuevamente.']);
+        }
+
+        if (!$response->successful()) {
+            return back()
+                ->withInput()
+                ->withErrors(['email' => $this->api->errorMessage($response, 'No se pudo procesar la solicitud.')]);
+        }
+
+        return back()->with(
+            'success',
+            'Si el correo pertenece a una cuenta activa, recibiras un enlace para crear una nueva contrasena.'
+        );
+    }
+
+    public function showResetPassword(Request $request): View
+    {
+        return view('web.auth.reset-password', [
+            'token' => (string) $request->query('token', ''),
+        ]);
+    }
+
+    public function resetPassword(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'token' => ['required', 'string', 'max:4096'],
+            'password' => ['required', 'confirmed', PasswordRules::userPassword()],
+        ], [
+            'token.required' => 'El enlace de recuperacion no es valido.',
+            'password.confirmed' => 'La confirmacion de contrasena no coincide.',
+        ]);
+
+        try {
+            $response = $this->api->post('auth/password/reset', $data);
+        } catch (Throwable $exception) {
+            Log::error('No se pudo restablecer la contrasena.', [
+                'error' => $exception->getMessage(),
+            ]);
+
+            return back()
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->withErrors(['password' => 'No se pudo conectar con el servidor. Intenta nuevamente.']);
+        }
+
+        if (!$response->successful()) {
+            return back()
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->withErrors([
+                    'password' => $this->api->errorMessage(
+                        $response,
+                        'El enlace es invalido, ya fue utilizado o ha vencido.'
+                    ),
+                ]);
+        }
+
+        return redirect()
+            ->route('web.login')
+            ->with('success', 'Tu contrasena fue actualizada. Ya puedes iniciar sesion.');
+    }
+
     public function showRegister(Request $request): View|RedirectResponse
     {
         if ($request->session()->has('web_user')) {

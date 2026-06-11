@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\JwtService;
+use App\Support\PasswordRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -279,6 +281,108 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'email' => ['required', 'email', 'max:191'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'statusCode' => 400,
+                'error' => 'Datos invalidos',
+                'message' => 'Ingresa un correo valido',
+                'details' => $e->errors(),
+            ], 400);
+        }
+
+        $email = mb_strtolower(trim((string) $data['email']));
+        $user = DB::table('usuarios')
+            ->select(['id', 'nombre', 'email', 'password', 'activo'])
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->first();
+
+        if ($user && (bool) $user->activo) {
+            $ttlMinutes = max(5, (int) config('services.password_reset.ttl_minutes', 30));
+            $token = app(JwtService::class)->sign([
+                'purpose' => 'password_reset',
+                'user_id' => (int) $user->id,
+                'password_fingerprint' => hash('sha256', (string) $user->password),
+            ], $ttlMinutes * 60);
+
+            $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
+            $resetUrl = $frontendUrl . '/password/reset?' . http_build_query(['token' => $token]);
+
+            $this->sendPasswordResetEmail(
+                (string) $user->email,
+                (string) $user->nombre,
+                $resetUrl,
+                $ttlMinutes
+            );
+        }
+
+        return response()->json([
+            'statusCode' => 200,
+            'message' => 'Si el correo pertenece a una cuenta activa, recibiras un enlace para restablecer tu contrasena.',
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'token' => ['required', 'string', 'max:4096'],
+                'password' => ['required', 'confirmed', PasswordRules::userPassword()],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'statusCode' => 422,
+                'error' => 'Datos invalidos',
+                'message' => 'Revisa la nueva contrasena',
+                'details' => $e->errors(),
+            ], 422);
+        }
+
+        try {
+            $payload = app(JwtService::class)->verify($data['token']);
+        } catch (\Throwable) {
+            return $this->invalidPasswordResetToken();
+        }
+
+        if (($payload['purpose'] ?? null) !== 'password_reset') {
+            return $this->invalidPasswordResetToken();
+        }
+
+        $user = DB::table('usuarios')
+            ->select(['id', 'password', 'activo'])
+            ->where('id', (int) ($payload['user_id'] ?? 0))
+            ->first();
+
+        $expectedFingerprint = hash('sha256', (string) ($user->password ?? ''));
+        $receivedFingerprint = (string) ($payload['password_fingerprint'] ?? '');
+
+        if (
+            !$user
+            || !(bool) $user->activo
+            || $receivedFingerprint === ''
+            || !hash_equals($expectedFingerprint, $receivedFingerprint)
+        ) {
+            return $this->invalidPasswordResetToken();
+        }
+
+        DB::table('usuarios')
+            ->where('id', (int) $user->id)
+            ->update([
+                'password' => Hash::make($data['password']),
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'statusCode' => 200,
+            'message' => 'Tu contrasena fue actualizada. Ya puedes iniciar sesion.',
+        ]);
+    }
+
     public function adminLogin(Request $request)
     {
         try {
@@ -407,5 +511,69 @@ class AuthController extends Controller
                 'numero_casa' => $user->numero_casa,
             ],
         ], 200);
+    }
+
+    private function invalidPasswordResetToken()
+    {
+        return response()->json([
+            'statusCode' => 422,
+            'error' => 'Enlace invalido',
+            'message' => 'El enlace es invalido, ya fue utilizado o ha vencido.',
+        ], 422);
+    }
+
+    private function sendPasswordResetEmail(
+        string $email,
+        string $name,
+        string $resetUrl,
+        int $ttlMinutes
+    ): void {
+        $apiKey = trim((string) config('services.resend.key'));
+        $fromAddress = trim((string) config('mail.from.address'));
+        $fromName = trim((string) config('mail.from.name', 'Delicias del centro'));
+
+        if ($apiKey === '' || $fromAddress === '' || str_contains($fromAddress, 'example.com')) {
+            Log::error('Password reset email is not configured.', [
+                'has_resend_key' => $apiKey !== '',
+                'from_address' => $fromAddress,
+            ]);
+
+            return;
+        }
+
+        $safeName = htmlspecialchars($name !== '' ? $name : 'cliente', ENT_QUOTES, 'UTF-8');
+        $safeUrl = htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8');
+        $html = <<<HTML
+            <div style="font-family:Arial,sans-serif;color:#292524;line-height:1.6">
+                <h2>Restablece tu contrasena</h2>
+                <p>Hola {$safeName}, recibimos una solicitud para cambiar la contrasena de tu cuenta.</p>
+                <p><a href="{$safeUrl}" style="display:inline-block;padding:12px 20px;background:#1c1917;color:#fff;text-decoration:none;border-radius:10px">Crear nueva contrasena</a></p>
+                <p>Este enlace vence en {$ttlMinutes} minutos y solo puede utilizarse una vez.</p>
+                <p>Si no solicitaste el cambio, ignora este correo.</p>
+            </div>
+            HTML;
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->acceptJson()
+                ->timeout(20)
+                ->post('https://api.resend.com/emails', [
+                    'from' => $fromName . ' <' . $fromAddress . '>',
+                    'to' => [$email],
+                    'subject' => 'Restablece tu contrasena',
+                    'html' => $html,
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Resend rejected the password reset email.', [
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Could not send password reset email.', [
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 }

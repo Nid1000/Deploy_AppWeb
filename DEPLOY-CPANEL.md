@@ -54,10 +54,40 @@ DB_USERNAME=USUARIO_ACTUAL
 DB_PASSWORD=CLAVE_ACTUAL
 JWT_SECRET=SECRETO_ACTUAL
 GOOGLE_CLIENT_ID=EL_MISMO_CLIENT_ID_DEL_FRONTEND
+FRONTEND_URL=https://delicias.saborcentral.com
+PASSWORD_RESET_TTL_MINUTES=30
+RESEND_API_KEY=LA_MISMA_CLAVE_RESEND_VALIDA
+MAIL_FROM_ADDRESS=CORREO_VERIFICADO_EN_RESEND
+MAIL_FROM_NAME="Delicias del centro"
 ```
 
 Conserva los demás tokens de facturación y correo del `.env` actual del API.
 Nunca subas ninguno de los dos archivos `.env` a Git.
+
+## Recuperacion de contrasena
+
+El despliegue FTP automatico excluye `/backend`, por lo que estos archivos se
+suben manualmente dentro de `public_html/api.saborcentral.com` conservando sus
+rutas:
+
+```text
+backend/app/Http/Controllers/AuthController.php -> app/Http/Controllers/AuthController.php
+backend/app/Services/JwtService.php              -> app/Services/JwtService.php
+backend/config/services.php                      -> config/services.php
+backend/routes/api.php                           -> routes/api.php
+```
+
+No reemplaces el `.env` del hosting. Agrega solo las variables indicadas arriba
+y conserva la base de datos, claves y tokens existentes.
+
+Despues ejecuta con PHP 8.3:
+
+```bash
+cd ~/public_html/api.saborcentral.com
+/opt/cpanel/ea-php83/root/usr/bin/php artisan config:clear
+/opt/cpanel/ea-php83/root/usr/bin/php artisan cache:clear
+/opt/cpanel/ea-php83/root/usr/bin/php artisan config:cache
+```
 
 ## Instalacion
 

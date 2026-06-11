@@ -24,6 +24,14 @@ Route::post('/carrito/vaciar', [CartWebController::class, 'clear'])->name('web.c
 Route::get('/login', [AuthWebController::class, 'showLogin'])->name('web.login');
 Route::post('/login', [AuthWebController::class, 'login'])->name('web.login.submit');
 Route::get('/login/google', [AuthWebController::class, 'redirectToGoogleLogin'])->name('web.login.google.redirect');
+Route::get('/password/forgot', [AuthWebController::class, 'showForgotPassword'])->name('web.password.forgot');
+Route::post('/password/forgot', [AuthWebController::class, 'sendPasswordResetLink'])
+    ->middleware('throttle:5,1')
+    ->name('web.password.email');
+Route::get('/password/reset', [AuthWebController::class, 'showResetPassword'])->name('web.password.reset');
+Route::post('/password/reset', [AuthWebController::class, 'resetPassword'])
+    ->middleware('throttle:10,1')
+    ->name('web.password.update');
 Route::get('/register', [AuthWebController::class, 'showRegister'])->name('web.register');
 Route::post('/register/email/send-code', [AuthWebController::class, 'sendRegistrationCode'])->name('web.register.email.send-code');
 Route::post('/register/email/verify-code', [AuthWebController::class, 'verifyRegistrationCode'])->name('web.register.email.verify-code');

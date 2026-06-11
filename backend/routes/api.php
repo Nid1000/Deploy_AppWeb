@@ -35,6 +35,8 @@ Route::get('/health', function () {
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/google', [AuthController::class, 'googleLogin']);
+Route::post('/auth/password/forgot', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
+Route::post('/auth/password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:10,1');
 Route::post('/auth/admin/login', [AuthController::class, 'adminLogin']);
 Route::get('/auth/verify', [AuthController::class, 'verify'])->middleware('jwt');
 

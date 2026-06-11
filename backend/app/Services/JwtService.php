@@ -16,7 +16,7 @@ class JwtService
             'exp' => $now + $ttlSeconds,
         ]);
 
-        $secret = env('JWT_SECRET');
+        $secret = config('services.jwt.secret');
         if (!$secret) {
             throw new \RuntimeException('JWT_SECRET no está configurado');
         }
@@ -26,7 +26,7 @@ class JwtService
 
     public function verify(string $token): array
     {
-        $secret = env('JWT_SECRET');
+        $secret = config('services.jwt.secret');
         if (!$secret) {
             throw new \RuntimeException('JWT_SECRET no está configurado');
         }
@@ -35,4 +35,3 @@ class JwtService
         return json_decode(json_encode($decoded), true);
     }
 }
-

@@ -15,7 +15,7 @@ class GoogleLoginTest extends TestCase
         parent::setUp();
 
         config()->set('services.google.client_id', 'frontend-client.apps.googleusercontent.com');
-        putenv('JWT_SECRET=test-jwt-secret-with-enough-random-characters');
+        config()->set('services.jwt.secret', 'test-jwt-secret-with-enough-random-characters');
 
         Schema::create('usuarios', function (Blueprint $table): void {
             $table->id();
@@ -35,7 +35,6 @@ class GoogleLoginTest extends TestCase
     protected function tearDown(): void
     {
         Schema::dropIfExists('usuarios');
-        putenv('JWT_SECRET');
 
         parent::tearDown();
     }
