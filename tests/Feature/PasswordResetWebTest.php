@@ -48,4 +48,26 @@ class PasswordResetWebTest extends TestCase
         Http::assertSent(fn ($request): bool => $request->url()
             === 'https://api.saborcentral.com/api/auth/password/forgot');
     }
+
+    public function test_reset_request_forwards_password_confirmation_to_backend(): void
+    {
+        Http::fake([
+            'https://api.saborcentral.com/api/auth/password/reset' => Http::response([
+                'message' => 'Contrasena actualizada',
+            ], 200),
+            '*' => Http::response([], 200),
+        ]);
+
+        $this->post('/password/reset', [
+            'token' => 'test-token',
+            'password' => 'NuevaClave1',
+            'password_confirmation' => 'NuevaClave1',
+        ])->assertRedirect(route('web.login'));
+
+        Http::assertSent(function ($request): bool {
+            return $request->url() === 'https://api.saborcentral.com/api/auth/password/reset'
+                && $request['password'] === 'NuevaClave1'
+                && $request['password_confirmation'] === 'NuevaClave1';
+        });
+    }
 }

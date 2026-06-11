@@ -164,6 +164,7 @@ class AuthWebController extends Controller
         $data = $request->validate([
             'token' => ['required', 'string', 'max:4096'],
             'password' => ['required', 'confirmed', PasswordRules::userPassword()],
+            'password_confirmation' => ['required', 'string'],
         ], [
             'token.required' => 'El enlace de recuperacion no es valido.',
             'password.confirmed' => 'La confirmacion de contrasena no coincide.',
