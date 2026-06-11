@@ -22,6 +22,8 @@ class AuthWebController extends Controller
     private const EMAIL_VERIFICATION_SESSION_KEY = 'web_registration_email_verification';
     private const GOOGLE_REGISTRATION_SESSION_KEY = 'web_registration_google_profile';
     private const GOOGLE_STATE_SESSION_KEY = 'web_google_oauth_state';
+    private const GOOGLE_INTENT_LOGIN = 'login';
+    private const GOOGLE_INTENT_REGISTER = 'register';
     private const DEFAULT_DISTRICTS = [
         ['id' => 1, 'nombre' => 'Huancayo'],
         ['id' => 2, 'nombre' => 'El Tambo'],
@@ -292,19 +294,33 @@ class AuthWebController extends Controller
         return redirect()->route('web.home')->with('success', 'Tu cuenta fue creada correctamente.');
     }
 
-    public function redirectToGoogle(Request $request): RedirectResponse
+    public function redirectToGoogleLogin(Request $request): RedirectResponse
+    {
+        return $this->redirectToGoogle($request, self::GOOGLE_INTENT_LOGIN);
+    }
+
+    public function redirectToGoogleRegistration(Request $request): RedirectResponse
+    {
+        return $this->redirectToGoogle($request, self::GOOGLE_INTENT_REGISTER);
+    }
+
+    private function redirectToGoogle(Request $request, string $intent): RedirectResponse
     {
         $clientId = trim((string) config('services.google.client_id'));
         $redirectUri = trim((string) config('services.google.redirect'));
+        $returnRoute = $intent === self::GOOGLE_INTENT_LOGIN ? 'web.login' : 'web.register';
 
         if ($clientId === '' || $redirectUri === '') {
             return redirect()
-                ->route('web.register')
+                ->route($returnRoute)
                 ->with('error', 'Google no esta configurado todavia. Completa las variables GOOGLE_CLIENT_ID y GOOGLE_REDIRECT_URI.');
         }
 
         $state = Str::random(40);
-        $request->session()->put(self::GOOGLE_STATE_SESSION_KEY, $state);
+        $request->session()->put(self::GOOGLE_STATE_SESSION_KEY, [
+            'value' => $state,
+            'intent' => $intent,
+        ]);
 
         $query = http_build_query([
             'client_id' => $clientId,
@@ -321,18 +337,25 @@ class AuthWebController extends Controller
 
     public function handleGoogleCallback(Request $request): RedirectResponse
     {
-        $expectedState = (string) $request->session()->pull(self::GOOGLE_STATE_SESSION_KEY, '');
+        $oauthState = $request->session()->pull(self::GOOGLE_STATE_SESSION_KEY, []);
+        $expectedState = is_array($oauthState) ? (string) ($oauthState['value'] ?? '') : '';
+        $intent = is_array($oauthState) ? (string) ($oauthState['intent'] ?? '') : '';
+        $returnRoute = $intent === self::GOOGLE_INTENT_LOGIN ? 'web.login' : 'web.register';
         $receivedState = (string) $request->query('state', '');
 
-        if ($expectedState === '' || !hash_equals($expectedState, $receivedState)) {
+        if (
+            !in_array($intent, [self::GOOGLE_INTENT_LOGIN, self::GOOGLE_INTENT_REGISTER], true)
+            || $expectedState === ''
+            || !hash_equals($expectedState, $receivedState)
+        ) {
             return redirect()
-                ->route('web.register')
+                ->route($returnRoute)
                 ->withErrors(['email' => 'No se pudo validar la sesion de Google. Intenta nuevamente.']);
         }
 
         if ($request->filled('error')) {
             return redirect()
-                ->route('web.register')
+                ->route($returnRoute)
                 ->withErrors(['email' => 'Google cancelo el acceso o no autorizo los permisos solicitados.']);
         }
 
@@ -349,10 +372,11 @@ class AuthWebController extends Controller
                 ->throw();
 
             $accessToken = (string) $tokenResponse->json('access_token', '');
-            if ($accessToken === '') {
+            $idToken = (string) $tokenResponse->json('id_token', '');
+            if ($accessToken === '' || $idToken === '') {
                 return redirect()
-                    ->route('web.register')
-                    ->withErrors(['email' => 'Google no devolvio un token de acceso valido.']);
+                    ->route($returnRoute)
+                    ->withErrors(['email' => 'Google no devolvio credenciales de acceso validas.']);
             }
 
             $profile = Http::withToken($accessToken)
@@ -363,7 +387,7 @@ class AuthWebController extends Controller
                 ->json();
         } catch (RequestException) {
             return redirect()
-                ->route('web.register')
+                ->route($returnRoute)
                 ->withErrors(['email' => 'No se pudo completar la validacion con Google en este momento.']);
         }
 
@@ -372,8 +396,12 @@ class AuthWebController extends Controller
 
         if ($email === '' || !$emailVerified) {
             return redirect()
-                ->route('web.register')
+                ->route($returnRoute)
                 ->withErrors(['email' => 'La cuenta de Google no devolvio un correo verificado.']);
+        }
+
+        if ($intent === self::GOOGLE_INTENT_LOGIN) {
+            return $this->loginWithGoogle($request, $idToken, $email);
         }
 
         $request->session()->put(self::GOOGLE_REGISTRATION_SESSION_KEY, [
@@ -396,6 +424,67 @@ class AuthWebController extends Controller
         return redirect()
             ->route('web.register')
             ->with('success', 'Tu correo fue validado con Google. Completa los datos faltantes para crear tu cuenta.');
+    }
+
+    private function loginWithGoogle(Request $request, string $idToken, string $email): RedirectResponse
+    {
+        try {
+            $response = $this->api->post('auth/google', [
+                'id_token' => $idToken,
+            ]);
+        } catch (Throwable $exception) {
+            Log::error('No se pudo conectar con el backend para iniciar sesion con Google.', [
+                'email' => $email,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('web.login')
+                ->withInput(['email' => $email])
+                ->withErrors(['email' => 'No se pudo iniciar sesion con Google en este momento.']);
+        }
+
+        if (!$response->successful()) {
+            return redirect()
+                ->route('web.login')
+                ->withInput(['email' => $email])
+                ->withErrors([
+                    'email' => $this->api->errorMessage(
+                        $response,
+                        'No existe una cuenta registrada con este correo. Registrate primero.'
+                    ),
+                ]);
+        }
+
+        $payload = (array) $response->json();
+        $user = (array) (data_get($payload, 'user') ?: data_get($payload, 'usuario', []));
+        $token = (string) (data_get($payload, 'token') ?: data_get($payload, 'access_token', ''));
+
+        if (!$this->validUserLoginPayload($user, $token, $email)) {
+            return redirect()
+                ->route('web.login')
+                ->withInput(['email' => $email])
+                ->withErrors(['email' => 'El backend no devolvio una sesion de Google valida.']);
+        }
+
+        $request->session()->put([
+            'web_user' => [
+                'id' => (int) $user['id'],
+                'nombre' => (string) ($user['nombre'] ?? ''),
+                'apellido' => (string) ($user['apellido'] ?? ''),
+                'email' => (string) $user['email'],
+                'telefono' => $user['telefono'] ?? null,
+                'direccion' => $user['direccion'] ?? null,
+                'distrito' => $user['distrito'] ?? null,
+                'numero_casa' => $user['numero_casa'] ?? null,
+            ],
+            'auth_token' => $token,
+            'auth_tipo' => 'usuario',
+        ]);
+        $request->session()->regenerate();
+        $this->clearRegistrationVerificationState($request);
+
+        return redirect()->route('web.home')->with('success', 'Sesion iniciada correctamente con Google.');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -437,5 +526,15 @@ class AuthWebController extends Controller
             self::GOOGLE_REGISTRATION_SESSION_KEY,
             self::GOOGLE_STATE_SESSION_KEY,
         ]);
+    }
+
+    private function validUserLoginPayload(array $user, string $token, ?string $expectedEmail = null): bool
+    {
+        $email = (string) ($user['email'] ?? '');
+
+        return $token !== ''
+            && (int) ($user['id'] ?? 0) > 0
+            && filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+            && ($expectedEmail === null || strcasecmp($email, $expectedEmail) === 0);
     }
 }
