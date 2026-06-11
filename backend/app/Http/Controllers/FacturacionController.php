@@ -295,6 +295,7 @@ class FacturacionController extends Controller
             'apellido_paterno' => $firstLastName,
             'apellido_materno' => $secondLastName,
             'nombre_completo' => $fullName,
+            'validacion' => $data['validacion'] ?? null,
             'raw' => $data,
         ], fn ($value) => $value !== null && $value !== '');
     }
@@ -309,6 +310,7 @@ class FacturacionController extends Controller
             'estado' => $data['estado'] ?? null,
             'condicion' => $data['condicion'] ?? null,
             'direccion' => $data['direccion'] ?? $data['direccion_completa'] ?? $data['domicilio_fiscal'] ?? $data['domicilio'] ?? null,
+            'validacion' => $data['validacion'] ?? null,
             'raw' => $data,
         ], fn ($value) => $value !== null && $value !== '');
     }
@@ -777,6 +779,10 @@ class FacturacionController extends Controller
             }
         }
 
+        $identidad = $data['tipo_documento'] === 'DNI'
+            ? $this->normalizeDniResponse($identidad)
+            : $this->normalizeRucResponse($identidad);
+
         $total = $this->toFloat($pedido->total);
         $fechaEmision = now()->format('Y-m-d H:i:s');
         $clienteNombre = '';
@@ -811,11 +817,7 @@ class FacturacionController extends Controller
             . '<div>Documento: <b>' . $data['tipo_documento'] . ' ' . htmlspecialchars($data['numero_documento']) . '</b></div>';
 
         if ($data['tipo_documento'] === 'DNI') {
-            $nombre = '';
-            if (is_array($identidad)) {
-                $nombre = trim(($identidad['first_name'] ?? '') . ' ' . ($identidad['first_last_name'] ?? '') . ' ' . ($identidad['second_last_name'] ?? ''));
-            }
-            $html .= '<div>Cliente: <b>' . htmlspecialchars($nombre !== '' ? $nombre : 'N/A') . '</b></div>';
+            $html .= '<div>Cliente: <b>' . htmlspecialchars($clienteNombre !== '' ? $clienteNombre : 'N/A') . '</b></div>';
             $html .= '<div>Verificado en RENIEC: <b>' . $verificadoTexto . '</b></div>';
         } else {
             $razon = '';

@@ -46,6 +46,23 @@ class ApiPeruDocumentTest extends TestCase
         });
     }
 
+    public function test_api_peru_camel_case_names_are_normalized(): void
+    {
+        Http::fake([
+            'https://dniruc.apisperu.com/api/v1/dni/76047284*' => Http::response([
+                'dni' => '76047284',
+                'nombres' => 'JUAN CARLOS',
+                'apellidoPaterno' => 'PEREZ',
+                'apellidoMaterno' => 'LOPEZ',
+            ]),
+        ]);
+
+        $this->withToken($this->userToken())
+            ->getJson('/api/facturacion/consulta-dni?numero=76047284')
+            ->assertOk()
+            ->assertJsonPath('data.nombre_completo', 'JUAN CARLOS PEREZ LOPEZ');
+    }
+
     private function userToken(): string
     {
         return app(JwtService::class)->sign([
