@@ -142,45 +142,36 @@ class FacturacionController extends Controller
 
     private function decolectaBaseUrl(): string
     {
-        return rtrim((string) env('DECOLECTA_BASE_URL', 'https://api.decolecta.com/v1'), '/');
+        return rtrim((string) config('services.documents.decolecta.base_url'), '/');
     }
 
     private function apiperuBaseUrl(): string
     {
-        return rtrim((string) env('APIPERU_BASE_URL', 'https://dniruc.apisperu.com/api/v1'), '/');
+        return rtrim((string) config('services.documents.apiperu.base_url'), '/');
     }
 
     private function documentValidationRequired(): bool
     {
-        return filter_var(env('DOCUMENT_VALIDATION_REQUIRED', true), FILTER_VALIDATE_BOOLEAN);
+        return (bool) config('services.documents.validation_required', true);
     }
 
     private function documentProvider(): string
     {
-        $provider = strtolower(trim((string) env('DOCUMENT_PROVIDER', '')));
+        $provider = strtolower(trim((string) config('services.documents.provider', 'apiperu')));
         if (in_array($provider, ['decolecta', 'apiperu'], true)) {
             return $provider;
         }
 
-        // Preferimos Decolecta por compatibilidad con WEBNIDA.
         $decolectaToken = $this->sanitizeToken((string) (
-            env('DECOLECTA_TOKEN', '')
-            ?: env('DECOLECTA_API_TOKEN', '')
-            ?: env('RENIEC_API_TOKEN', '')
-            ?: env('SUNAT_API_TOKEN', '')
-            ?: env('RENIEC_TOKEN', '')
-            ?: env('SUNAT_TOKEN', '')
+            config('services.documents.decolecta.token')
+            ?: config('services.documents.decolecta.reniec_token')
+            ?: config('services.documents.decolecta.sunat_token')
         ));
         if ($decolectaToken !== null) {
             return 'decolecta';
         }
 
-        $apiPeruToken = $this->sanitizeToken((string) (
-            env('APIPERU_TOKEN', '')
-            ?: env('APIPERU_API_TOKEN', '')
-        ));
-
-        return $apiPeruToken !== null ? 'apiperu' : 'decolecta';
+        return 'apiperu';
     }
 
     private function apiPeruToken(Request $request): ?string
@@ -188,8 +179,7 @@ class FacturacionController extends Controller
         $candidates = [
             (string) $request->header('X-ApiPeru-Token'),
             (string) $request->header('X-Api-Peru-Token'),
-            (string) env('APIPERU_TOKEN', ''),
-            (string) env('APIPERU_API_TOKEN', ''),
+            (string) config('services.documents.apiperu.token'),
         ];
 
         foreach ($candidates as $candidate) {
@@ -209,15 +199,14 @@ class FacturacionController extends Controller
             : (string) $request->header('X-Sunat-Token');
 
         $providerEnv = $provider === 'reniec'
-            ? (string) (env('RENIEC_API_TOKEN', '') ?: env('RENIEC_TOKEN', ''))
-            : (string) (env('SUNAT_API_TOKEN', '') ?: env('SUNAT_TOKEN', ''));
+            ? (string) config('services.documents.decolecta.reniec_token')
+            : (string) config('services.documents.decolecta.sunat_token');
 
         $candidates = [
             $providerHeader,
             (string) $request->header('X-Decolecta-Token'),
             $providerEnv,
-            (string) env('DECOLECTA_API_TOKEN', ''),
-            (string) env('DECOLECTA_TOKEN', ''),
+            (string) config('services.documents.decolecta.token'),
         ];
 
         foreach ($candidates as $candidate) {
@@ -346,7 +335,7 @@ class FacturacionController extends Controller
 
     private function decolectaVerifyOption()
     {
-        $envBundle = trim((string) env('CURL_CA_BUNDLE', ''));
+        $envBundle = trim((string) config('services.documents.ca_bundle'));
         if ($envBundle !== '' && is_file($envBundle)) {
             return $envBundle;
         }

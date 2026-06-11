@@ -51,4 +51,23 @@ return [
         'ttl_minutes' => (int) env('PASSWORD_RESET_TTL_MINUTES', 30),
     ],
 
+    'documents' => [
+        'provider' => env('DOCUMENT_PROVIDER', 'apiperu'),
+        'validation_required' => filter_var(
+            env('DOCUMENT_VALIDATION_REQUIRED', true),
+            FILTER_VALIDATE_BOOLEAN
+        ),
+        'apiperu' => [
+            'token' => env('APIPERU_TOKEN', env('APIPERU_API_TOKEN')),
+            'base_url' => env('APIPERU_BASE_URL', 'https://dniruc.apisperu.com/api/v1'),
+        ],
+        'decolecta' => [
+            'token' => env('DECOLECTA_TOKEN', env('DECOLECTA_API_TOKEN')),
+            'base_url' => env('DECOLECTA_BASE_URL', 'https://api.decolecta.com/v1'),
+            'reniec_token' => env('RENIEC_API_TOKEN', env('RENIEC_TOKEN')),
+            'sunat_token' => env('SUNAT_API_TOKEN', env('SUNAT_TOKEN')),
+        ],
+        'ca_bundle' => env('CURL_CA_BUNDLE'),
+    ],
+
 ];
