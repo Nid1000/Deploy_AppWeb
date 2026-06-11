@@ -147,8 +147,27 @@ class CheckoutWebController extends Controller
                 ->with('error', $this->api->errorMessage($invoiceResponse, 'No se pudo emitir el comprobante.'));
         }
 
+        $emailSent = data_get($invoiceResponse->json(), 'correo.enviado');
+        if ($emailSent === false) {
+            return redirect()->route('web.orders.show', $pedidoId)
+                ->with('success', 'Pedido creado y comprobante emitido correctamente.')
+                ->with(
+                    'error',
+                    (string) data_get(
+                        $invoiceResponse->json(),
+                        'correo.message',
+                        'El comprobante no pudo enviarse al correo registrado.'
+                    )
+                );
+        }
+
+        if ($emailSent !== true) {
+            return redirect()->route('web.orders.show', $pedidoId)
+                ->with('success', 'Pedido creado y comprobante emitido correctamente.');
+        }
+
         return redirect()->route('web.orders.show', $pedidoId)
-            ->with('success', 'Pedido creado y comprobante emitido correctamente.');
+            ->with('success', 'Pedido creado. El comprobante fue enviado a tu correo registrado.');
     }
 
     public function validateDocument(Request $request): JsonResponse

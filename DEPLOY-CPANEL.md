@@ -72,6 +72,8 @@ rutas:
 
 ```text
 backend/app/Http/Controllers/AuthController.php -> app/Http/Controllers/AuthController.php
+backend/app/Http/Controllers/FacturacionController.php -> app/Http/Controllers/FacturacionController.php
+backend/app/Services/ComprobanteEmailService.php -> app/Services/ComprobanteEmailService.php
 backend/app/Services/JwtService.php              -> app/Services/JwtService.php
 backend/config/services.php                      -> config/services.php
 backend/routes/api.php                           -> routes/api.php

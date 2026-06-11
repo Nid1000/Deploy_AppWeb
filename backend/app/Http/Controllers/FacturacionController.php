@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ComprobanteEmailService;
 use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,11 @@ use Illuminate\Validation\ValidationException;
 
 class FacturacionController extends Controller
 {
+    public function __construct(
+        private readonly ComprobanteEmailService $comprobanteEmail
+    ) {
+    }
+
     private function sanitizeToken(string $value): ?string
     {
         $token = trim($value);
@@ -911,9 +917,30 @@ class FacturacionController extends Controller
             'created_at' => now(),
         ]);
 
+        $usuario = DB::table('usuarios')
+            ->select(['nombre', 'apellido', 'email'])
+            ->where('id', $usuarioId)
+            ->first();
+
+        $correo = $usuario
+            ? $this->comprobanteEmail->send(
+                $usuario,
+                $pedido,
+                (string) $data['comprobante_tipo'],
+                $numeroFormateado,
+                $pdfAbs,
+                (int) $db
+            )
+            : [
+                'enviado' => false,
+                'message' => 'El comprobante fue emitido, pero no se encontro al usuario.',
+            ];
+
         return response()->json([
             'statusCode' => 200,
-            'message' => 'Comprobante emitido exitosamente',
+            'message' => $correo['enviado']
+                ? 'Comprobante emitido y enviado al correo registrado'
+                : 'Comprobante emitido exitosamente',
             'comprobante' => [
                 'id' => (int) $db,
                 'tipo' => (string) $data['comprobante_tipo'],
@@ -930,6 +957,7 @@ class FacturacionController extends Controller
                 'xml' => '/uploads/' . $xmlRel,
                 'img' => '/uploads/' . $svgRel,
             ],
+            'correo' => $correo,
         ], 200);
     }
 
