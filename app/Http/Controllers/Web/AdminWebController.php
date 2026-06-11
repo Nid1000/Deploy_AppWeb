@@ -221,8 +221,16 @@ class AdminWebController extends Controller
             return back()->withInput()->with('error', $this->api->errorMessage($response, 'No se pudo crear el producto.'));
         }
         $id = (int) data_get($response->json(), 'producto.id', 0);
+        $emailMessage = trim((string) data_get($response->json(), 'correo.message', ''));
 
-        return redirect()->route('web.admin.products.edit', $id)->with('success', 'Producto creado correctamente.');
+        return redirect()
+            ->route('web.admin.products.edit', $id)
+            ->with(
+                'success',
+                $emailMessage !== ''
+                    ? 'Producto creado correctamente. ' . $emailMessage
+                    : 'Producto creado correctamente.'
+            );
     }
 
     public function productsEdit(int $id): View

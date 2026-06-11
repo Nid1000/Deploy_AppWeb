@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\NewProductEmailService;
 use App\Services\NotificacionesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,8 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class ProductosController extends Controller
 {
-    public function __construct(private readonly NotificacionesService $notificaciones)
-    {
+    public function __construct(
+        private readonly NotificacionesService $notificaciones,
+        private readonly NewProductEmailService $productEmails
+    ) {
     }
 
     private function coerceBooleanInput(Request $request, string $key): void
@@ -259,10 +262,24 @@ class ProductosController extends Controller
             // No bloquear la creación si falla la notificación.
         }
 
+        try {
+            $correo = $this->productEmails->send($p);
+        } catch (\Throwable) {
+            $correo = [
+                'enabled' => true,
+                'sent' => 0,
+                'failed' => 0,
+                'message' => 'El producto fue creado, pero no se pudo iniciar el envio de correos.',
+            ];
+        }
+
         return response()->json([
             'statusCode' => 201,
-            'message' => 'Producto creado exitosamente',
+            'message' => $correo['sent'] > 0
+                ? 'Producto creado y clientes notificados por correo'
+                : 'Producto creado exitosamente',
             'producto' => $p,
+            'correo' => $correo,
         ], 201);
     }
 

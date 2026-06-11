@@ -56,6 +56,7 @@ JWT_SECRET=SECRETO_ACTUAL
 GOOGLE_CLIENT_ID=EL_MISMO_CLIENT_ID_DEL_FRONTEND
 FRONTEND_URL=https://delicias.saborcentral.com
 PASSWORD_RESET_TTL_MINUTES=30
+PRODUCT_EMAIL_NOTIFICATIONS_ENABLED=true
 RESEND_API_KEY=LA_MISMA_CLAVE_RESEND_VALIDA
 MAIL_FROM_ADDRESS=CORREO_VERIFICADO_EN_RESEND
 MAIL_FROM_NAME="Delicias del centro"
@@ -73,7 +74,9 @@ rutas:
 ```text
 backend/app/Http/Controllers/AuthController.php -> app/Http/Controllers/AuthController.php
 backend/app/Http/Controllers/FacturacionController.php -> app/Http/Controllers/FacturacionController.php
+backend/app/Http/Controllers/ProductosController.php -> app/Http/Controllers/ProductosController.php
 backend/app/Services/ComprobanteEmailService.php -> app/Services/ComprobanteEmailService.php
+backend/app/Services/NewProductEmailService.php -> app/Services/NewProductEmailService.php
 backend/app/Services/JwtService.php              -> app/Services/JwtService.php
 backend/config/services.php                      -> config/services.php
 backend/routes/api.php                           -> routes/api.php

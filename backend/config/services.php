@@ -51,6 +51,13 @@ return [
         'ttl_minutes' => (int) env('PASSWORD_RESET_TTL_MINUTES', 30),
     ],
 
+    'product_notifications' => [
+        'email_enabled' => filter_var(
+            env('PRODUCT_EMAIL_NOTIFICATIONS_ENABLED', true),
+            FILTER_VALIDATE_BOOLEAN
+        ),
+    ],
+
     'documents' => [
         'provider' => env('DOCUMENT_PROVIDER', 'apiperu'),
         'validation_required' => filter_var(
