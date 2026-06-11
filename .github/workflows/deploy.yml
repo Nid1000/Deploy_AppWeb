@@ -34,6 +34,8 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
+            backend/**
+            DEPLOY-CPANEL.md
             **/node_modules/**
             **/tests/**
             **/.env

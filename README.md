@@ -4,9 +4,17 @@ Este `frontend` es la aplicacion web en Laravel que conserva el diseno del siste
 
 ## Arquitectura
 
-- `frontend/`: interfaz web Laravel + Blade + Vite
-- `backend/`: API Laravel en `http://127.0.0.1:5001`
+- `/`: interfaz web Laravel + Blade + Vite
+- `/backend`: API Laravel independiente
 - Conexion API: `BACKEND_API_BASE_URL`
+
+En produccion:
+
+- Frontend: `https://delicias.saborcentral.com`
+- Backend: `https://api.saborcentral.com`
+
+Consulta [`DEPLOY-CPANEL.md`](DEPLOY-CPANEL.md) para configurar ambos dominios
+desde este mismo repositorio.
 
 La interfaz Blade usa:
 
