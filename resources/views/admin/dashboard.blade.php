@@ -94,7 +94,9 @@
                         </linearGradient>
                     </defs>
                     @foreach ([0, 1, 2, 3] as $line)
-                        @php($gridY = $chartTop + (($chartRange / 3) * $line))
+                        @php
+                            $gridY = $chartTop + (($chartRange / 3) * $line);
+                        @endphp
                         <line x1="{{ $chartLeft }}" x2="{{ $chartRight }}" y1="{{ $gridY }}" y2="{{ $gridY }}" class="dashboard-chart-grid"/>
                     @endforeach
                     <polygon points="{{ $areaPoints }}" fill="url(#sales-area)"/>
