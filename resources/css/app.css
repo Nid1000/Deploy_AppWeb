@@ -773,6 +773,18 @@
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(255, 250, 242, 0.9));
     }
 
+    .dashboard-reveal {
+        opacity: 1;
+        transform: none;
+    }
+
+    .dashboard-animation-ready .dashboard-reveal {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+        animation: dashboard-reveal 620ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        animation-delay: var(--reveal-delay, 0ms);
+    }
+
     .dashboard-stat-icon {
         @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl;
     }
@@ -780,6 +792,11 @@
     .dashboard-stat-icon svg {
         @apply h-5 w-5;
         stroke-width: 1.8;
+    }
+
+    .dashboard-animation-ready .dashboard-stat-icon {
+        animation: dashboard-icon-pulse 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        animation-delay: calc(var(--reveal-delay, 0ms) + 180ms);
     }
 
     .dashboard-stat-icon-amber {
@@ -824,11 +841,35 @@
         stroke-width: 4;
     }
 
+    .dashboard-chart-area {
+        opacity: 1;
+        transform: none;
+        transform-origin: center bottom;
+    }
+
+    .dashboard-animation-ready .dashboard-chart-area {
+        opacity: 0;
+        transform: translateY(8px);
+        animation: dashboard-area-in 700ms ease-out 700ms forwards;
+    }
+
     .dashboard-chart-point circle {
         fill: #fff;
         stroke: #d97706;
         stroke-width: 3;
         transition: r 160ms ease;
+    }
+
+    .dashboard-chart-point {
+        opacity: 1;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .dashboard-animation-ready .dashboard-chart-point {
+        opacity: 0;
+        animation: dashboard-point-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.4) forwards;
+        animation-delay: var(--point-delay, 700ms);
     }
 
     .dashboard-chart-point:hover circle {
@@ -850,10 +891,23 @@
     .dashboard-progress span {
         @apply block h-full rounded-full;
         min-width: 0;
+        transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .dashboard-order-row {
         @apply flex items-center justify-between gap-4 rounded-2xl border border-stone-100 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/40;
+    }
+
+    .dashboard-list-reveal {
+        opacity: 1;
+        transform: none;
+    }
+
+    .dashboard-animation-ready .dashboard-list-reveal {
+        opacity: 0;
+        transform: translateX(-12px);
+        animation: dashboard-list-in 480ms ease-out forwards;
+        animation-delay: calc(760ms + var(--list-delay, 0ms));
     }
 
     .dashboard-status {
@@ -887,6 +941,13 @@
     .dashboard-donut {
         @apply relative flex h-40 w-40 items-center justify-center rounded-full;
         background: conic-gradient(#f59e0b 0 var(--donut-percent), #c2410c var(--donut-percent) 100%);
+        transform: none;
+        transition: transform 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
+    }
+
+    .dashboard-animation-ready .dashboard-donut {
+        animation: dashboard-donut-in 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards;
+        transform: rotate(0) scale(1);
     }
 
     .dashboard-donut-empty {
@@ -925,6 +986,78 @@
 
     .dashboard-receipt-summary strong {
         @apply mt-1 block text-xl text-stone-950;
+    }
+
+    @keyframes dashboard-reveal {
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes dashboard-icon-pulse {
+        0% {
+            transform: scale(0.65) rotate(-8deg);
+        }
+        65% {
+            transform: scale(1.1) rotate(3deg);
+        }
+        100% {
+            transform: scale(1) rotate(0);
+        }
+    }
+
+    @keyframes dashboard-area-in {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes dashboard-point-in {
+        0% {
+            opacity: 0;
+            transform: scale(0);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes dashboard-list-in {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes dashboard-donut-in {
+        0% {
+            transform: rotate(-10deg) scale(0.88);
+        }
+        100% {
+            transform: rotate(0) scale(1);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .dashboard-reveal,
+        .dashboard-list-reveal,
+        .dashboard-chart-area,
+        .dashboard-chart-point {
+            animation: none !important;
+            opacity: 1;
+            transform: none;
+        }
+
+        .dashboard-stat-icon,
+        .dashboard-progress span,
+        .dashboard-donut {
+            animation: none !important;
+            transition: none !important;
+            transform: none;
+        }
     }
 
     .table-shell {
