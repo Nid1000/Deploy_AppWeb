@@ -29,7 +29,11 @@
                 </span>
                 <span class="register-progress-line"></span>
                 <span class="register-progress-item">
-                    <strong>3</strong> Cuenta
+                    <strong>3</strong> Seguridad
+                </span>
+                <span class="register-progress-line"></span>
+                <span class="register-progress-item">
+                    <strong>4</strong> Direccion
                 </span>
             </div>
         </header>
