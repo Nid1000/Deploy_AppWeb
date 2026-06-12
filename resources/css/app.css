@@ -768,6 +768,165 @@
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
     }
 
+    .dashboard-stat-card {
+        @apply flex min-h-36 items-start gap-4 rounded-[1.75rem] border border-stone-200 bg-white p-5 shadow-sm shadow-stone-200/35;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(255, 250, 242, 0.9));
+    }
+
+    .dashboard-stat-icon {
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl;
+    }
+
+    .dashboard-stat-icon svg {
+        @apply h-5 w-5;
+        stroke-width: 1.8;
+    }
+
+    .dashboard-stat-icon-amber {
+        @apply bg-amber-100 text-amber-700;
+    }
+
+    .dashboard-stat-icon-blue {
+        @apply bg-blue-100 text-blue-700;
+    }
+
+    .dashboard-stat-icon-green {
+        @apply bg-emerald-100 text-emerald-700;
+    }
+
+    .dashboard-stat-icon-violet {
+        @apply bg-violet-100 text-violet-700;
+    }
+
+    .dashboard-chart-card {
+        overflow: hidden;
+    }
+
+    .dashboard-line-chart {
+        @apply relative min-w-0;
+    }
+
+    .dashboard-line-chart svg {
+        @apply block h-auto w-full overflow-visible;
+    }
+
+    .dashboard-chart-grid {
+        stroke: #e7e5e4;
+        stroke-dasharray: 5 7;
+        stroke-width: 1;
+    }
+
+    .dashboard-chart-line {
+        fill: none;
+        stroke: #d97706;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 4;
+    }
+
+    .dashboard-chart-point circle {
+        fill: #fff;
+        stroke: #d97706;
+        stroke-width: 3;
+        transition: r 160ms ease;
+    }
+
+    .dashboard-chart-point:hover circle {
+        r: 7;
+    }
+
+    .dashboard-chart-labels {
+        @apply relative mt-1 h-6 text-[11px] text-stone-400;
+    }
+
+    .dashboard-chart-labels span {
+        @apply absolute top-0 -translate-x-1/2 whitespace-nowrap;
+    }
+
+    .dashboard-progress {
+        @apply h-2 overflow-hidden rounded-full bg-stone-100;
+    }
+
+    .dashboard-progress span {
+        @apply block h-full rounded-full;
+        min-width: 0;
+    }
+
+    .dashboard-order-row {
+        @apply flex items-center justify-between gap-4 rounded-2xl border border-stone-100 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/40;
+    }
+
+    .dashboard-status {
+        @apply mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+    }
+
+    .dashboard-status-amber {
+        @apply bg-amber-100 text-amber-800;
+    }
+
+    .dashboard-status-blue {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    .dashboard-status-green {
+        @apply bg-emerald-100 text-emerald-800;
+    }
+
+    .dashboard-status-red {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .dashboard-product-row {
+        @apply flex items-center gap-3;
+    }
+
+    .dashboard-rank {
+        @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600;
+    }
+
+    .dashboard-donut {
+        @apply relative flex h-40 w-40 items-center justify-center rounded-full;
+        background: conic-gradient(#f59e0b 0 var(--donut-percent), #c2410c var(--donut-percent) 100%);
+    }
+
+    .dashboard-donut-empty {
+        background: #e7e5e4;
+    }
+
+    .dashboard-donut::after {
+        @apply absolute rounded-full bg-white;
+        content: '';
+        inset: 1.15rem;
+    }
+
+    .dashboard-donut > div {
+        @apply relative z-10 text-center;
+    }
+
+    .dashboard-donut strong {
+        @apply block text-3xl font-semibold text-stone-950;
+    }
+
+    .dashboard-donut span {
+        @apply text-xs uppercase tracking-[0.18em] text-stone-500;
+    }
+
+    .dashboard-receipt-summary {
+        @apply rounded-2xl bg-stone-50 p-3 text-center;
+    }
+
+    .dashboard-receipt-summary > span {
+        @apply mx-auto mb-2 block h-2 w-8 rounded-full;
+    }
+
+    .dashboard-receipt-summary p {
+        @apply text-xs text-stone-500;
+    }
+
+    .dashboard-receipt-summary strong {
+        @apply mt-1 block text-xl text-stone-950;
+    }
+
     .table-shell {
         @apply overflow-hidden rounded-[1.5rem] border border-stone-200 bg-white shadow-sm shadow-stone-200/30;
     }
@@ -825,12 +984,33 @@
     .theme-dark .admin-topbar,
     .theme-dark .admin-card,
     .theme-dark .stat-card,
+    .theme-dark .dashboard-stat-card,
     .theme-dark .table-shell,
     .theme-dark .admin-login-card,
     .theme-dark .admin-notifications-panel {
         background: rgba(26, 20, 18, 0.94);
         border-color: rgba(115, 82, 46, 0.5);
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+    }
+
+    .theme-dark .dashboard-chart-grid {
+        stroke: rgba(255, 255, 255, 0.12);
+    }
+
+    .theme-dark .dashboard-chart-point circle,
+    .theme-dark .dashboard-donut::after {
+        fill: #1a1412;
+        background: #1a1412;
+    }
+
+    .theme-dark .dashboard-progress,
+    .theme-dark .dashboard-rank,
+    .theme-dark .dashboard-receipt-summary {
+        @apply bg-white/8;
+    }
+
+    .theme-dark .dashboard-order-row {
+        @apply border-white/8 hover:border-amber-800 hover:bg-white/5;
     }
 
     .theme-dark .admin-sidebar-title,

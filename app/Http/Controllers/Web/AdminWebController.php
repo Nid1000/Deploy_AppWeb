@@ -21,35 +21,106 @@ class AdminWebController extends Controller
 
     public function dashboard(): View
     {
+        $today = now()->startOfDay();
+        $salesFrom = $today->copy()->subDays(27);
+        $dashboardFrom = $today->copy()->subDays(29);
+        $exclusiveUntil = $today->copy()->addDay();
+
         $productsResponse = $this->api->get('productos', ['pagina' => 1, 'limite' => 1]);
         $categoriesResponse = $this->api->get('categorias/admin/todos', ['pagina' => 1, 'limite' => 1]);
         $usersResponse = $this->api->get('usuarios/admin/todos', ['pagina' => 1, 'limite' => 1]);
         $dailySalesResponse = $this->api->get('reportes/admin/ventas-diarias', [
-            'desde' => now()->subDays(6)->toDateString(),
-            'hasta' => now()->toDateString(),
+            'desde' => $salesFrom->toDateString(),
+            'hasta' => $exclusiveUntil->toDateString(),
+        ]);
+        $ordersResponse = $this->api->get('pedidos/admin/todos', [
+            'pagina' => 1,
+            'limite' => 500,
+            'desde' => $dashboardFrom->toDateString(),
+            'hasta' => $exclusiveUntil->toDateString(),
+        ]);
+        $topProductsResponse = $this->api->get('reportes/admin/top-productos', [
+            'desde' => $dashboardFrom->toDateString(),
+            'hasta' => $exclusiveUntil->toDateString(),
+            'limite' => 5,
         ]);
         $receiptsResponse = $this->api->get('facturacion/admin/comprobantes', ['pagina' => 1, 'limite' => 200]);
 
-        $salesSeries = collect($this->api->okData($dailySalesResponse, 'data', []))->map(function ($item) {
+        $rawSales = collect($this->api->okData($dailySalesResponse, 'data', []))
+            ->mapWithKeys(fn ($item) => [
+                (string) data_get($item, 'fecha') => (float) data_get($item, 'total', 0),
+            ]);
+        $salesSeries = collect(range(13, 0))->map(function (int $daysAgo) use ($today, $rawSales) {
+            $date = $today->copy()->subDays($daysAgo);
+
             return (object) [
-                'fecha' => data_get($item, 'fecha'),
-                'total' => (float) data_get($item, 'total', 0),
+                'fecha' => $date->toDateString(),
+                'label' => $date->locale('es')->isoFormat('dd D'),
+                'total' => (float) $rawSales->get($date->toDateString(), 0),
             ];
         });
+        $currentWeekSales = (float) $salesSeries->slice(7)->sum('total');
+        $previousWeekSales = (float) $salesSeries->take(7)->sum('total');
+        $salesGrowth = $previousWeekSales > 0
+            ? (($currentWeekSales - $previousWeekSales) / $previousWeekSales) * 100
+            : ($currentWeekSales > 0 ? 100.0 : 0.0);
+
+        $orders = collect($this->api->okData($ordersResponse, 'pedidos', []))
+            ->map(fn ($item) => (object) $item);
+        $activeOrders = $orders->where('estado', '<>', 'cancelado');
+        $ordersLast14Days = $activeOrders->filter(function ($order) use ($today) {
+            $createdAt = data_get($order, 'created_at');
+
+            return $createdAt && Carbon::parse($createdAt)->greaterThanOrEqualTo($today->copy()->subDays(13));
+        });
+        $ordersToday = $orders->filter(function ($order) use ($today) {
+            $createdAt = data_get($order, 'created_at');
+
+            return $createdAt && Carbon::parse($createdAt)->isSameDay($today);
+        })->count();
+        $orderStatuses = collect([
+            'pendiente' => ['label' => 'Pendientes', 'color' => '#f59e0b'],
+            'listo' => ['label' => 'Listos', 'color' => '#2563eb'],
+            'entregado' => ['label' => 'Entregados', 'color' => '#16a34a'],
+            'cancelado' => ['label' => 'Cancelados', 'color' => '#dc2626'],
+        ])->map(function (array $meta, string $status) use ($orders) {
+            return (object) [
+                'key' => $status,
+                'label' => $meta['label'],
+                'color' => $meta['color'],
+                'total' => $orders->where('estado', $status)->count(),
+            ];
+        })->values();
+
+        $topProducts = collect($this->api->okData($topProductsResponse, 'data', []))
+            ->map(fn ($item) => $this->mapProduct($item));
         $receipts = collect($this->api->okData($receiptsResponse, 'comprobantes', []));
+        $receiptTypes = [
+            'boleta' => (int) $receipts->where('tipo', 'boleta')->count(),
+            'factura' => (int) $receipts->where('tipo', 'factura')->count(),
+        ];
 
         return view('admin.dashboard', [
             'metrics' => [
                 'productos' => (int) data_get($productsResponse->json(), 'pagination.total', 0),
                 'categorias' => (int) data_get($categoriesResponse->json(), 'pagination.total', 0),
                 'usuarios' => (int) data_get($usersResponse->json(), 'pagination.total', 0),
-                'ventasSemana' => (float) $salesSeries->sum('total'),
+                'ventasSemana' => $currentWeekSales,
+                'crecimientoVentas' => $salesGrowth,
+                'pedidosHoy' => $ordersToday,
+                'ticketPromedio' => $ordersLast14Days->count() > 0
+                    ? (float) $salesSeries->sum('total') / $ordersLast14Days->count()
+                    : 0.0,
+                'pedidosPeriodo' => (int) data_get($ordersResponse->json(), 'pagination.total', $orders->count()),
             ],
             'salesSeries' => $salesSeries,
-            'receiptTypes' => [
-                'boleta' => (int) $receipts->where('tipo', 'boleta')->count(),
-                'factura' => (int) $receipts->where('tipo', 'factura')->count(),
-            ],
+            'salesChartMax' => max(1, (float) $salesSeries->max('total')),
+            'orderStatuses' => $orderStatuses,
+            'recentOrders' => $orders->take(5),
+            'topProducts' => $topProducts,
+            'topProductMax' => max(1, (int) $topProducts->max('cantidad')),
+            'receiptTypes' => $receiptTypes,
+            'receiptTotal' => array_sum($receiptTypes),
         ]);
     }
 
