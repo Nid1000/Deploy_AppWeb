@@ -45,7 +45,7 @@
 
                 <div>
                     <label for="mensaje" class="label">Mensaje</label>
-                    <textarea id="mensaje" name="mensaje" rows="6" required class="input min-h-36" placeholder="Cuentanos que necesitas">{{ old('mensaje') }}</textarea>
+                    <textarea id="mensaje" name="mensaje" rows="6" required class="input min-h-36" placeholder="Cuentanos que necesitas">{{ old('mensaje', request('mensaje')) }}</textarea>
                     @error('mensaje')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\JwtService;
+use App\Services\CustomerLifecycleEmailService;
 use App\Support\PasswordRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly CustomerLifecycleEmailService $customerLifecycleEmails,
+    ) {
+    }
+
     private function passwordLooksHashed(string $hash): bool
     {
         $h = trim($hash);
@@ -101,6 +107,15 @@ class AuthController extends Controller
             'email' => $data['email'],
             'tipo' => 'usuario',
         ]);
+
+        try {
+            $this->customerLifecycleEmails->sendWelcome($user);
+        } catch (\Throwable $exception) {
+            Log::warning('Welcome email could not be started.', [
+                'user_id' => $id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'statusCode' => 201,

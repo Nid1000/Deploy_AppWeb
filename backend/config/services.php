@@ -58,6 +58,18 @@ return [
         ),
     ],
 
+    'customer_lifecycle' => [
+        'enabled' => filter_var(env('CUSTOMER_LIFECYCLE_EMAILS_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'welcome_enabled' => filter_var(env('WELCOME_EMAIL_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'welcome_offer' => env('WELCOME_OFFER_TEXT', ''),
+        'welcome_retry_days' => (int) env('WELCOME_EMAIL_RETRY_DAYS', 7),
+        'dormant_enabled' => filter_var(env('DORMANT_EMAIL_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'dormant_days' => (int) env('DORMANT_CUSTOMER_DAYS', 30),
+        'dormant_offer' => env('DORMANT_OFFER_TEXT', ''),
+        'review_enabled' => filter_var(env('REVIEW_EMAIL_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+        'review_delay_days' => (int) env('REVIEW_EMAIL_DELAY_DAYS', 1),
+    ],
+
     'documents' => [
         'provider' => env('DOCUMENT_PROVIDER', 'apiperu'),
         'validation_required' => filter_var(

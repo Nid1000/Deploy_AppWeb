@@ -114,6 +114,60 @@ php artisan optimize
 
 Da permisos de escritura a `storage` y `bootstrap/cache` en ambas aplicaciones.
 
+## Correos de ciclo de vida del cliente
+
+El API puede enviar:
+
+- bienvenida al crear una cuenta;
+- reactivacion cuando la ultima compra supera 30 dias;
+- solicitud de opinion un dia despues de marcar un pedido como entregado.
+
+Archivos adicionales para subir manualmente al API:
+
+```text
+backend/app/Services/CustomerLifecycleEmailService.php -> app/Services/CustomerLifecycleEmailService.php
+backend/database/migrations/2026_06_12_000000_create_customer_email_events_table.php -> database/migrations/2026_06_12_000000_create_customer_email_events_table.php
+backend/routes/console.php -> routes/console.php
+```
+
+Agrega al `.env` del API:
+
+```env
+CUSTOMER_LIFECYCLE_EMAILS_ENABLED=true
+WELCOME_EMAIL_ENABLED=true
+WELCOME_OFFER_TEXT=
+WELCOME_EMAIL_RETRY_DAYS=7
+DORMANT_EMAIL_ENABLED=true
+DORMANT_CUSTOMER_DAYS=30
+DORMANT_OFFER_TEXT=
+REVIEW_EMAIL_ENABLED=true
+REVIEW_EMAIL_DELAY_DAYS=1
+```
+
+No escribas descuentos ni beneficios en `WELCOME_OFFER_TEXT` o
+`DORMANT_OFFER_TEXT` si no se aplican realmente en caja o checkout.
+
+Ejecuta solo la migracion nueva:
+
+```bash
+cd ~/public_html/api.saborcentral.com
+/opt/cpanel/ea-php83/root/usr/bin/php artisan migrate \
+  --path=database/migrations/2026_06_12_000000_create_customer_email_events_table.php \
+  --force
+```
+
+En `cPanel > Cron Jobs`, agrega una tarea cada hora:
+
+```cron
+0 * * * * cd /home/bcdroovr/public_html/api.saborcentral.com && /opt/cpanel/ea-php83/root/usr/bin/php artisan customers:lifecycle-emails --limit=100 >> /dev/null 2>&1
+```
+
+Para probarla manualmente:
+
+```bash
+/opt/cpanel/ea-php83/root/usr/bin/php artisan customers:lifecycle-emails --limit=10
+```
+
 ## Datos persistentes
 
 La base MySQL existente es obligatoria. El código recibido no contiene
