@@ -19,23 +19,6 @@
                     Verifica tu correo y completa tus datos para realizar pedidos y recibir tus comprobantes.
                 </p>
             </div>
-            <div class="register-progress" aria-label="Progreso del registro">
-                <span class="register-progress-item register-progress-item-active">
-                    <strong>1</strong> Correo
-                </span>
-                <span class="register-progress-line"></span>
-                <span class="register-progress-item {{ $isVerified ? 'register-progress-item-active' : '' }}">
-                    <strong>2</strong> Datos
-                </span>
-                <span class="register-progress-line"></span>
-                <span class="register-progress-item">
-                    <strong>3</strong> Seguridad
-                </span>
-                <span class="register-progress-line"></span>
-                <span class="register-progress-item">
-                    <strong>4</strong> Direccion
-                </span>
-            </div>
         </header>
 
         @if ($errors->any())
