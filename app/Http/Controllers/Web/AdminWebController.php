@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AdminWebController extends Controller
 {
@@ -33,17 +35,26 @@ class AdminWebController extends Controller
             'desde' => $salesFrom->toDateString(),
             'hasta' => $exclusiveUntil->toDateString(),
         ]);
-        $ordersResponse = $this->api->get('pedidos/admin/todos', [
-            'pagina' => 1,
-            'limite' => 500,
-            'desde' => $dashboardFrom->toDateString(),
-            'hasta' => $exclusiveUntil->toDateString(),
-        ]);
-        $topProductsResponse = $this->api->get('reportes/admin/top-productos', [
-            'desde' => $dashboardFrom->toDateString(),
-            'hasta' => $exclusiveUntil->toDateString(),
-            'limite' => 5,
-        ]);
+        $ordersResponse = null;
+        $topProductsResponse = null;
+
+        try {
+            $ordersResponse = $this->api->get('pedidos/admin/todos', [
+                'pagina' => 1,
+                'limite' => 100,
+                'desde' => $dashboardFrom->toDateString(),
+                'hasta' => $exclusiveUntil->toDateString(),
+            ]);
+            $topProductsResponse = $this->api->get('reportes/admin/top-productos', [
+                'desde' => $dashboardFrom->toDateString(),
+                'hasta' => $exclusiveUntil->toDateString(),
+                'limite' => 5,
+            ]);
+        } catch (Throwable $exception) {
+            Log::warning('No se pudieron cargar las estadísticas ampliadas del dashboard.', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
         $receiptsResponse = $this->api->get('facturacion/admin/comprobantes', ['pagina' => 1, 'limite' => 200]);
 
         $rawSales = collect($this->api->okData($dailySalesResponse, 'data', []))
@@ -65,18 +76,25 @@ class AdminWebController extends Controller
             ? (($currentWeekSales - $previousWeekSales) / $previousWeekSales) * 100
             : ($currentWeekSales > 0 ? 100.0 : 0.0);
 
-        $orders = collect($this->api->okData($ordersResponse, 'pedidos', []))
-            ->map(fn ($item) => (object) $item);
-        $activeOrders = $orders->where('estado', '<>', 'cancelado');
+        $orders = $ordersResponse
+            ? collect($this->api->okData($ordersResponse, 'pedidos', []))
+                ->map(function ($item) {
+                    $order = (object) $item;
+                    $order->display_date = $this->formatDashboardDate($order->created_at ?? null);
+
+                    return $order;
+                })
+            : collect();
+        $activeOrders = $orders->reject(fn ($order) => ($order->estado ?? null) === 'cancelado');
         $ordersLast14Days = $activeOrders->filter(function ($order) use ($today) {
             $createdAt = data_get($order, 'created_at');
 
-            return $createdAt && Carbon::parse($createdAt)->greaterThanOrEqualTo($today->copy()->subDays(13));
+            return $this->dashboardDateIsOnOrAfter($createdAt, $today->copy()->subDays(13));
         });
         $ordersToday = $orders->filter(function ($order) use ($today) {
             $createdAt = data_get($order, 'created_at');
 
-            return $createdAt && Carbon::parse($createdAt)->isSameDay($today);
+            return $this->dashboardDateIsSameDay($createdAt, $today);
         })->count();
         $orderStatuses = collect([
             'pendiente' => ['label' => 'Pendientes', 'color' => '#f59e0b'],
@@ -92,8 +110,10 @@ class AdminWebController extends Controller
             ];
         })->values();
 
-        $topProducts = collect($this->api->okData($topProductsResponse, 'data', []))
-            ->map(fn ($item) => $this->mapProduct($item));
+        $topProducts = $topProductsResponse
+            ? collect($this->api->okData($topProductsResponse, 'data', []))
+                ->map(fn ($item) => $this->mapProduct((array) $item))
+            : collect();
         $receipts = collect($this->api->okData($receiptsResponse, 'comprobantes', []));
         $receiptTypes = [
             'boleta' => (int) $receipts->where('tipo', 'boleta')->count(),
@@ -111,7 +131,9 @@ class AdminWebController extends Controller
                 'ticketPromedio' => $ordersLast14Days->count() > 0
                     ? (float) $salesSeries->sum('total') / $ordersLast14Days->count()
                     : 0.0,
-                'pedidosPeriodo' => (int) data_get($ordersResponse->json(), 'pagination.total', $orders->count()),
+                'pedidosPeriodo' => $ordersResponse
+                    ? (int) data_get($ordersResponse->json(), 'pagination.total', $orders->count())
+                    : 0,
             ],
             'salesSeries' => $salesSeries,
             'salesChartMax' => max(1, (float) $salesSeries->max('total')),
@@ -122,6 +144,33 @@ class AdminWebController extends Controller
             'receiptTypes' => $receiptTypes,
             'receiptTotal' => array_sum($receiptTypes),
         ]);
+    }
+
+    private function formatDashboardDate(mixed $value): string
+    {
+        try {
+            return $value ? Carbon::parse((string) $value)->format('d/m H:i') : '';
+        } catch (Throwable) {
+            return '';
+        }
+    }
+
+    private function dashboardDateIsOnOrAfter(mixed $value, Carbon $date): bool
+    {
+        try {
+            return $value && Carbon::parse((string) $value)->greaterThanOrEqualTo($date);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function dashboardDateIsSameDay(mixed $value, Carbon $date): bool
+    {
+        try {
+            return $value && Carbon::parse((string) $value)->isSameDay($date);
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     public function categoriesIndex(Request $request): View

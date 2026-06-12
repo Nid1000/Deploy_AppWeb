@@ -161,7 +161,7 @@
                     <a href="{{ route('web.admin.orders.show', $order->id) }}" class="dashboard-order-row">
                         <div>
                             <p class="font-semibold text-stone-900">Pedido #{{ $order->id }}</p>
-                            <p class="mt-1 text-xs text-stone-500">{{ $customer !== '' ? $customer : 'Cliente' }} · {{ \Illuminate\Support\Carbon::parse($order->created_at)->format('d/m H:i') }}</p>
+                            <p class="mt-1 text-xs text-stone-500">{{ $customer !== '' ? $customer : 'Cliente' }} · {{ $order->display_date ?: 'Sin fecha' }}</p>
                         </div>
                         <div class="text-right">
                             <p class="font-semibold text-stone-900">S/ {{ number_format((float) $order->total, 2) }}</p>
