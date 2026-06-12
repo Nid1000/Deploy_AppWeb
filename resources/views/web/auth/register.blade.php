@@ -146,12 +146,12 @@
 
                 <div class="mt-5 grid gap-4 lg:grid-cols-[1fr_1fr_0.8fr] lg:items-start">
                     <div>
-                        <label for="password" class="label">Contrasena</label>
+                        <label for="password" class="label">Contraseña</label>
                         <input id="password" name="password" type="password" required class="input" placeholder="Ejemplo: Panaderia1" data-password-input autocomplete="new-password">
                         @error('password')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="password_confirmation" class="label">Confirmar contrasena</label>
+                        <label for="password_confirmation" class="label">Confirmar contraseña</label>
                         <input id="password_confirmation" name="password_confirmation" type="password" required class="input" autocomplete="new-password">
                     </div>
                     <div class="register-password-rules">
