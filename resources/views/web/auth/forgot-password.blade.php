@@ -3,8 +3,8 @@
 @section('content')
     <div class="auth-shell">
         <div class="mb-6">
-            <p class="text-sm uppercase tracking-[0.25em] text-amber-700">Recuperacion</p>
-            <h2 class="mt-2 text-2xl font-semibold text-stone-900">Olvidaste tu contrasena?</h2>
+            <p class="text-sm uppercase tracking-[0.25em] text-amber-700">Recuperación</p>
+            <h2 class="mt-2 text-2xl font-semibold text-stone-900">Olvidaste tu contraseña?</h2>
             <p class="mt-2 text-sm text-stone-600">
                 Ingresa el correo de tu cuenta y te enviaremos un enlace seguro para crear una nueva contraseña.
             </p>
@@ -27,7 +27,7 @@
 
         <p class="mt-5 text-sm text-stone-600">
             <a href="{{ route('web.login') }}" class="font-semibold text-amber-700 underline underline-offset-4">
-                Volver a iniciar sesion
+                Volver a iniciar sesión
             </a>
         </p>
     </div>
