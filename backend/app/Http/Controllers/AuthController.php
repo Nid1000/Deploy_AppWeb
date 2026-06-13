@@ -560,9 +560,9 @@ class AuthController extends Controller
         $safeUrl = htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8');
         $html = <<<HTML
             <div style="font-family:Arial,sans-serif;color:#292524;line-height:1.6">
-                <h2>Restablece tu contrasena</h2>
-                <p>Hola {$safeName}, recibimos una solicitud para cambiar la contrasena de tu cuenta.</p>
-                <p><a href="{$safeUrl}" style="display:inline-block;padding:12px 20px;background:#1c1917;color:#fff;text-decoration:none;border-radius:10px">Crear nueva contrasena</a></p>
+                <h2>Restablece tu contraseña</h2>
+                <p>Hola {$safeName}, recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>
+                <p><a href="{$safeUrl}" style="display:inline-block;padding:12px 20px;background:#1c1917;color:#fff;text-decoration:none;border-radius:10px">Crear nueva contraseña</a></p>
                 <p>Este enlace vence en {$ttlMinutes} minutos y solo puede utilizarse una vez.</p>
                 <p>Si no solicitaste el cambio, ignora este correo.</p>
             </div>
