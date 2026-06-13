@@ -18,14 +18,14 @@
                 @enderror
             </div>
             <div>
-                <label for="password" class="mb-1 block text-sm font-medium text-stone-700">Contrasena</label>
+                <label for="password" class="mb-1 block text-sm font-medium text-stone-700">Contraseña</label>
                 <input id="password" name="password" type="password" required class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-amber-500" placeholder="••••••••">
                 @error('password')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 <div class="mt-2 text-right">
                     <a href="{{ route('web.password.forgot') }}" class="text-sm font-semibold text-amber-700 underline underline-offset-4">
-                        Olvidaste tu contrasena?
+                        Olvidaste tu contraseña?
                     </a>
                 </div>
             </div>
