@@ -1,4 +1,4 @@
-@extends('layouts.storefront', ['title' => 'Recuperar contrasena'])
+@extends('layouts.storefront', ['title' => 'Recuperar contraseña'])
 
 @section('content')
     <div class="auth-shell">
@@ -6,7 +6,7 @@
             <p class="text-sm uppercase tracking-[0.25em] text-amber-700">Recuperacion</p>
             <h2 class="mt-2 text-2xl font-semibold text-stone-900">Olvidaste tu contrasena?</h2>
             <p class="mt-2 text-sm text-stone-600">
-                Ingresa el correo de tu cuenta y te enviaremos un enlace seguro para crear una nueva contrasena.
+                Ingresa el correo de tu cuenta y te enviaremos un enlace seguro para crear una nueva contraseña.
             </p>
         </div>
 
