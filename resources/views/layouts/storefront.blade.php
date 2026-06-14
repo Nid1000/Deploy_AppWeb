@@ -138,8 +138,12 @@
                         <a href="{{ route('web.orders') }}" class="hidden text-sm font-medium text-stone-700 transition hover:text-[var(--color-secondary)] xl:inline-flex">
                             Historial
                         </a>
-                        <a href="{{ route('web.profile') }}" class="hidden rounded-full border border-amber-200 bg-white/90 px-4 py-2 font-medium text-stone-700 shadow-sm xl:inline-flex">
-                            Mi cuenta
+                        <a
+                            href="{{ route('web.profile') }}"
+                            class="hidden max-w-40 truncate rounded-full border border-amber-200 bg-white/90 px-4 py-2 font-medium text-stone-700 shadow-sm xl:inline-flex"
+                            title="{{ trim((string) data_get($storefrontUser, 'nombre').' '.(string) data_get($storefrontUser, 'apellido')) }}"
+                        >
+                            {{ trim((string) data_get($storefrontUser, 'nombre')) ?: 'Mi cuenta' }}
                         </a>
                         <form action="{{ route('web.logout') }}" method="POST">
                             @csrf
