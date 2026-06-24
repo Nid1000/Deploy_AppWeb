@@ -1386,4 +1386,82 @@
         @apply border-transparent text-stone-950;
         background: var(--color-secondary);
     }
+
+    .whatsapp-widget {
+        @apply fixed bottom-6 right-5 z-50 flex items-end gap-3 sm:right-7;
+    }
+
+    .whatsapp-button {
+        @apply inline-flex h-15 w-15 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl shadow-emerald-900/20 ring-4 ring-white transition hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-200;
+    }
+
+    .whatsapp-button svg {
+        @apply h-9 w-9;
+    }
+
+    .whatsapp-greeting {
+        @apply pointer-events-none relative max-w-64 rounded-2xl border border-emerald-100 bg-white px-4 py-3 pr-10 text-left text-sm text-stone-700 opacity-0 shadow-xl shadow-stone-900/12 transition duration-300;
+        transform: translateY(0.5rem) scale(0.98);
+    }
+
+    .whatsapp-greeting::after {
+        @apply absolute bottom-5 -right-2 h-4 w-4 rotate-45 border-r border-t border-emerald-100 bg-white;
+        content: '';
+    }
+
+    .whatsapp-greeting.is-visible {
+        @apply pointer-events-auto opacity-100;
+        transform: translateY(0) scale(1);
+    }
+
+    .whatsapp-greeting-title {
+        @apply text-sm font-semibold text-stone-950;
+    }
+
+    .whatsapp-greeting-copy {
+        @apply mt-1 text-xs leading-5 text-stone-600;
+    }
+
+    .whatsapp-greeting-close {
+        @apply absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700;
+    }
+
+    .whatsapp-greeting-close svg {
+        @apply h-4 w-4;
+    }
+
+    .theme-dark .whatsapp-button {
+        @apply ring-stone-950 shadow-black/35;
+    }
+
+    .theme-dark .whatsapp-greeting,
+    .theme-dark .whatsapp-greeting::after {
+        @apply border-emerald-900/45 bg-stone-900;
+    }
+
+    .theme-dark .whatsapp-greeting-title {
+        color: var(--color-ink);
+    }
+
+    .theme-dark .whatsapp-greeting-copy {
+        color: var(--muted-text);
+    }
+
+    @media (max-width: 640px) {
+        .whatsapp-widget {
+            @apply bottom-4 right-4;
+        }
+
+        .whatsapp-button {
+            @apply h-14 w-14;
+        }
+
+        .whatsapp-button svg {
+            @apply h-8 w-8;
+        }
+
+        .whatsapp-greeting {
+            @apply hidden;
+        }
+    }
 }

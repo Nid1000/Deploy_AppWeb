@@ -103,8 +103,36 @@ const animateDashboard = () => {
     });
 };
 
+const initWhatsappWidget = () => {
+    const widget = document.querySelector('[data-whatsapp-widget]');
+    const greeting = document.querySelector('[data-whatsapp-greeting]');
+    const closeButton = document.querySelector('[data-whatsapp-greeting-close]');
+
+    if (!widget || !greeting) {
+        return;
+    }
+
+    const showTimer = window.setTimeout(() => {
+        greeting.classList.add('is-visible');
+    }, 1200);
+
+    const hideTimer = window.setTimeout(() => {
+        greeting.classList.remove('is-visible');
+    }, 9000);
+
+    closeButton?.addEventListener('click', () => {
+        window.clearTimeout(showTimer);
+        window.clearTimeout(hideTimer);
+        greeting.classList.remove('is-visible');
+    });
+};
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', animateDashboard);
+    document.addEventListener('DOMContentLoaded', () => {
+        animateDashboard();
+        initWhatsappWidget();
+    });
 } else {
     animateDashboard();
+    initWhatsappWidget();
 }

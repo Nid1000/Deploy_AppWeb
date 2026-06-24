@@ -269,5 +269,35 @@
             </div>
         </div>
     </footer>
+
+    @php
+        $whatsappNumber = '51974268690';
+        $whatsappMessage = rawurlencode('Hola, vengo de la web de Delicias del centro. Quisiera hacer una consulta.');
+    @endphp
+
+    <div class="whatsapp-widget" data-whatsapp-widget>
+        <div class="whatsapp-greeting" data-whatsapp-greeting role="status" aria-live="polite">
+            <button type="button" class="whatsapp-greeting-close" data-whatsapp-greeting-close aria-label="Cerrar mensaje">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 6l12 12" />
+                    <path d="M18 6L6 18" />
+                </svg>
+            </button>
+            <p class="whatsapp-greeting-title">Hola, somos Delicias</p>
+            <p class="whatsapp-greeting-copy">Escríbenos para pedidos, horarios o consultas.</p>
+        </div>
+
+        <a
+            href="https://wa.me/{{ $whatsappNumber }}?text={{ $whatsappMessage }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="whatsapp-button"
+            aria-label="Escribir por WhatsApp"
+        >
+            <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+                <path d="M16.04 3.2A12.7 12.7 0 0 0 5.18 22.47L3.8 28.8l6.47-1.54A12.72 12.72 0 1 0 16.04 3.2Zm0 2.35a10.37 10.37 0 1 1-5.28 19.3l-.38-.23-3.58.85.76-3.5-.25-.4A10.36 10.36 0 0 1 16.04 5.55Zm-4.62 4.78c-.22 0-.58.08-.88.4-.3.34-1.16 1.14-1.16 2.77 0 1.64 1.19 3.22 1.36 3.44.17.22 2.3 3.68 5.68 5.01 2.8 1.1 3.38.89 3.99.83.61-.06 1.96-.8 2.24-1.58.28-.78.28-1.45.2-1.59-.08-.14-.3-.22-.63-.39-.34-.17-1.97-.97-2.28-1.08-.3-.12-.53-.17-.75.17-.22.33-.86 1.08-1.06 1.3-.2.23-.39.25-.72.09-.34-.17-1.42-.53-2.7-1.67-1-.89-1.67-1.99-1.86-2.33-.2-.33-.02-.51.15-.68.15-.15.34-.39.5-.58.17-.2.22-.33.34-.56.11-.22.05-.42-.03-.59-.08-.17-.74-1.8-1.03-2.47-.27-.65-.55-.56-.75-.57l-.64-.01Z" />
+            </svg>
+        </a>
+    </div>
 </body>
 </html>
