@@ -27,112 +27,142 @@ document.addEventListener('click', (event) => {
     applyTheme(nextTheme);
 });
 
-const animateDashboard = () => {
-    const dashboard = document.querySelector('[data-dashboard-animated]');
-    if (!dashboard) {
-        return;
+const chatReplies = {
+    horario: 'Atendemos de lunes a domingo, de 7:00 AM a 9:00 PM.',
+    delivery: 'Si, hacemos delivery. Tambien puedes escribirnos o llamar al 993560096 para coordinar tu pedido.',
+    pagos: 'Aceptamos pago contra entrega, Yape y tarjeta.',
+    pedido: 'Puedes pedir desde la seccion Menu, agregar productos al carrito y finalizar tu compra en checkout.',
+    contacto: 'Puedes contactarnos al 993560096 o al correo deliciasdelcentro@gmail.com.',
+    torta: 'Si, realizamos tortas personalizadas. Puedes escribirnos por contacto y contarnos el diseno o sabor que deseas.',
+    carrito: 'Si ya elegiste productos, revisa tu carrito y continua al checkout para completar el pedido.',
+    checkout: 'En checkout debes confirmar direccion, fecha de entrega, metodo de pago y comprobante.',
+    historial: 'En tu historial puedes revisar pedidos, comprobantes y el estado de cada compra.',
+    default: 'Puedo ayudarte con horarios, delivery, pagos, pedidos y contacto. Si prefieres, usa el boton de WhatsApp.',
+};
+
+const createBubble = (text, type) => {
+    const bubble = document.createElement('article');
+    bubble.className = `chat-bubble ${type === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
+    bubble.textContent = text;
+    return bubble;
+};
+
+const resolveReply = (message) => {
+    const normalized = message.toLowerCase();
+    const page = document.body?.dataset.page ?? '';
+
+    if (page === 'web.checkout' && (normalized.includes('ayuda') || normalized.includes('sigue') || normalized.includes('continuar'))) {
+        return chatReplies.checkout;
+    }
+    if ((page === 'web.orders' || page === 'web.history') && (normalized.includes('pedido') || normalized.includes('historial') || normalized.includes('comprobante'))) {
+        return chatReplies.historial;
+    }
+    if ((page === 'web.products' || page === 'web.products.show') && (normalized.includes('comprar') || normalized.includes('agregar') || normalized.includes('carrito'))) {
+        return chatReplies.carrito;
     }
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    dashboard.classList.add('dashboard-animation-ready');
+    if (normalized.includes('hora') || normalized.includes('horario') || normalized.includes('atienden')) {
+        return chatReplies.horario;
+    }
+    if (normalized.includes('delivery') || normalized.includes('envio') || normalized.includes('domicilio')) {
+        return chatReplies.delivery;
+    }
+    if (normalized.includes('pago') || normalized.includes('yape') || normalized.includes('tarjeta')) {
+        return chatReplies.pagos;
+    }
+    if (normalized.includes('pedido') || normalized.includes('comprar') || normalized.includes('ordenar')) {
+        return chatReplies.pedido;
+    }
+    if (normalized.includes('carrito')) {
+        return chatReplies.carrito;
+    }
+    if (normalized.includes('contacto') || normalized.includes('telefono') || normalized.includes('correo')) {
+        return chatReplies.contacto;
+    }
+    if (normalized.includes('torta') || normalized.includes('personalizada')) {
+        return chatReplies.torta;
+    }
 
-    dashboard.querySelectorAll('[data-dashboard-line]').forEach((line) => {
-        const length = line.getTotalLength();
-        line.style.strokeDasharray = `${length}`;
-        line.style.strokeDashoffset = reduceMotion ? '0' : `${length}`;
-        line.style.transition = reduceMotion
-            ? 'none'
-            : 'stroke-dashoffset 1200ms cubic-bezier(0.2, 0.75, 0.2, 1) 420ms';
+    return chatReplies.default;
+};
 
-        requestAnimationFrame(() => {
-            line.style.strokeDashoffset = '0';
+const chatRoot = document.querySelector('[data-chat-assistant]');
+if (chatRoot) {
+    const toggle = chatRoot.querySelector('[data-chat-toggle]');
+    const close = chatRoot.querySelector('[data-chat-close]');
+    const panel = chatRoot.querySelector('[data-chat-panel]');
+    const form = chatRoot.querySelector('[data-chat-form]');
+    const input = form?.querySelector('input[name="message"]');
+    const messages = chatRoot.querySelector('[data-chat-messages]');
+
+    const setOpen = (isOpen) => {
+        panel?.classList.toggle('hidden', !isOpen);
+        toggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) {
+            input?.focus();
+        }
+    };
+
+    const appendConversation = (userMessage) => {
+        if (!messages) {
+            return;
+        }
+
+        messages.appendChild(createBubble(userMessage, 'user'));
+        const reply = resolveReply(userMessage);
+        messages.appendChild(createBubble(reply, 'bot'));
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    toggle?.addEventListener('click', () => {
+        const isClosed = panel?.classList.contains('hidden') ?? true;
+        setOpen(isClosed);
+    });
+
+    close?.addEventListener('click', () => {
+        setOpen(false);
+    });
+
+    chatRoot.querySelectorAll('[data-chat-question]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const question = button.getAttribute('data-chat-question') ?? '';
+            const label = button.textContent?.trim() || question;
+            setOpen(true);
+            appendConversation(label);
         });
     });
 
-    dashboard.querySelectorAll('[data-dashboard-progress]').forEach((bar, index) => {
-        const target = Math.max(0, Math.min(100, Number(bar.dataset.dashboardProgress) || 0));
-        bar.style.width = reduceMotion ? `${target}%` : '0';
-        window.setTimeout(() => {
-            bar.style.width = `${target}%`;
-        }, reduceMotion ? 0 : 520 + (index * 90));
-    });
-
-    dashboard.querySelectorAll('[data-dashboard-donut]').forEach((donut) => {
-        const target = Math.max(0, Math.min(100, Number(donut.dataset.dashboardDonut) || 0));
-        if (reduceMotion) {
-            donut.style.setProperty('--donut-percent', `${target}%`);
+    form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const value = input?.value.trim() ?? '';
+        if (!value) {
             return;
         }
 
-        donut.style.setProperty('--donut-percent', '0%');
-        const start = performance.now();
-        const duration = 1100;
-        const draw = (time) => {
-            const progress = Math.min(1, (time - start) / duration);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            donut.style.setProperty('--donut-percent', `${target * eased}%`);
-            if (progress < 1) {
-                requestAnimationFrame(draw);
-            }
-        };
-        requestAnimationFrame(draw);
-    });
-
-    dashboard.querySelectorAll('[data-dashboard-counter]').forEach((counter) => {
-        const target = Number(counter.dataset.dashboardCounter) || 0;
-        const decimals = Number(counter.dataset.counterDecimals) || 0;
-        const prefix = counter.dataset.counterPrefix || '';
-        if (reduceMotion) {
-            return;
+        appendConversation(value);
+        if (input) {
+            input.value = '';
         }
-
-        const start = performance.now();
-        const duration = 900;
-        const count = (time) => {
-            const progress = Math.min(1, (time - start) / duration);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            counter.textContent = `${prefix}${(target * eased).toLocaleString('es-PE', {
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals,
-            })}`;
-            if (progress < 1) {
-                requestAnimationFrame(count);
-            }
-        };
-        requestAnimationFrame(count);
     });
-};
 
-const initWhatsappWidget = () => {
-    const widget = document.querySelector('[data-whatsapp-widget]');
-    const greeting = document.querySelector('[data-whatsapp-greeting]');
-    const closeButton = document.querySelector('[data-whatsapp-greeting-close]');
+    const page = document.body?.dataset.page ?? '';
+    if (messages && page) {
+        const welcomeByPage = {
+            'web.products': 'Estas viendo el menu. Si quieres, te ayudo a encontrar productos o explicarte como comprar.',
+            'web.products.show': 'Puedo ayudarte con este producto, el carrito o el proceso de compra.',
+            'web.checkout': 'Estas en checkout. Si tienes dudas con pago, direccion o comprobante, preguntame aqui.',
+            'web.orders': 'Desde aqui puedes revisar tus pedidos y comprobantes.',
+            'web.history': 'Puedo ayudarte a entender tu historial de compras.',
+        };
 
-    if (!widget || !greeting) {
-        return;
+        if (welcomeByPage[page]) {
+            messages.appendChild(createBubble(welcomeByPage[page], 'bot'));
+        }
     }
 
-    const showTimer = window.setTimeout(() => {
-        greeting.classList.add('is-visible');
-    }, 1200);
-
-    const hideTimer = window.setTimeout(() => {
-        greeting.classList.remove('is-visible');
-    }, 9000);
-
-    closeButton?.addEventListener('click', () => {
-        window.clearTimeout(showTimer);
-        window.clearTimeout(hideTimer);
-        greeting.classList.remove('is-visible');
+    document.addEventListener('click', (event) => {
+        if (!chatRoot.contains(event.target) && !(panel?.classList.contains('hidden') ?? true)) {
+            setOpen(false);
+        }
     });
-};
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        animateDashboard();
-        initWhatsappWidget();
-    });
-} else {
-    animateDashboard();
-    initWhatsappWidget();
 }
