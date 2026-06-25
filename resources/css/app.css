@@ -491,159 +491,6 @@
         @apply mx-auto mt-8 max-w-md rounded-[2.25rem] border border-amber-200/80 bg-white/92 p-8 shadow-xl shadow-amber-100/35;
     }
 
-    .register-shell {
-        @apply mx-auto mt-8 max-w-5xl rounded-[2.25rem] border border-amber-200/80 bg-white/92 p-5 shadow-xl shadow-amber-100/35 sm:p-8;
-    }
-
-    .register-header {
-        @apply flex flex-col gap-6 border-b border-stone-200 pb-6 lg:flex-row lg:items-end lg:justify-between;
-    }
-
-    .register-progress {
-        @apply flex items-center gap-2;
-    }
-
-    .register-progress-item {
-        @apply flex items-center gap-2 whitespace-nowrap text-xs font-medium text-stone-400;
-    }
-
-    .register-progress-item strong {
-        @apply inline-flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 bg-white text-xs;
-    }
-
-    .register-progress-item-active {
-        @apply text-amber-800;
-    }
-
-    .register-progress-item-active strong {
-        @apply border-amber-500 bg-amber-500 text-white;
-    }
-
-    .register-progress-line {
-        @apply h-px w-6 bg-stone-200 sm:w-10;
-    }
-
-    .register-section {
-        @apply mt-6 rounded-[1.75rem] border border-stone-200 bg-white/80 p-5 sm:p-6;
-    }
-
-    .register-section-highlight {
-        @apply border-amber-200 bg-amber-50/45;
-    }
-
-    .register-section-heading {
-        @apply flex items-start gap-3;
-    }
-
-    .register-section-heading h3 {
-        @apply text-lg font-semibold text-stone-950;
-    }
-
-    .register-section-heading p {
-        @apply mt-1 text-sm text-stone-500;
-    }
-
-    .register-step-number {
-        @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-sm font-semibold text-white;
-    }
-
-    .register-google-row {
-        @apply mt-5 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between;
-    }
-
-    .register-google-button,
-    .register-secondary-button,
-    .register-primary-button {
-        @apply inline-flex min-h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition;
-    }
-
-    .register-google-button,
-    .register-secondary-button {
-        @apply border border-stone-300 bg-white text-stone-800 hover:border-amber-400 hover:text-amber-800;
-    }
-
-    .register-primary-button {
-        @apply bg-stone-900 text-white hover:bg-amber-700;
-    }
-
-    .register-divider {
-        @apply my-5 flex items-center gap-4 text-xs uppercase tracking-[0.16em] text-stone-400;
-    }
-
-    .register-divider::before,
-    .register-divider::after {
-        @apply h-px flex-1 bg-stone-200;
-        content: '';
-    }
-
-    .register-verified-message,
-    .register-pending-message {
-        @apply mt-4 rounded-2xl px-4 py-3 text-sm;
-    }
-
-    .register-verified-message {
-        @apply border border-emerald-200 bg-emerald-50 text-emerald-800;
-    }
-
-    .register-pending-message {
-        @apply border border-stone-200 bg-white text-stone-600;
-    }
-
-    .register-password-rules {
-        @apply rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-stone-600;
-    }
-
-    .register-password-rules li::before {
-        content: '○';
-        @apply mr-2 text-stone-400;
-    }
-
-    .register-password-rules li.text-emerald-700::before {
-        content: '✓';
-        @apply text-emerald-600;
-    }
-
-    .register-submit-row {
-        @apply flex flex-col gap-4 rounded-[1.75rem] border border-stone-200 bg-stone-50 p-5 sm:flex-row sm:items-center sm:justify-between;
-    }
-
-    .register-submit-button {
-        @apply inline-flex min-h-12 min-w-52 items-center justify-center rounded-2xl bg-stone-900 px-6 text-sm font-semibold text-white transition hover:bg-amber-700;
-    }
-
-    .theme-dark .register-shell,
-    .theme-dark .register-section,
-    .theme-dark .register-google-row,
-    .theme-dark .register-submit-row,
-    .theme-dark .register-pending-message {
-        background: var(--panel-bg);
-        border-color: var(--panel-border);
-        box-shadow: 0 20px 45px var(--panel-shadow);
-    }
-
-    .theme-dark .register-section-highlight,
-    .theme-dark .register-password-rules {
-        @apply border-amber-900/55 bg-amber-950/25;
-    }
-
-    .theme-dark .register-google-button,
-    .theme-dark .register-secondary-button,
-    .theme-dark .register-progress-item strong {
-        @apply border-amber-900/45 bg-stone-900/70 text-amber-50;
-    }
-
-    .theme-dark .register-primary-button,
-    .theme-dark .register-submit-button,
-    .theme-dark .register-step-number {
-        @apply bg-amber-500 text-stone-950;
-    }
-
-    .theme-dark .register-progress-line,
-    .theme-dark .register-divider::before,
-    .theme-dark .register-divider::after {
-        @apply bg-amber-900/45;
-    }
-
     .product-card {
         @apply overflow-hidden rounded-[1.5rem] border border-amber-200/80 bg-white/95 shadow-md shadow-amber-100/25 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-100/50;
     }
@@ -775,6 +622,85 @@
 
     .footer-bottom-links a {
         @apply transition hover:text-[var(--color-secondary)];
+    }
+
+    .chat-assistant {
+        @apply fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3;
+    }
+
+    .chat-assistant-toggle {
+        @apply inline-flex h-18 w-18 items-center justify-center rounded-full border-4 border-white text-white shadow-2xl transition hover:-translate-y-1;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        box-shadow: 0 18px 40px rgba(22, 163, 74, 0.35);
+    }
+
+    .chat-assistant-toggle svg {
+        @apply h-8 w-8;
+    }
+
+    .chat-assistant-panel {
+        @apply w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[1.8rem] border border-amber-200/80 bg-white shadow-2xl;
+    }
+
+    .chat-assistant-header {
+        @apply flex items-start justify-between gap-3 border-b border-amber-100 bg-[linear-gradient(135deg,#fff7ed,#fef3c7)] px-5 py-4;
+    }
+
+    .chat-assistant-kicker {
+        @apply text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-secondary)];
+    }
+
+    .chat-assistant-title {
+        @apply mt-1 text-lg font-semibold text-stone-900;
+        font-family: 'Poppins', var(--font-sans);
+    }
+
+    .chat-assistant-close {
+        @apply inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-200 bg-white text-lg text-stone-600 transition hover:text-[var(--color-secondary)];
+    }
+
+    .chat-assistant-body {
+        @apply flex max-h-88 flex-col gap-3 overflow-y-auto bg-[#fffdf9] px-4 py-4;
+    }
+
+    .chat-bubble {
+        @apply max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm;
+    }
+
+    .chat-bubble-bot {
+        @apply self-start rounded-bl-md bg-amber-50 text-stone-700;
+    }
+
+    .chat-bubble-user {
+        @apply self-end rounded-br-md bg-stone-900 text-white;
+    }
+
+    .chat-assistant-quick {
+        @apply flex flex-wrap gap-2 border-t border-amber-100 bg-white px-4 py-3;
+    }
+
+    .chat-chip {
+        @apply inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-stone-700 transition hover:border-amber-400 hover:text-[var(--color-secondary)];
+    }
+
+    .chat-assistant-form {
+        @apply flex items-center gap-2 border-t border-amber-100 bg-white px-4 py-4;
+    }
+
+    .chat-assistant-input {
+        @apply min-w-0 flex-1 rounded-full border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 outline-none transition focus:border-amber-500;
+    }
+
+    .chat-assistant-send {
+        @apply inline-flex rounded-full bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-secondary)];
+    }
+
+    .chat-assistant-whatsapp {
+        @apply flex items-center justify-center gap-2 border-t border-amber-100 bg-[#f8fff9] px-4 py-4 text-sm font-semibold text-[#15803d] transition hover:bg-[#effcf1];
+    }
+
+    .chat-assistant-whatsapp svg {
+        @apply h-5 w-5;
     }
 
     .admin-shell {
@@ -921,298 +847,6 @@
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
     }
 
-    .dashboard-stat-card {
-        @apply flex min-h-36 items-start gap-4 rounded-[1.75rem] border border-stone-200 bg-white p-5 shadow-sm shadow-stone-200/35;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(255, 250, 242, 0.9));
-    }
-
-    .dashboard-reveal {
-        opacity: 1;
-        transform: none;
-    }
-
-    .dashboard-animation-ready .dashboard-reveal {
-        opacity: 0;
-        transform: translateY(18px) scale(0.985);
-        animation: dashboard-reveal 620ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        animation-delay: var(--reveal-delay, 0ms);
-    }
-
-    .dashboard-stat-icon {
-        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl;
-    }
-
-    .dashboard-stat-icon svg {
-        @apply h-5 w-5;
-        stroke-width: 1.8;
-    }
-
-    .dashboard-animation-ready .dashboard-stat-icon {
-        animation: dashboard-icon-pulse 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-        animation-delay: calc(var(--reveal-delay, 0ms) + 180ms);
-    }
-
-    .dashboard-stat-icon-amber {
-        @apply bg-amber-100 text-amber-700;
-    }
-
-    .dashboard-stat-icon-blue {
-        @apply bg-blue-100 text-blue-700;
-    }
-
-    .dashboard-stat-icon-green {
-        @apply bg-emerald-100 text-emerald-700;
-    }
-
-    .dashboard-stat-icon-violet {
-        @apply bg-violet-100 text-violet-700;
-    }
-
-    .dashboard-chart-card {
-        overflow: hidden;
-    }
-
-    .dashboard-line-chart {
-        @apply relative min-w-0;
-    }
-
-    .dashboard-line-chart svg {
-        @apply block h-auto w-full overflow-visible;
-    }
-
-    .dashboard-chart-grid {
-        stroke: #e7e5e4;
-        stroke-dasharray: 5 7;
-        stroke-width: 1;
-    }
-
-    .dashboard-chart-line {
-        fill: none;
-        stroke: #d97706;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        stroke-width: 4;
-    }
-
-    .dashboard-chart-area {
-        opacity: 1;
-        transform: none;
-        transform-origin: center bottom;
-    }
-
-    .dashboard-animation-ready .dashboard-chart-area {
-        opacity: 0;
-        transform: translateY(8px);
-        animation: dashboard-area-in 700ms ease-out 700ms forwards;
-    }
-
-    .dashboard-chart-point circle {
-        fill: #fff;
-        stroke: #d97706;
-        stroke-width: 3;
-        transition: r 160ms ease;
-    }
-
-    .dashboard-chart-point {
-        opacity: 1;
-        transform-box: fill-box;
-        transform-origin: center;
-    }
-
-    .dashboard-animation-ready .dashboard-chart-point {
-        opacity: 0;
-        animation: dashboard-point-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.4) forwards;
-        animation-delay: var(--point-delay, 700ms);
-    }
-
-    .dashboard-chart-point:hover circle {
-        r: 7;
-    }
-
-    .dashboard-chart-labels {
-        @apply relative mt-1 h-6 text-[11px] text-stone-400;
-    }
-
-    .dashboard-chart-labels span {
-        @apply absolute top-0 -translate-x-1/2 whitespace-nowrap;
-    }
-
-    .dashboard-progress {
-        @apply h-2 overflow-hidden rounded-full bg-stone-100;
-    }
-
-    .dashboard-progress span {
-        @apply block h-full rounded-full;
-        min-width: 0;
-        transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .dashboard-order-row {
-        @apply flex items-center justify-between gap-4 rounded-2xl border border-stone-100 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/40;
-    }
-
-    .dashboard-list-reveal {
-        opacity: 1;
-        transform: none;
-    }
-
-    .dashboard-animation-ready .dashboard-list-reveal {
-        opacity: 0;
-        transform: translateX(-12px);
-        animation: dashboard-list-in 480ms ease-out forwards;
-        animation-delay: calc(760ms + var(--list-delay, 0ms));
-    }
-
-    .dashboard-status {
-        @apply mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
-    }
-
-    .dashboard-status-amber {
-        @apply bg-amber-100 text-amber-800;
-    }
-
-    .dashboard-status-blue {
-        @apply bg-blue-100 text-blue-800;
-    }
-
-    .dashboard-status-green {
-        @apply bg-emerald-100 text-emerald-800;
-    }
-
-    .dashboard-status-red {
-        @apply bg-red-100 text-red-800;
-    }
-
-    .dashboard-product-row {
-        @apply flex items-center gap-3;
-    }
-
-    .dashboard-rank {
-        @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600;
-    }
-
-    .dashboard-donut {
-        @apply relative flex h-40 w-40 items-center justify-center rounded-full;
-        background: conic-gradient(#f59e0b 0 var(--donut-percent), #c2410c var(--donut-percent) 100%);
-        transform: none;
-        transition: transform 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
-    }
-
-    .dashboard-animation-ready .dashboard-donut {
-        animation: dashboard-donut-in 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards;
-        transform: rotate(0) scale(1);
-    }
-
-    .dashboard-donut-empty {
-        background: #e7e5e4;
-    }
-
-    .dashboard-donut::after {
-        @apply absolute rounded-full bg-white;
-        content: '';
-        inset: 1.15rem;
-    }
-
-    .dashboard-donut > div {
-        @apply relative z-10 text-center;
-    }
-
-    .dashboard-donut strong {
-        @apply block text-3xl font-semibold text-stone-950;
-    }
-
-    .dashboard-donut span {
-        @apply text-xs uppercase tracking-[0.18em] text-stone-500;
-    }
-
-    .dashboard-receipt-summary {
-        @apply rounded-2xl bg-stone-50 p-3 text-center;
-    }
-
-    .dashboard-receipt-summary > span {
-        @apply mx-auto mb-2 block h-2 w-8 rounded-full;
-    }
-
-    .dashboard-receipt-summary p {
-        @apply text-xs text-stone-500;
-    }
-
-    .dashboard-receipt-summary strong {
-        @apply mt-1 block text-xl text-stone-950;
-    }
-
-    @keyframes dashboard-reveal {
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    @keyframes dashboard-icon-pulse {
-        0% {
-            transform: scale(0.65) rotate(-8deg);
-        }
-        65% {
-            transform: scale(1.1) rotate(3deg);
-        }
-        100% {
-            transform: scale(1) rotate(0);
-        }
-    }
-
-    @keyframes dashboard-area-in {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes dashboard-point-in {
-        0% {
-            opacity: 0;
-            transform: scale(0);
-        }
-        100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    @keyframes dashboard-list-in {
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes dashboard-donut-in {
-        0% {
-            transform: rotate(-10deg) scale(0.88);
-        }
-        100% {
-            transform: rotate(0) scale(1);
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .dashboard-reveal,
-        .dashboard-list-reveal,
-        .dashboard-chart-area,
-        .dashboard-chart-point {
-            animation: none !important;
-            opacity: 1;
-            transform: none;
-        }
-
-        .dashboard-stat-icon,
-        .dashboard-progress span,
-        .dashboard-donut {
-            animation: none !important;
-            transition: none !important;
-            transform: none;
-        }
-    }
-
     .table-shell {
         @apply overflow-hidden rounded-[1.5rem] border border-stone-200 bg-white shadow-sm shadow-stone-200/30;
     }
@@ -1270,33 +904,12 @@
     .theme-dark .admin-topbar,
     .theme-dark .admin-card,
     .theme-dark .stat-card,
-    .theme-dark .dashboard-stat-card,
     .theme-dark .table-shell,
     .theme-dark .admin-login-card,
     .theme-dark .admin-notifications-panel {
         background: rgba(26, 20, 18, 0.94);
         border-color: rgba(115, 82, 46, 0.5);
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
-    }
-
-    .theme-dark .dashboard-chart-grid {
-        stroke: rgba(255, 255, 255, 0.12);
-    }
-
-    .theme-dark .dashboard-chart-point circle,
-    .theme-dark .dashboard-donut::after {
-        fill: #1a1412;
-        background: #1a1412;
-    }
-
-    .theme-dark .dashboard-progress,
-    .theme-dark .dashboard-rank,
-    .theme-dark .dashboard-receipt-summary {
-        @apply bg-white/8;
-    }
-
-    .theme-dark .dashboard-order-row {
-        @apply border-white/8 hover:border-amber-800 hover:bg-white/5;
     }
 
     .theme-dark .admin-sidebar-title,
@@ -1387,81 +1000,40 @@
         background: var(--color-secondary);
     }
 
-    .whatsapp-widget {
-        @apply fixed bottom-6 right-5 z-50 flex items-end gap-3 sm:right-7;
+    .theme-dark .chat-assistant-panel {
+        background: rgba(26, 20, 18, 0.96);
+        border-color: rgba(115, 82, 46, 0.5);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
     }
 
-    .whatsapp-button {
-        @apply inline-flex h-15 w-15 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl shadow-emerald-900/20 ring-4 ring-white transition hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-200;
+    .theme-dark .chat-assistant-header,
+    .theme-dark .chat-assistant-body,
+    .theme-dark .chat-assistant-quick,
+    .theme-dark .chat-assistant-form {
+        @apply border-amber-900/35;
+        background: transparent;
     }
 
-    .whatsapp-button svg {
-        @apply h-9 w-9;
-    }
-
-    .whatsapp-greeting {
-        @apply pointer-events-none relative max-w-64 rounded-2xl border border-emerald-100 bg-white px-4 py-3 pr-10 text-left text-sm text-stone-700 opacity-0 shadow-xl shadow-stone-900/12 transition duration-300;
-        transform: translateY(0.5rem) scale(0.98);
-    }
-
-    .whatsapp-greeting::after {
-        @apply absolute bottom-5 -right-2 h-4 w-4 rotate-45 border-r border-t border-emerald-100 bg-white;
-        content: '';
-    }
-
-    .whatsapp-greeting.is-visible {
-        @apply pointer-events-auto opacity-100;
-        transform: translateY(0) scale(1);
-    }
-
-    .whatsapp-greeting-title {
-        @apply text-sm font-semibold text-stone-950;
-    }
-
-    .whatsapp-greeting-copy {
-        @apply mt-1 text-xs leading-5 text-stone-600;
-    }
-
-    .whatsapp-greeting-close {
-        @apply absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700;
-    }
-
-    .whatsapp-greeting-close svg {
-        @apply h-4 w-4;
-    }
-
-    .theme-dark .whatsapp-button {
-        @apply ring-stone-950 shadow-black/35;
-    }
-
-    .theme-dark .whatsapp-greeting,
-    .theme-dark .whatsapp-greeting::after {
-        @apply border-emerald-900/45 bg-stone-900;
-    }
-
-    .theme-dark .whatsapp-greeting-title {
+    .theme-dark .chat-assistant-title {
         color: var(--color-ink);
     }
 
-    .theme-dark .whatsapp-greeting-copy {
-        color: var(--muted-text);
+    .theme-dark .chat-bubble-bot {
+        @apply bg-stone-900/80 text-amber-50;
     }
 
-    @media (max-width: 640px) {
-        .whatsapp-widget {
-            @apply bottom-4 right-4;
-        }
+    .theme-dark .chat-bubble-user {
+        background: var(--color-secondary);
+        color: #1c1917;
+    }
 
-        .whatsapp-button {
-            @apply h-14 w-14;
-        }
+    .theme-dark .chat-chip,
+    .theme-dark .chat-assistant-close,
+    .theme-dark .chat-assistant-input {
+        @apply border-amber-900/45 bg-stone-900/70 text-amber-50;
+    }
 
-        .whatsapp-button svg {
-            @apply h-8 w-8;
-        }
-
-        .whatsapp-greeting {
-            @apply hidden;
-        }
+    .theme-dark .chat-assistant-whatsapp {
+        @apply border-amber-900/35 bg-stone-900/65 text-emerald-300 hover:bg-stone-900/90;
     }
 }
