@@ -198,7 +198,7 @@
 
                     <div class="rounded-[1.5rem] border border-amber-100 bg-amber-50/60 p-5" data-payment-box>
                         <p class="eyebrow">Pago</p>
-                        <div class="mt-4 grid gap-3 md:grid-cols-4">
+                        <div class="mt-4 grid gap-3 md:grid-cols-3">
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="contra_entrega" class="mr-2" @checked($selectedPayment === 'contra_entrega') @disabled($izipayPayment)>
                                 <span class="font-semibold text-stone-900">Efectivo</span>
@@ -206,13 +206,8 @@
                             </label>
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="izipay" class="mr-2" @checked($selectedPayment === 'izipay') @disabled($izipayPayment)>
-                                <span class="font-semibold text-stone-900">Izipay</span>
-                                <span class="mt-1 block text-xs text-stone-500">Pago seguro online.</span>
-                            </label>
-                            <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
-                                <input type="radio" name="metodo_pago" value="tarjeta" class="mr-2" @checked($selectedPayment === 'tarjeta') @disabled($izipayPayment)>
                                 <span class="font-semibold text-stone-900">Tarjeta</span>
-                                <span class="mt-1 block text-xs text-stone-500">Registro manual.</span>
+                                <span class="mt-1 block text-xs text-stone-500">Pago seguro con tarjeta.</span>
                             </label>
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="yape" class="mr-2" @checked($selectedPayment === 'yape') @disabled($izipayPayment)>
@@ -221,45 +216,14 @@
                             </label>
                         </div>
 
-                        <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="tarjeta">
-                            <div class="grid gap-4 md:grid-cols-3">
-                                <div class="md:col-span-3">
-                                    <label for="tarjeta_titular" class="label">Titular de la tarjeta</label>
-                                    <input id="tarjeta_titular" name="tarjeta_titular" value="{{ old('tarjeta_titular') }}" class="input" autocomplete="cc-name">
-                                </div>
-                                <div>
-                                    <label for="tarjeta_ultimos" class="label">Ultimos 4 digitos</label>
-                                    <input id="tarjeta_ultimos" name="tarjeta_ultimos" value="{{ old('tarjeta_ultimos') }}" maxlength="4" inputmode="numeric" class="input" autocomplete="cc-number">
-                                </div>
-                                <div>
-                                    <label for="tarjeta_vencimiento" class="label">Vencimiento</label>
-                                    <input id="tarjeta_vencimiento" name="tarjeta_vencimiento" value="{{ old('tarjeta_vencimiento') }}" placeholder="MM/AA" maxlength="5" class="input" autocomplete="cc-exp">
-                                </div>
-                                <div>
-                                    <label class="label">Estado</label>
-                                    <p class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Pago registrado para confirmar.</p>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
-                            <p class="font-semibold text-stone-900">Pago seguro con Izipay</p>
+                            <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
                                 <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Completa el pago seguro con tarjeta.</p>
                                 <div class="izipay-embedded-shell mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
-                                    <div class="mb-3 grid gap-3 sm:grid-cols-3">
-                                        <div class="rounded-xl border border-teal-300 bg-white px-3 py-3 shadow-sm">
-                                            <span class="block text-sm font-semibold text-teal-700">Tarjeta</span>
-                                            <span class="text-xs text-stone-500">Preseleccionado</span>
-                                        </div>
-                                        <div class="rounded-xl border border-stone-200 bg-white px-3 py-3 opacity-60">
-                                            <span class="block text-sm font-semibold text-stone-600">QR</span>
-                                            <span class="text-xs text-stone-500">No disponible</span>
-                                        </div>
-                                        <div class="rounded-xl border border-stone-200 bg-white px-3 py-3 opacity-60">
-                                            <span class="block text-sm font-semibold text-stone-600">Yape</span>
-                                            <span class="text-xs text-stone-500">Usa opcion Yape</span>
-                                        </div>
+                                    <div class="mb-3 rounded-xl border border-teal-300 bg-white px-3 py-3 shadow-sm">
+                                        <span class="block text-sm font-semibold text-teal-700">Tarjeta</span>
+                                        <span class="text-xs text-stone-500">Pago seguro online</span>
                                     </div>
                                     <div class="kr-embedded" kr-form-token="{{ $izipayPayment['formToken'] }}">
                                         <div class="kr-pan"></div>
@@ -273,10 +237,9 @@
                                         <div class="kr-form-error"></div>
                                     </div>
                                     <p class="mt-3 text-center text-xs text-stone-500">Recuerda activar tus compras por internet.</p>
-                                    <p class="mt-1 text-center text-[10px] uppercase tracking-widest text-stone-400">Powered by <strong class="text-teal-600 normal-case tracking-normal">izipay</strong></p>
                                 </div>
                             @else
-                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aqui el formulario seguro de Izipay para pagar con tarjeta.</p>
+                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aqui el formulario seguro para pagar con tarjeta.</p>
                             @endif
                         </div>
 

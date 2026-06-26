@@ -40,9 +40,6 @@ class CheckoutWebController extends Controller
             'tipo_documento' => ['required', 'in:DNI,RUC'],
             'numero_documento' => ['required', 'string'],
             'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,izipay,yape'],
-            'tarjeta_titular' => ['nullable', 'string', 'max:120'],
-            'tarjeta_ultimos' => ['nullable', 'regex:/^\d{4}$/'],
-            'tarjeta_vencimiento' => ['nullable', 'regex:/^(0[1-9]|1[0-2])\/\d{2}$/'],
             'yape_operacion' => ['nullable', 'string', 'max:40'],
             'acepta_pago' => ['accepted'],
         ], [
@@ -63,10 +60,6 @@ class CheckoutWebController extends Controller
 
         if ($data['tipo_documento'] === 'RUC' && !preg_match('/^\d{11}$/', $data['numero_documento'])) {
             return back()->withInput()->with('error', 'El RUC debe tener 11 digitos.');
-        }
-
-        if ($data['metodo_pago'] === 'tarjeta' && (empty($data['tarjeta_titular']) || empty($data['tarjeta_ultimos']) || empty($data['tarjeta_vencimiento']))) {
-            return back()->withInput()->with('error', 'Completa los datos de la tarjeta.');
         }
 
         if ($data['metodo_pago'] === 'yape' && empty($data['yape_operacion'])) {
@@ -109,15 +102,12 @@ class CheckoutWebController extends Controller
             'telefono_contacto' => $data['telefono_contacto'],
             'notas' => $data['notas'] ?? null,
             'metodo_pago' => $data['metodo_pago'],
-            'pago_referencia' => $data['metodo_pago'] === 'tarjeta'
-                ? 'Tarjeta ****' . $data['tarjeta_ultimos'] . ' - ' . trim((string) $data['tarjeta_titular']) . ' - ' . $data['tarjeta_vencimiento']
-                : match ($data['metodo_pago']) {
-                    'yape' => 'Operacion Yape: ' . trim((string) $data['yape_operacion']),
-                    'izipay' => 'Pago Izipay pendiente',
-                    default => 'Pago contra entrega',
-                },
+            'pago_referencia' => match ($data['metodo_pago']) {
+                'izipay' => 'Pago con tarjeta pendiente',
+                'yape' => 'Operacion Yape: ' . trim((string) $data['yape_operacion']),
+                default => 'Pago contra entrega',
+            },
         ]);
-
         if ($orderResponse->failed()) {
             return back()->withInput()->with('error', $this->api->errorMessage($orderResponse, 'No se pudo crear el pedido.'));
         }
