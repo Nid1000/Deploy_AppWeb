@@ -112,6 +112,8 @@ class IzipayController extends Controller
             return response('Datos de pago invalidos', 400);
         }
 
+        $pedido = DB::table('pedidos')->select(['id', 'total'])->where('id', $pedidoId)->first();
+        $total = number_format((float) ($pedido->total ?? 0), 2);
         $publicKey = htmlspecialchars($this->izipay->publicKey(), ENT_QUOTES, 'UTF-8');
         $formTokenSafe = htmlspecialchars($formToken, ENT_QUOTES, 'UTF-8');
         $jsUrl = htmlspecialchars($this->izipay->jsUrl(), ENT_QUOTES, 'UTF-8');
@@ -132,23 +134,70 @@ class IzipayController extends Controller
     kr-post-url-success="{$successUrl}"
     kr-post-url-refused="{$cancelUrl}"></script>
   <style>
-    body{font-family:Arial,sans-serif;background:#f8f4ed;margin:0;padding:24px;color:#2b2118}
-    main{max-width:520px;margin:0 auto;background:white;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-    h1{font-size:22px;margin:0 0 12px}
+    *{box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7f4ee;margin:0;color:#1f2933}
+    .shell{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:34px 16px}
+    main{width:min(560px,100%);background:#fff;border:1px solid #ece7dd;border-radius:18px;padding:22px;box-shadow:0 18px 45px rgba(35,31,25,.10)}
+    .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .brand h1{font-size:22px;line-height:1.1;margin:0;color:#111827}
+    .brand p{margin:6px 0 0;color:#6b7280;font-size:14px}
+    .amount{border-radius:14px;background:#f9fafb;border:1px solid #e5e7eb;padding:10px 14px;text-align:right}
+    .amount span{display:block;color:#6b7280;font-size:12px}
+    .amount strong{display:block;margin-top:2px;color:#009b9f;font-size:18px}
+    .methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 14px}
+    .method{min-height:64px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:10px 12px;font-size:13px;color:#374151;box-shadow:0 2px 8px rgba(17,24,39,.04)}
+    .method.active{border-color:#00a6a6;box-shadow:0 0 0 1px #00a6a6,0 8px 18px rgba(0,166,166,.12)}
+    .method .icon{display:block;color:#00a6a6;font-weight:700;font-size:15px;margin-bottom:5px}
+    .method.disabled{color:#9ca3af;background:#fafafa}
+    .kr-embedded{display:block;width:100%;margin-top:8px}
+    .kr-embedded .kr-pan,
+    .kr-embedded .kr-expiry,
+    .kr-embedded .kr-security-code,
+    .kr-embedded .kr-identity-document-type,
+    .kr-embedded .kr-first-installment-delay,
+    .kr-embedded .kr-installment-number{width:100%;min-height:46px;margin:10px 0;border:1px solid #d1d5db;border-radius:6px;background:#fff;padding:12px;color:#6b7280}
+    .kr-embedded select,
+    .kr-embedded input{width:100%;min-height:40px;border:1px solid #d1d5db;border-radius:6px;padding:10px 12px;background:#fff;font-size:14px}
+    .kr-payment-button{width:100%;min-height:48px;margin-top:16px;border:0;border-radius:7px;background:#00a6a6;color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 12px 24px rgba(0,166,166,.22)}
+    .kr-payment-button:hover{background:#008f91}
+    .kr-form-error{margin-top:12px;color:#dc2626;font-size:13px}
+    .note{margin:10px 0 0;text-align:center;color:#8b8b8b;font-size:11px}
+    .powered{margin-top:10px;text-align:center;color:#9ca3af;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+    .powered strong{color:#00a6a6;text-transform:none;letter-spacing:0}
+    @media(max-width:520px){.brand{align-items:flex-start;flex-direction:column}.amount{text-align:left;width:100%}.methods{grid-template-columns:1fr}.shell{padding:18px 10px}main{padding:18px}}
   </style>
 </head>
 <body>
+  <div class="shell">
   <main>
-    <h1>Pago seguro Izipay</h1>
-    <p>Pedido #{$pedidoId}</p>
+    <div class="brand">
+      <div>
+        <h1>Pago seguro Izipay</h1>
+        <p>Pedido #{$pedidoId}</p>
+      </div>
+      <div class="amount">
+        <span>Total</span>
+        <strong>S/ {$total}</strong>
+      </div>
+    </div>
+    <div class="methods" aria-label="Metodos de pago">
+      <div class="method active"><span class="icon">Tarjeta</span>Debito o credito</div>
+      <div class="method disabled"><span class="icon">QR</span>No disponible</div>
+      <div class="method disabled"><span class="icon">Yape</span>Usa el checkout</div>
+    </div>
     <div class="kr-embedded" kr-form-token="{$formTokenSafe}">
       <div class="kr-pan"></div>
       <div class="kr-expiry"></div>
       <div class="kr-security-code"></div>
+      <div class="kr-installment-number"></div>
+      <div class="kr-first-installment-delay"></div>
       <button class="kr-payment-button"></button>
       <div class="kr-form-error"></div>
     </div>
+    <p class="note">Recuerda activar tus compras por internet antes de pagar.</p>
+    <p class="powered">Powered by <strong>izipay</strong></p>
   </main>
+  </div>
 </body>
 </html>
 HTML;
