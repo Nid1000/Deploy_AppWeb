@@ -54,6 +54,12 @@ class IzipayController extends Controller
         try {
             $formToken = $this->izipay->createFormToken($pedido, $usuario);
         } catch (\Throwable $e) {
+            Log::error('No se pudo crear el formToken de Izipay.', [
+                'pedido_id' => (int) $pedido->id,
+                'usuario_id' => $usuarioId,
+                'error' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'statusCode' => 503,
                 'error' => 'Izipay no disponible',

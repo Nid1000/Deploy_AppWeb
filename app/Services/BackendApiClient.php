@@ -104,11 +104,26 @@ class BackendApiClient
 
     public function errorMessage(Response $response, string $fallback): string
     {
-        return (string) (
-            data_get($response->json(), 'message')
-            ?: data_get($response->json(), 'error')
-            ?: $fallback
-        );
+        $payload = null;
+        try {
+            $payload = $response->json();
+        } catch (\Throwable) {
+            $payload = null;
+        }
+
+        $message = is_array($payload)
+            ? (string) (data_get($payload, 'message') ?: data_get($payload, 'error') ?: '')
+            : '';
+
+        if ($message !== '' && !in_array(strtolower($message), ['server error', 'internal server error'], true)) {
+            return $message;
+        }
+
+        if ($response->serverError()) {
+            return $fallback . ' El backend devolvio error ' . $response->status() . '. Revisa logs y cache del backend.';
+        }
+
+        return $message !== '' ? $message : $fallback;
     }
 
     public function publicUrl(null|string $path = null): string

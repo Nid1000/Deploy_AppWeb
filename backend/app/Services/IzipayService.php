@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class IzipayService
@@ -137,7 +138,19 @@ class IzipayService
     private function decodePaymentResponse(Response $response): array
     {
         if (!$response->successful()) {
-            throw new RuntimeException('Izipay rechazo la solicitud de pago.');
+            Log::warning('Izipay rechazo la solicitud de pago.', [
+                'status' => $response->status(),
+                'response' => $response->json() ?: $response->body(),
+            ]);
+
+            $message = (string) (
+                data_get($response->json(), 'answer.errorMessage')
+                ?: data_get($response->json(), 'answer.detailedErrorMessage')
+                ?: data_get($response->json(), 'message')
+                ?: 'Izipay rechazo la solicitud de pago.'
+            );
+
+            throw new RuntimeException($message);
         }
 
         $payload = $response->json();
