@@ -51,7 +51,7 @@ class CheckoutWebController extends Controller
             'comprobante_tipo' => ['required', 'in:boleta,factura'],
             'tipo_documento' => ['required', 'in:DNI,RUC'],
             'numero_documento' => ['required', 'string'],
-            'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,yape'],
+            'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,izipay,yape'],
             'tarjeta_titular' => ['nullable', 'string', 'max:120'],
             'tarjeta_ultimos' => ['nullable', 'regex:/^\d{4}$/'],
             'tarjeta_vencimiento' => ['nullable', 'regex:/^(0[1-9]|1[0-2])\/\d{2}$/'],
@@ -123,7 +123,11 @@ class CheckoutWebController extends Controller
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => $data['metodo_pago'] === 'tarjeta'
                 ? 'Tarjeta ****' . $data['tarjeta_ultimos'] . ' - ' . trim((string) $data['tarjeta_titular']) . ' - ' . $data['tarjeta_vencimiento']
-                : ($data['metodo_pago'] === 'yape' ? 'Operacion Yape: ' . trim((string) $data['yape_operacion']) : 'Pago contra entrega'),
+                : match ($data['metodo_pago']) {
+                    'yape' => 'Operacion Yape: ' . trim((string) $data['yape_operacion']),
+                    'izipay' => 'Pago Izipay pendiente',
+                    default => 'Pago contra entrega',
+                },
         ]);
 
         if ($orderResponse->failed()) {
@@ -131,6 +135,29 @@ class CheckoutWebController extends Controller
         }
 
         $pedidoId = (int) data_get($orderResponse->json(), 'pedido.id', 0);
+
+        if ($data['metodo_pago'] === 'izipay') {
+            $paymentResponse = $this->api->post('pagos/izipay/crear', [
+                'pedido_id' => $pedidoId,
+            ]);
+
+            if ($paymentResponse->failed()) {
+                return redirect()->route('web.orders.show', $pedidoId)
+                    ->with('success', 'Pedido creado correctamente.')
+                    ->with('error', $this->api->errorMessage($paymentResponse, 'No se pudo iniciar el pago con Izipay.'));
+            }
+
+            StorefrontCart::clear($request);
+
+            $checkoutUrl = (string) data_get($paymentResponse->json(), 'checkout_url', '');
+            if ($checkoutUrl === '') {
+                return redirect()->route('web.orders.show', $pedidoId)
+                    ->with('success', 'Pedido creado correctamente.')
+                    ->with('error', 'Izipay no devolvio una URL de pago.');
+            }
+
+            return redirect()->away($checkoutUrl);
+        }
 
         $invoiceResponse = $this->api->post('facturacion/emitir', [
             'pedido_id' => $pedidoId,

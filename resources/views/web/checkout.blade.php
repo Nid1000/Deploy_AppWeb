@@ -141,11 +141,16 @@
 
                     <div class="rounded-[1.5rem] border border-amber-100 bg-amber-50/60 p-5" data-payment-box>
                         <p class="eyebrow">Pago</p>
-                        <div class="mt-4 grid gap-3 md:grid-cols-3">
+                        <div class="mt-4 grid gap-3 md:grid-cols-4">
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="contra_entrega" class="mr-2" @checked(old('metodo_pago', 'contra_entrega') === 'contra_entrega')>
                                 <span class="font-semibold text-stone-900">Efectivo</span>
                                 <span class="mt-1 block text-xs text-stone-500">Paga al recibir.</span>
+                            </label>
+                            <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
+                                <input type="radio" name="metodo_pago" value="izipay" class="mr-2" @checked(old('metodo_pago') === 'izipay')>
+                                <span class="font-semibold text-stone-900">Izipay</span>
+                                <span class="mt-1 block text-xs text-stone-500">Pago seguro online.</span>
                             </label>
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="tarjeta" class="mr-2" @checked(old('metodo_pago') === 'tarjeta')>
@@ -178,6 +183,11 @@
                                     <p class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Pago registrado para confirmar.</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
+                            <p class="font-semibold text-stone-900">Pago seguro con Izipay</p>
+                            <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido te enviaremos al formulario seguro de Izipay para pagar con tarjeta.</p>
                         </div>
 
                         <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">

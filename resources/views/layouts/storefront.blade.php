@@ -139,7 +139,7 @@
                             Historial
                         </a>
                         <a href="{{ route('web.profile') }}" class="hidden rounded-full border border-amber-200 bg-white/90 px-4 py-2 font-medium text-stone-700 shadow-sm xl:inline-flex">
-                            Mi cuenta
+                            {{ trim(($storefrontUser['nombre'] ?? '') . ' ' . ($storefrontUser['apellido'] ?? '')) ?: 'Mi cuenta' }}
                         </a>
                         <form action="{{ route('web.logout') }}" method="POST">
                             @csrf

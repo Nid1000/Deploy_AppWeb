@@ -70,6 +70,28 @@ return [
         'review_delay_days' => (int) env('REVIEW_EMAIL_DELAY_DAYS', 1),
     ],
 
+    'izipay' => [
+        'enabled' => filter_var(env('IZIPAY_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+        'mode' => env('IZIPAY_MODE', 'test'),
+        'api_base_url' => rtrim((string) env('IZIPAY_API_BASE_URL', env('IZIPAY_API_REST_URL', 'https://api.micuentaweb.pe')), '/'),
+        'api_rest_url' => rtrim((string) env('IZIPAY_API_REST_URL', env('IZIPAY_API_BASE_URL', 'https://api.micuentaweb.pe')), '/'),
+        'static_base_url' => rtrim((string) env('IZIPAY_STATIC_BASE_URL', 'https://static.micuentaweb.pe'), '/'),
+        'js_url' => env('IZIPAY_JS_URL', 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js'),
+        'username' => env('IZIPAY_USERNAME', env('IZIPAY_API_USER', '')),
+        'api_user' => env('IZIPAY_API_USER', env('IZIPAY_USERNAME', '')),
+        'password' => env('IZIPAY_PASSWORD', ''),
+        'api_password_test' => env('IZIPAY_API_PASSWORD_TEST', env('IZIPAY_PASSWORD', '')),
+        'api_password_production' => env('IZIPAY_API_PASSWORD_PRODUCTION', env('IZIPAY_PASSWORD', '')),
+        'public_key' => env('IZIPAY_PUBLIC_KEY', ''),
+        'public_key_test' => env('IZIPAY_PUBLIC_KEY_TEST', env('IZIPAY_PUBLIC_KEY', '')),
+        'public_key_production' => env('IZIPAY_PUBLIC_KEY_PRODUCTION', env('IZIPAY_PUBLIC_KEY', '')),
+        'hmac_key_test' => env('IZIPAY_HMAC_KEY_TEST', ''),
+        'hmac_key_production' => env('IZIPAY_HMAC_KEY_PRODUCTION', ''),
+        'currency' => env('IZIPAY_CURRENCY', 'PEN'),
+        'return_url' => env('IZIPAY_RETURN_URL', env('APP_URL').'/api/pagos/izipay/retorno'),
+        'cancel_url' => env('IZIPAY_CANCEL_URL', env('APP_URL').'/api/pagos/izipay/cancelado'),
+    ],
+
     'documents' => [
         'provider' => env('DOCUMENT_PROVIDER', 'apiperu'),
         'validation_required' => filter_var(

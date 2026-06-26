@@ -11,6 +11,7 @@ use App\Http\Controllers\NotificacionesController;
 use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\IzipayController;
 use App\Http\Controllers\AdminReservasController;
 use App\Http\Controllers\AdminAlmacenController;
 use Illuminate\Support\Facades\DB;
@@ -108,7 +109,14 @@ Route::middleware(['jwt', 'tipo:usuario'])->group(function () {
     Route::get('/facturacion/mis-comprobantes', [FacturacionController::class, 'misComprobantes']);
     Route::get('/facturacion/consulta-dni', [FacturacionController::class, 'consultaDni']);
     Route::get('/facturacion/consulta-ruc', [FacturacionController::class, 'consultaRuc']);
+    Route::post('/pagos/izipay/crear', [IzipayController::class, 'crear']);
 });
+
+Route::get('/pagos/izipay/checkout', [IzipayController::class, 'checkout']);
+Route::post('/pagos/izipay/confirmar', [IzipayController::class, 'confirmar']);
+Route::post('/pagos/izipay/ipn', [IzipayController::class, 'ipn']);
+Route::match(['get', 'post'], '/pagos/izipay/retorno', [IzipayController::class, 'retorno']);
+Route::match(['get', 'post'], '/pagos/izipay/cancelado', [IzipayController::class, 'cancelado']);
 
 Route::middleware(['jwt', 'tipo:admin'])->group(function () {
     Route::get('/facturacion/admin/comprobantes', [FacturacionController::class, 'adminComprobantes']);

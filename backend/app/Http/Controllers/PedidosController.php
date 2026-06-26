@@ -117,7 +117,7 @@ class PedidosController extends Controller
                 'direccion_id' => ['nullable', 'integer'],
                 'telefono_contacto' => ['nullable', 'string'],
                 'notas' => ['nullable', 'string'],
-                'metodo_pago' => ['nullable', 'in:yape,tarjeta,contra_entrega'],
+                'metodo_pago' => ['nullable', 'in:yape,tarjeta,izipay,contra_entrega'],
                 'pago_referencia' => ['nullable', 'string', 'max:255'],
             ]);
         } catch (ValidationException $e) {
@@ -200,7 +200,7 @@ class PedidosController extends Controller
                 'pedido_id' => $pedidoId,
                 'metodo' => $data['metodo_pago'] ?? 'contra_entrega',
                 'monto' => (string) $total,
-                'estado' => ($data['metodo_pago'] ?? 'contra_entrega') === 'contra_entrega' ? 'pendiente' : 'pagado',
+                'estado' => in_array(($data['metodo_pago'] ?? 'contra_entrega'), ['contra_entrega', 'izipay'], true) ? 'pendiente' : 'pagado',
                 'referencia' => $data['pago_referencia'] ?? null,
                 'fecha' => now(),
             ]);
