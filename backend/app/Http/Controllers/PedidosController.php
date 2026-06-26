@@ -196,11 +196,14 @@ class PedidosController extends Controller
                 ]);
             }
 
+            $metodoPago = (string) ($data['metodo_pago'] ?? 'contra_entrega');
+            $metodoPersistido = $metodoPago === 'izipay' ? 'tarjeta' : $metodoPago;
+
             DB::table('pagos')->insert([
                 'pedido_id' => $pedidoId,
-                'metodo' => $data['metodo_pago'] ?? 'contra_entrega',
+                'metodo' => $metodoPersistido,
                 'monto' => (string) $total,
-                'estado' => in_array(($data['metodo_pago'] ?? 'contra_entrega'), ['contra_entrega', 'izipay'], true) ? 'pendiente' : 'pagado',
+                'estado' => in_array($metodoPago, ['contra_entrega', 'izipay'], true) ? 'pendiente' : 'pagado',
                 'referencia' => $data['pago_referencia'] ?? null,
                 'fecha' => now(),
             ]);

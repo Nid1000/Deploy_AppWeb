@@ -68,7 +68,7 @@ class IzipayController extends Controller
         }
 
         DB::table('pagos')->where('pedido_id', (int) $pedido->id)->update([
-            'metodo' => 'izipay',
+            'metodo' => 'tarjeta',
             'estado' => 'pendiente',
             'referencia' => 'izipay:form-token-created',
         ]);
@@ -225,11 +225,11 @@ HTML;
 
         DB::table('pagos')
             ->where('pedido_id', $pedidoId)
-            ->whereIn('metodo', ['izipay', 'tarjeta'])
+            ->whereIn('metodo', ['tarjeta'])
             ->update([
-                'metodo' => 'izipay',
+                'metodo' => 'tarjeta',
                 'estado' => $paid ? 'pagado' : 'rechazado',
-                'referencia' => $transaction ? $orderId.' / '.$transaction : $orderId,
+                'referencia' => $transaction ? 'Izipay '.$orderId.' / '.$transaction : 'Izipay '.$orderId,
                 'fecha' => now(),
             ]);
 
