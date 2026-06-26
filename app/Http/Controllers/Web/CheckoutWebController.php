@@ -19,22 +19,10 @@ class CheckoutWebController extends Controller
 
     public function show(Request $request): View
     {
-        $cartItems = StorefrontCart::items($request);
-        $districtsResponse = $this->api->get('usuarios/distritos-huancayo');
-        $minDeliveryDate = now()->addDay()->toDateString();
-
-        return view('web.checkout', [
-            'cartItems' => $cartItems,
-            'cartTotal' => StorefrontCart::total($request),
-            'distritos' => $this->mapDistricts($this->api->okData($districtsResponse, 'distritos', [])),
-            'user' => $request->session()->get('web_user'),
-            'minDeliveryDate' => $minDeliveryDate,
-            'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.svg')),
-            'yapePhone' => env('YAPE_PHONE', '993560096'),
-        ]);
+        return view('web.checkout', $this->checkoutViewData($request));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): View|RedirectResponse
     {
         $cartItems = StorefrontCart::items($request);
         if ($cartItems->isEmpty()) {
@@ -149,14 +137,25 @@ class CheckoutWebController extends Controller
 
             StorefrontCart::clear($request);
 
-            $checkoutUrl = (string) data_get($paymentResponse->json(), 'checkout_url', '');
-            if ($checkoutUrl === '') {
+            $payment = $paymentResponse->json();
+            $formToken = (string) data_get($payment, 'formToken', '');
+            $publicKey = (string) data_get($payment, 'publicKey', '');
+            if ($formToken === '' || $publicKey === '') {
                 return redirect()->route('web.orders.show', $pedidoId)
                     ->with('success', 'Pedido creado correctamente.')
-                    ->with('error', 'Izipay no devolvio una URL de pago.');
+                    ->with('error', 'Izipay no devolvio los datos para mostrar el formulario de pago.');
             }
 
-            return redirect()->away($checkoutUrl);
+            return view('web.checkout', $this->checkoutViewData($request, $cartItems, [
+                'pedidoId' => $pedidoId,
+                'orderId' => (string) data_get($payment, 'orderId', 'PEDIDO-'.$pedidoId),
+                'formToken' => $formToken,
+                'publicKey' => $publicKey,
+                'jsUrl' => (string) data_get($payment, 'jsUrl', ''),
+                'cssUrl' => (string) data_get($payment, 'cssUrl', ''),
+                'successUrl' => (string) data_get($payment, 'successUrl', ''),
+                'cancelUrl' => (string) data_get($payment, 'cancelUrl', ''),
+            ]));
         }
 
         $invoiceResponse = $this->api->post('facturacion/emitir', [
@@ -282,6 +281,23 @@ class CheckoutWebController extends Controller
     private function mapDistricts(mixed $districts): \Illuminate\Support\Collection
     {
         return collect($districts)->map(fn ($district) => is_array($district) ? (object) $district : $district)->values();
+    }
+
+    private function checkoutViewData(Request $request, mixed $cartItems = null, ?array $izipayPayment = null): array
+    {
+        $cartItems ??= StorefrontCart::items($request);
+        $districtsResponse = $this->api->get('usuarios/distritos-huancayo');
+
+        return [
+            'cartItems' => $cartItems,
+            'cartTotal' => $cartItems->sum('subtotal'),
+            'distritos' => $this->mapDistricts($this->api->okData($districtsResponse, 'distritos', [])),
+            'user' => $request->session()->get('web_user'),
+            'minDeliveryDate' => now()->addDay()->toDateString(),
+            'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.svg')),
+            'yapePhone' => env('YAPE_PHONE', '993560096'),
+            'izipayPayment' => $izipayPayment,
+        ];
     }
 
     private function requiresRealDocumentValidation(): bool

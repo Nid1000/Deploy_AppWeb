@@ -16,6 +16,7 @@
         })();
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('head')
 </head>
 <body class="storefront-body" data-page="{{ request()->route()?->getName() }}">
     <div class="storefront-bg" aria-hidden="true">
@@ -334,5 +335,6 @@
             </div>
         </div>
     </footer>
+    @stack('scripts')
 </body>
 </html>

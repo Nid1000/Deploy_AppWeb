@@ -85,6 +85,10 @@ class IzipayController extends Controller
             'checkout_url' => url('/api/pagos/izipay/checkout?token='.$checkoutToken),
             'formToken' => $formToken,
             'publicKey' => $this->izipay->publicKey(),
+            'jsUrl' => $this->izipay->jsUrl(),
+            'cssUrl' => (string) preg_replace('/\.js(\?.*)?$/', '.css$1', $this->izipay->jsUrl()),
+            'successUrl' => url('/api/pagos/izipay/confirmar'),
+            'cancelUrl' => (string) config('services.izipay.cancel_url'),
             'orderId' => 'PEDIDO-'.(int) $pedido->id,
         ], 200);
     }
