@@ -216,7 +216,7 @@
                             </label>
                         </div>
 
-                        <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
+                        <div class="mt-4 {{ $selectedPayment === 'izipay' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
                             <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
                                 <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Completa el pago seguro con tarjeta.</p>
@@ -243,7 +243,7 @@
                             @endif
                         </div>
 
-                        <div class="mt-4 hidden rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">
+                        <div class="mt-4 {{ $selectedPayment === 'yape' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">
                             <div class="grid gap-4 md:grid-cols-[150px_1fr] md:items-center">
                                 <img src="{{ $yapeQrUrl }}" alt="QR de Yape" class="h-36 w-36 rounded-2xl border border-stone-200 object-cover">
                                 <div>
