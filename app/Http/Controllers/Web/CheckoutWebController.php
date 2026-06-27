@@ -100,7 +100,7 @@ class CheckoutWebController extends Controller
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => match ($data['metodo_pago']) {
                 'izipay' => 'Pago con tarjeta Izipay pendiente',
-                'yape' => 'Pago QR/Yape Izipay pendiente',
+                'yape' => 'Pago por Yape pendiente',
                 default => 'Pago contra entrega',
             },
         ]);
@@ -110,10 +110,10 @@ class CheckoutWebController extends Controller
 
         $pedidoId = (int) data_get($orderResponse->json(), 'pedido.id', 0);
 
-        if (in_array($data['metodo_pago'], ['izipay', 'yape'], true)) {
+        if ($data['metodo_pago'] === 'izipay') {
             $paymentResponse = $this->api->post('pagos/izipay/crear', [
                 'pedido_id' => $pedidoId,
-                'metodo_pago' => $data['metodo_pago'] === 'yape' ? 'yape' : 'tarjeta',
+                'metodo_pago' => 'tarjeta',
             ]);
 
             if ($paymentResponse->failed()) {
@@ -293,8 +293,8 @@ class CheckoutWebController extends Controller
             'distritos' => $this->mapDistricts($this->api->okData($districtsResponse, 'distritos', [])),
             'user' => $request->session()->get('web_user'),
             'minDeliveryDate' => now()->addDay()->toDateString(),
-            'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.svg')),
-            'yapePhone' => env('YAPE_PHONE', '993560096'),
+            'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.png')),
+            'yapePhone' => env('YAPE_PHONE', '974268690'),
             'izipayPayment' => $izipayPayment,
         ];
     }

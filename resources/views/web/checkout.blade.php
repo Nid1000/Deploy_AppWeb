@@ -292,16 +292,17 @@
                         </div>
 
                         <div class="mt-4 {{ $selectedPayment === 'yape' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">
-                            <p class="font-semibold text-stone-900">Pago seguro con QR/Yape</p>
-                            @if ($izipayPayment)
-                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Elige QR/Yape en el formulario seguro si esta disponible en tu cuenta Izipay.</p>
-                                <div class="izipay-embedded-shell mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
-                                    <div class="kr-smart-form" kr-form-token="{{ $izipayPayment['formToken'] }}"></div>
-                                    <p class="mt-3 text-center text-xs text-stone-500">Si no aparece QR/Yape, debes activarlo en el Back Office de Izipay.</p>
+                            <p class="font-semibold text-stone-900">Pago con Yape</p>
+                            <div class="mt-4 grid gap-4 rounded-2xl border border-purple-100 bg-purple-50/40 p-4 md:grid-cols-[190px_1fr] md:items-center">
+                                <div class="rounded-2xl border border-purple-100 bg-white p-3 shadow-sm">
+                                    <img src="{{ $yapeQrUrl }}" alt="QR de Yape Delicias del centro" class="mx-auto aspect-square w-full max-w-[170px] rounded-xl object-contain">
                                 </div>
-                            @else
-                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos el QR seguro generado por Izipay, si esta habilitado en tu cuenta.</p>
-                            @endif
+                                <div>
+                                    <p class="text-sm text-stone-600">Escanea el QR y paga al numero:</p>
+                                    <p class="mt-1 text-2xl font-semibold text-purple-900">{{ $yapePhone }}</p>
+                                    <p class="mt-3 text-sm text-stone-600">Luego confirma el pedido. Delicias verificara el pago y lo marcara como pagado.</p>
+                                </div>
+                            </div>
                         </div>
 
                         <label class="mt-4 flex items-start gap-3 text-sm text-stone-700">
