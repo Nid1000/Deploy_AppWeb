@@ -23,6 +23,7 @@ class IzipayController extends Controller
         try {
             $data = $request->validate([
                 'pedido_id' => ['required', 'integer', 'min:1'],
+                'metodo_pago' => ['nullable', 'in:tarjeta,yape'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -67,10 +68,12 @@ class IzipayController extends Controller
             ], 503);
         }
 
+        $metodoPago = ($data['metodo_pago'] ?? 'tarjeta') === 'yape' ? 'yape' : 'tarjeta';
+
         DB::table('pagos')->where('pedido_id', (int) $pedido->id)->update([
-            'metodo' => 'tarjeta',
+            'metodo' => $metodoPago,
             'estado' => 'pendiente',
-            'referencia' => 'izipay:form-token-created',
+            'referencia' => $metodoPago === 'yape' ? 'izipay:yape-form-token-created' : 'izipay:form-token-created',
         ]);
 
         $checkoutToken = app(JwtService::class)->sign([
@@ -78,6 +81,7 @@ class IzipayController extends Controller
             'pedido_id' => (int) $pedido->id,
             'usuario_id' => $usuarioId,
             'form_token' => $formToken,
+            'metodo_pago' => $metodoPago,
         ], 15 * 60);
 
         return response()->json([
@@ -90,6 +94,7 @@ class IzipayController extends Controller
             'successUrl' => url('/api/pagos/izipay/confirmar'),
             'cancelUrl' => (string) config('services.izipay.cancel_url'),
             'orderId' => 'PEDIDO-'.(int) $pedido->id,
+            'metodo_pago' => $metodoPago,
         ], 200);
     }
 
@@ -148,12 +153,7 @@ class IzipayController extends Controller
     .amount{border-radius:14px;background:#f9fafb;border:1px solid #e5e7eb;padding:10px 14px;text-align:right}
     .amount span{display:block;color:#6b7280;font-size:12px}
     .amount strong{display:block;margin-top:2px;color:#009b9f;font-size:18px}
-    .methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 14px}
-    .method{min-height:64px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:10px 12px;font-size:13px;color:#374151;box-shadow:0 2px 8px rgba(17,24,39,.04)}
-    .method.active{border-color:#00a6a6;box-shadow:0 0 0 1px #00a6a6,0 8px 18px rgba(0,166,166,.12)}
-    .method .icon{display:block;color:#00a6a6;font-weight:700;font-size:15px;margin-bottom:5px}
-    .method.disabled{color:#9ca3af;background:#fafafa}
-    .kr-embedded{display:block;width:100%;margin-top:8px}
+    .kr-smart-form,.kr-embedded{display:block;width:100%;margin-top:16px}
     .kr-embedded .kr-pan,
     .kr-embedded .kr-expiry,
     .kr-embedded .kr-security-code,
@@ -168,7 +168,6 @@ class IzipayController extends Controller
     .note{margin:10px 0 0;text-align:center;color:#8b8b8b;font-size:11px}
     .powered{margin-top:10px;text-align:center;color:#9ca3af;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
     .powered strong{color:#00a6a6;text-transform:none;letter-spacing:0}
-    @media(max-width:520px){.brand{align-items:flex-start;flex-direction:column}.amount{text-align:left;width:100%}.methods{grid-template-columns:1fr}.shell{padding:18px 10px}main{padding:18px}}
   </style>
 </head>
 <body>
@@ -184,20 +183,8 @@ class IzipayController extends Controller
         <strong>S/ {$total}</strong>
       </div>
     </div>
-    <div class="methods" aria-label="Metodos de pago">
-      <div class="method active"><span class="icon">Tarjeta</span>Debito o credito</div>
-      <div class="method disabled"><span class="icon">QR</span>No disponible</div>
-      <div class="method disabled"><span class="icon">Yape</span>Usa el checkout</div>
-    </div>
-    <div class="kr-embedded" kr-form-token="{$formTokenSafe}">
-      <div class="kr-pan"></div>
-      <div class="kr-expiry"></div>
-      <div class="kr-security-code"></div>
-      <div class="kr-installment-number"></div>
-      <div class="kr-first-installment-delay"></div>
-      <button class="kr-payment-button"></button>
-      <div class="kr-form-error"></div>
-    </div>
+    <p class="note">Elige tarjeta, QR o el metodo disponible en el formulario seguro.</p>
+    <div class="kr-smart-form" kr-form-token="{$formTokenSafe}"></div>
     <p class="note">Recuerda activar tus compras por internet antes de pagar.</p>
     <p class="powered">Powered by <strong>izipay</strong></p>
   </main>
@@ -278,9 +265,8 @@ HTML;
 
         DB::table('pagos')
             ->where('pedido_id', $pedidoId)
-            ->whereIn('metodo', ['tarjeta'])
+            ->whereIn('metodo', ['tarjeta', 'yape'])
             ->update([
-                'metodo' => 'tarjeta',
                 'estado' => $paid ? 'pagado' : 'rechazado',
                 'referencia' => $transaction ? 'Izipay '.$orderId.' / '.$transaction : 'Izipay '.$orderId,
                 'fecha' => now(),

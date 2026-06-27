@@ -40,7 +40,6 @@ class CheckoutWebController extends Controller
             'tipo_documento' => ['required', 'in:DNI,RUC'],
             'numero_documento' => ['required', 'string'],
             'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,izipay,yape'],
-            'yape_operacion' => ['nullable', 'string', 'max:40'],
             'acepta_pago' => ['accepted'],
         ], [
             'fecha_entrega.after_or_equal' => 'La fecha de entrega debe ser desde manana en adelante.',
@@ -62,9 +61,6 @@ class CheckoutWebController extends Controller
             return back()->withInput()->with('error', 'El RUC debe tener 11 digitos.');
         }
 
-        if ($data['metodo_pago'] === 'yape' && empty($data['yape_operacion'])) {
-            return back()->withInput()->with('error', 'Ingresa el numero de operacion de Yape.');
-        }
 
         $documentPath = $data['tipo_documento'] === 'DNI'
             ? 'facturacion/consulta-dni'
@@ -103,8 +99,8 @@ class CheckoutWebController extends Controller
             'notas' => $data['notas'] ?? null,
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => match ($data['metodo_pago']) {
-                'izipay' => 'Pago con tarjeta pendiente',
-                'yape' => 'Operacion Yape: ' . trim((string) $data['yape_operacion']),
+                'izipay' => 'Pago con tarjeta Izipay pendiente',
+                'yape' => 'Pago QR/Yape Izipay pendiente',
                 default => 'Pago contra entrega',
             },
         ]);
@@ -114,9 +110,10 @@ class CheckoutWebController extends Controller
 
         $pedidoId = (int) data_get($orderResponse->json(), 'pedido.id', 0);
 
-        if ($data['metodo_pago'] === 'izipay') {
+        if (in_array($data['metodo_pago'], ['izipay', 'yape'], true)) {
             $paymentResponse = $this->api->post('pagos/izipay/crear', [
                 'pedido_id' => $pedidoId,
+                'metodo_pago' => $data['metodo_pago'] === 'yape' ? 'yape' : 'tarjeta',
             ]);
 
             if ($paymentResponse->failed()) {
@@ -145,6 +142,7 @@ class CheckoutWebController extends Controller
                 'cssUrl' => (string) data_get($payment, 'cssUrl', ''),
                 'successUrl' => (string) data_get($payment, 'successUrl', ''),
                 'cancelUrl' => (string) data_get($payment, 'cancelUrl', ''),
+                'method' => $data['metodo_pago'],
             ]));
         }
 
