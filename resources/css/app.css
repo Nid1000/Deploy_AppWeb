@@ -842,6 +842,195 @@
         @apply rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm shadow-stone-200/40;
     }
 
+    .dashboard-stat-card {
+        @apply grid gap-4 rounded-[1.75rem] border border-stone-200 bg-white p-5 shadow-sm shadow-stone-200/35;
+        min-height: 12rem;
+    }
+
+    .dashboard-stat-icon {
+        @apply flex h-14 w-14 items-center justify-center rounded-2xl;
+    }
+
+    .dashboard-stat-icon svg {
+        width: 2rem;
+        height: 2rem;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .dashboard-stat-icon-amber {
+        @apply bg-amber-50 text-amber-600;
+    }
+
+    .dashboard-stat-icon-blue {
+        @apply bg-blue-100 text-blue-700;
+    }
+
+    .dashboard-stat-icon-green {
+        @apply bg-emerald-50 text-emerald-700;
+    }
+
+    .dashboard-stat-icon-violet {
+        background: #f3e8ff;
+        color: #7e22ce;
+    }
+
+    .dashboard-chart-card {
+        overflow: hidden;
+    }
+
+    .dashboard-line-chart {
+        position: relative;
+        min-height: 16rem;
+        padding-bottom: 1.6rem;
+    }
+
+    .dashboard-line-chart svg {
+        display: block;
+        width: 100%;
+        height: 16rem;
+        overflow: visible;
+    }
+
+    .dashboard-chart-grid {
+        stroke: #e7e5e4;
+        stroke-width: 1;
+        stroke-dasharray: 5 8;
+    }
+
+    .dashboard-chart-area {
+        opacity: 1;
+    }
+
+    .dashboard-chart-line {
+        fill: none;
+        stroke: #d97706;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .dashboard-chart-point circle {
+        fill: #fff;
+        stroke: #d97706;
+        stroke-width: 4;
+    }
+
+    .dashboard-chart-labels {
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        height: 1.25rem;
+        font-size: .75rem;
+        color: #a8a29e;
+    }
+
+    .dashboard-chart-labels span {
+        position: absolute;
+        transform: translateX(-50%);
+        white-space: nowrap;
+    }
+
+    .dashboard-progress {
+        height: .42rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #f1f5f9;
+    }
+
+    .dashboard-progress span {
+        display: block;
+        height: 100%;
+        min-width: .25rem;
+        border-radius: inherit;
+    }
+
+    .dashboard-order-row {
+        @apply flex items-center justify-between gap-4 rounded-2xl border border-stone-100 bg-white px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/35;
+    }
+
+    .dashboard-status {
+        @apply mt-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold;
+    }
+
+    .dashboard-status-amber {
+        @apply bg-amber-100 text-amber-700;
+    }
+
+    .dashboard-status-blue {
+        @apply bg-blue-100 text-blue-700;
+    }
+
+    .dashboard-status-green {
+        @apply bg-emerald-100 text-emerald-700;
+    }
+
+    .dashboard-status-red {
+        @apply bg-red-100 text-red-700;
+    }
+
+    .dashboard-product-row {
+        @apply flex items-center gap-3;
+    }
+
+    .dashboard-rank {
+        @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-500;
+    }
+
+    .dashboard-donut {
+        width: 8.25rem;
+        height: 8.25rem;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: conic-gradient(#f59e0b var(--donut-percent), #fed7aa 0);
+    }
+
+    .dashboard-donut::before {
+        content: "";
+        position: absolute;
+    }
+
+    .dashboard-donut > div {
+        width: 5.35rem;
+        height: 5.35rem;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        border-radius: 999px;
+        background: #fff;
+        text-align: center;
+    }
+
+    .dashboard-donut strong {
+        @apply text-2xl font-semibold text-stone-950;
+    }
+
+    .dashboard-donut span {
+        @apply text-[11px] uppercase tracking-[0.18em] text-stone-400;
+    }
+
+    .dashboard-donut-empty {
+        background: #f5f5f4;
+    }
+
+    .dashboard-receipt-summary {
+        @apply rounded-2xl border border-stone-100 bg-stone-50 px-4 py-3;
+    }
+
+    .dashboard-receipt-summary span {
+        @apply mb-2 block h-1.5 w-8 rounded-full;
+    }
+
+    .dashboard-receipt-summary p {
+        @apply text-sm text-stone-600;
+    }
+
+    .dashboard-receipt-summary strong {
+        @apply text-lg font-semibold text-stone-950;
+    }
+
     .stat-card {
         @apply rounded-[1.75rem] border border-stone-200 bg-white p-5 shadow-sm shadow-stone-200/35;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
