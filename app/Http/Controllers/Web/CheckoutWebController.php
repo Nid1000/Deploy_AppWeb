@@ -133,15 +133,26 @@ class CheckoutWebController extends Controller
                     ->with('error', 'Izipay no devolvio los datos para mostrar el formulario de pago.');
             }
 
+            $backendUrl = rtrim((string) config('services.backend.url'), '/');
+            $defaultJsUrl = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
+            $jsUrl = (string) data_get($payment, 'jsUrl', $defaultJsUrl);
+            if ($jsUrl === '') {
+                $jsUrl = $defaultJsUrl;
+            }
+            $cssUrl = (string) data_get($payment, 'cssUrl', '');
+            if ($cssUrl === '') {
+                $cssUrl = (string) preg_replace('/\.js(\?.*)?$/', '.css$1', $jsUrl);
+            }
+
             return view('web.checkout', $this->checkoutViewData($request, $cartItems, [
                 'pedidoId' => $pedidoId,
                 'orderId' => (string) data_get($payment, 'orderId', 'PEDIDO-'.$pedidoId),
                 'formToken' => $formToken,
                 'publicKey' => $publicKey,
-                'jsUrl' => (string) data_get($payment, 'jsUrl', ''),
-                'cssUrl' => (string) data_get($payment, 'cssUrl', ''),
-                'successUrl' => (string) data_get($payment, 'successUrl', ''),
-                'cancelUrl' => (string) data_get($payment, 'cancelUrl', ''),
+                'jsUrl' => $jsUrl,
+                'cssUrl' => $cssUrl,
+                'successUrl' => (string) data_get($payment, 'successUrl', $backendUrl.'/api/pagos/izipay/confirmar'),
+                'cancelUrl' => (string) data_get($payment, 'cancelUrl', $backendUrl.'/api/pagos/izipay/cancelado'),
                 'method' => $data['metodo_pago'],
             ]));
         }
@@ -312,11 +323,25 @@ class CheckoutWebController extends Controller
                 . ($data['second_last_name'] ?? $data['apellido_materno'] ?? '')
             ));
         }
+        if ($type === 'RUC') {
+            return $this->rucDisplayName($data);
+        }
 
         return trim((string) (
             $data['razon_social']
             ?? $data['nombre_o_razon_social']
             ?? $data['nombre_comercial']
+            ?? ''
+        ));
+    }
+
+    private function rucDisplayName(array $data): string
+    {
+        return trim((string) (
+            $data['razon_social']
+            ?? $data['nombre_o_razon_social']
+            ?? $data['nombre_comercial']
+            ?? $data['nombre']
             ?? ''
         ));
     }

@@ -222,7 +222,17 @@
                             @if ($izipayPayment)
                                 <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Completa el pago seguro con tarjeta.</p>
                                 <div class="izipay-embedded-shell mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
-                                    <div class="kr-smart-form" kr-form-token="{{ $izipayPayment['formToken'] }}"></div>
+                                    <div class="kr-embedded" kr-form-token="{{ $izipayPayment['formToken'] }}">
+                                        <div class="kr-pan"></div>
+                                        <div class="grid gap-3 md:grid-cols-2">
+                                            <div class="kr-expiry"></div>
+                                            <div class="kr-security-code"></div>
+                                        </div>
+                                        <div class="kr-installment-number"></div>
+                                        <div class="kr-first-installment-delay"></div>
+                                        <button class="kr-payment-button"></button>
+                                        <div class="kr-form-error"></div>
+                                    </div>
                                     <p class="mt-3 text-center text-xs text-stone-500">Recuerda activar tus compras por internet.</p>
                                 </div>
                             @else
@@ -233,9 +243,10 @@
                         <div class="mt-4 {{ $selectedPayment === 'yape' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">
                             <p class="font-semibold text-stone-900">Pago seguro con QR/Yape</p>
                             @if ($izipayPayment)
-                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Elige QR/Yape en el formulario seguro si esta disponible.</p>
+                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Elige QR/Yape en el formulario seguro si esta disponible en tu cuenta Izipay.</p>
                                 <div class="izipay-embedded-shell mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
                                     <div class="kr-smart-form" kr-form-token="{{ $izipayPayment['formToken'] }}"></div>
+                                    <p class="mt-3 text-center text-xs text-stone-500">Si no aparece QR/Yape, debes activarlo en el Back Office de Izipay.</p>
                                 </div>
                             @else
                                 <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos el QR seguro generado por Izipay, si esta habilitado en tu cuenta.</p>
