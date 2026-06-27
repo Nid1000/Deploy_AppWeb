@@ -17,10 +17,16 @@
             kr-post-url-refused="{{ $izipayPayment['cancelUrl'] }}"
         ></script>
         <style>
+            .izipay-embedded-shell {
+                background: linear-gradient(180deg, rgba(240, 253, 250, .92), rgba(255, 255, 255, .96));
+            }
+
             .izipay-embedded-shell .kr-smart-form,
             .izipay-embedded-shell .kr-embedded {
                 display: block;
                 width: 100%;
+                max-width: 620px;
+                margin: 0 auto;
             }
 
             .izipay-embedded-shell .kr-pan,
@@ -29,12 +35,49 @@
             .izipay-embedded-shell .kr-installment-number,
             .izipay-embedded-shell .kr-first-installment-delay {
                 width: 100%;
-                min-height: 46px;
+                height: 48px !important;
+                min-height: 48px !important;
+                max-height: 48px !important;
                 margin: 10px 0;
                 border: 1px solid #d6d3d1;
                 border-radius: 0.75rem;
                 background: #fff;
-                padding: 12px;
+                padding: 0;
+                overflow: hidden;
+                box-shadow: 0 1px 2px rgba(28, 25, 23, .04);
+            }
+
+            .izipay-embedded-shell .kr-pan:focus-within,
+            .izipay-embedded-shell .kr-expiry:focus-within,
+            .izipay-embedded-shell .kr-security-code:focus-within,
+            .izipay-embedded-shell .kr-installment-number:focus-within,
+            .izipay-embedded-shell .kr-first-installment-delay:focus-within {
+                border-color: #14b8a6;
+                box-shadow: 0 0 0 3px rgba(20, 184, 166, .15);
+            }
+
+            .izipay-embedded-shell .kr-pan iframe,
+            .izipay-embedded-shell .kr-expiry iframe,
+            .izipay-embedded-shell .kr-security-code iframe,
+            .izipay-embedded-shell .kr-installment-number iframe,
+            .izipay-embedded-shell .kr-first-installment-delay iframe {
+                width: 100% !important;
+                height: 48px !important;
+                min-height: 48px !important;
+                max-height: 48px !important;
+                display: block;
+            }
+
+            .izipay-embedded-shell select,
+            .izipay-embedded-shell input {
+                width: 100%;
+                min-height: 46px;
+                border: 0;
+                background: transparent;
+                padding: 0 12px;
+                color: #292524;
+                font-size: 0.925rem;
+                outline: none;
             }
 
             .izipay-embedded-shell .kr-payment-button {
@@ -47,6 +90,14 @@
                 color: #fff;
                 font-weight: 700;
                 box-shadow: 0 14px 26px rgba(14, 165, 164, .22);
+                cursor: pointer;
+                transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+            }
+
+            .izipay-embedded-shell .kr-payment-button:hover {
+                background: #0f9695;
+                box-shadow: 0 16px 30px rgba(14, 165, 164, .28);
+                transform: translateY(-1px);
             }
 
             .izipay-embedded-shell .kr-form-error {
