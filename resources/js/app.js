@@ -27,6 +27,67 @@ document.addEventListener('click', (event) => {
     applyTheme(nextTheme);
 });
 
+const dashboard = document.querySelector('[data-dashboard-animated]');
+if (dashboard) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = reducedMotion ? 0 : 950;
+    const easeOut = (value) => 1 - Math.pow(1 - value, 3);
+    const formatValue = (value, decimals, prefix) => `${prefix}${Number(value).toLocaleString('es-PE', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    })}`;
+
+    dashboard.querySelectorAll('[data-dashboard-progress]').forEach((bar) => {
+        const target = Math.max(0, Math.min(100, Number(bar.dataset.dashboardProgress || 0)));
+        bar.style.setProperty('--progress-width', `${target}%`);
+    });
+
+    dashboard.querySelectorAll('[data-dashboard-donut]').forEach((donut) => {
+        const target = Math.max(0, Math.min(100, Number(donut.dataset.dashboardDonut || 0)));
+        donut.style.setProperty('--donut-target', `${target}%`);
+    });
+
+    dashboard.querySelectorAll('[data-dashboard-line]').forEach((line) => {
+        const length = typeof line.getTotalLength === 'function' ? line.getTotalLength() : 1400;
+        line.style.setProperty('--line-length', length);
+    });
+
+    const animateCounters = () => {
+        const start = performance.now();
+        const counters = [...dashboard.querySelectorAll('[data-dashboard-counter]')].map((node) => ({
+            node,
+            target: Number(node.dataset.dashboardCounter || 0),
+            prefix: node.dataset.counterPrefix || '',
+            decimals: Number(node.dataset.counterDecimals || 0),
+        }));
+
+        const tick = (now) => {
+            const progress = duration === 0 ? 1 : Math.min(1, (now - start) / duration);
+            const eased = easeOut(progress);
+
+            counters.forEach(({ node, target, prefix, decimals }) => {
+                node.textContent = formatValue(target * eased, decimals, prefix);
+            });
+
+            dashboard.querySelectorAll('[data-dashboard-donut]').forEach((donut) => {
+                const target = Math.max(0, Math.min(100, Number(donut.dataset.dashboardDonut || 0)));
+                donut.style.setProperty('--donut-percent', `${target * eased}%`);
+            });
+
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        };
+
+        requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(() => {
+        dashboard.classList.add('dashboard-ready');
+        animateCounters();
+    });
+}
+
 const chatReplies = {
     horario: 'Atendemos de lunes a domingo, de 7:00 AM a 9:00 PM.',
     delivery: 'Si, hacemos delivery. Tambien puedes escribirnos o llamar al 993560096 para coordinar tu pedido.',

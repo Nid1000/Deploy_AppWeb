@@ -845,6 +845,13 @@
     .dashboard-stat-card {
         @apply grid gap-4 rounded-[1.75rem] border border-stone-200 bg-white p-5 shadow-sm shadow-stone-200/35;
         min-height: 12rem;
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .dashboard-stat-card:hover {
+        transform: translateY(-4px);
+        border-color: #fbbf24;
+        box-shadow: 0 18px 38px rgba(120, 53, 15, .12);
     }
 
     .dashboard-stat-icon {
@@ -857,6 +864,7 @@
         stroke-width: 1.8;
         stroke-linecap: round;
         stroke-linejoin: round;
+        animation: dashboardIconFloat 3.2s ease-in-out infinite;
     }
 
     .dashboard-stat-icon-amber {
@@ -909,12 +917,25 @@
         stroke-width: 4;
         stroke-linecap: round;
         stroke-linejoin: round;
+        stroke-dasharray: var(--line-length, 1400);
+        stroke-dashoffset: var(--line-length, 1400);
+        transition: stroke-dashoffset 1.2s ease;
+    }
+
+    .dashboard-ready .dashboard-chart-line {
+        stroke-dashoffset: 0;
     }
 
     .dashboard-chart-point circle {
         fill: #fff;
         stroke: #d97706;
         stroke-width: 4;
+        opacity: 0;
+        transform: scale(.45);
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: dashboardPointPop .45s ease forwards;
+        animation-delay: var(--point-delay, 0ms);
     }
 
     .dashboard-chart-labels {
@@ -944,6 +965,12 @@
         height: 100%;
         min-width: .25rem;
         border-radius: inherit;
+        width: 0 !important;
+        transition: width .9s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .dashboard-ready .dashboard-progress span {
+        width: var(--progress-width, 0%) !important;
     }
 
     .dashboard-order-row {
@@ -985,6 +1012,8 @@
         place-items: center;
         border-radius: 999px;
         background: conic-gradient(#f59e0b var(--donut-percent), #fed7aa 0);
+        --donut-percent: 0%;
+        transition: background .8s ease;
     }
 
     .dashboard-donut::before {
@@ -1013,6 +1042,37 @@
 
     .dashboard-donut-empty {
         background: #f5f5f4;
+    }
+
+    .dashboard-reveal,
+    .dashboard-list-reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        animation: dashboardReveal .55s ease forwards;
+        animation-delay: var(--reveal-delay, var(--list-delay, 0ms));
+    }
+
+    @keyframes dashboardReveal {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes dashboardPointPop {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes dashboardIconFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-3px);
+        }
     }
 
     .dashboard-receipt-summary {
