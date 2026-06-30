@@ -49,7 +49,7 @@
 
                 <nav class="hidden items-center gap-6 text-sm lg:flex">
                     <a href="{{ route('web.home') }}" class="hover:text-[var(--color-secondary)]">Inicio</a>
-                    <a href="{{ route('web.products') }}" class="hover:text-[var(--color-secondary)]">Menu</a>
+                    <a href="{{ route('web.products') }}" class="hover:text-[var(--color-secondary)]">Productos</a>
                     <a href="{{ route('web.home') }}#nosotros" class="hover:text-[var(--color-secondary)]">Nosotros</a>
                     <a href="{{ route('web.home') }}#contacto" class="hover:text-[var(--color-secondary)]">Contactanos</a>
                 </nav>
