@@ -237,7 +237,7 @@
                         <div>
                             <label for="numero_documento" class="label">Numero</label>
                             <div class="flex gap-2">
-                                <input id="numero_documento" name="numero_documento" type="text" required value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
+                                <input id="numero_documento" name="numero_documento" type="text" value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
                                 <button type="button" class="btn btn-outline-secondary shrink-0" data-document-lookup>Validar</button>
                             </div>
                         </div>
@@ -363,6 +363,8 @@
             let lookupTimer = null;
             let lookupKey = '';
 
+            const selectedPayment = () => document.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
+            const skipsDocumentValidation = () => selectedPayment() === 'izipay';
             const onlyDigits = (value) => value.replace(/\D+/g, '');
             const validRuc = (value) => {
                 const ruc = onlyDigits(value);
@@ -429,6 +431,24 @@
                 details.classList.add('hidden');
             };
 
+            const syncDocumentRequirement = () => {
+                const skip = skipsDocumentValidation();
+                form.classList.toggle('opacity-60', skip);
+                [receipt, type, number, lookup].forEach((element) => {
+                    if (!element) return;
+                    element.disabled = skip;
+                });
+
+                if (skip) {
+                    lookupKey = '';
+                    clearDetails();
+                    clearInlineName();
+                    setMessage('Para continuar con tarjeta no necesitas validar DNI/RUC en este paso.');
+                }
+
+                return skip;
+            };
+
             const setDetails = (payload) => {
                 if (!details) return;
                 const data = payload?.data || {};
@@ -462,6 +482,10 @@
                 : validRuc(number.value);
 
             const sync = () => {
+                if (syncDocumentRequirement()) {
+                    return;
+                }
+
                 if (receipt.value === 'factura') {
                     type.value = 'RUC';
                 }
@@ -487,6 +511,10 @@
             };
 
             const validateWithProvider = async () => {
+                if (syncDocumentRequirement()) {
+                    return;
+                }
+
                 if (!hasValidFormat()) {
                     sync();
                     return;
@@ -544,6 +572,9 @@
             type.addEventListener('change', sync);
             number.addEventListener('input', sync);
             lookup.addEventListener('click', validateWithProvider);
+            document.querySelectorAll('input[name="metodo_pago"]').forEach((input) => {
+                input.addEventListener('change', sync);
+            });
             sync();
         });
     </script>
