@@ -18,12 +18,12 @@
         ></script>
         <style>
             .izipay-smart-shell {
-                max-width: 360px;
+                max-width: 390px;
                 margin: 0 auto;
                 border: 1px solid #d7f0ea;
-                border-radius: 8px;
-                background: #fff;
-                box-shadow: 0 18px 36px rgba(15, 118, 110, .12);
+                border-radius: 10px;
+                background: linear-gradient(180deg, #ffffff 0%, #fafffd 100%);
+                box-shadow: 0 20px 42px rgba(15, 118, 110, .14);
                 overflow: hidden;
             }
 
@@ -57,23 +57,116 @@
             }
 
             .izipay-smart-body {
-                padding: 10px 18px 12px;
+                padding: 16px 20px 14px;
             }
 
             .izipay-smart-shell .kr-smart-form {
                 display: block;
                 width: 100%;
+                font-family: inherit;
+            }
+
+            .izipay-smart-shell .kr-smart-form,
+            .izipay-smart-shell .kr-smart-form * {
+                box-sizing: border-box;
+            }
+
+            .izipay-smart-shell .kr-smart-form form,
+            .izipay-smart-shell .kr-smart-form .kr-embedded,
+            .izipay-smart-shell .kr-smart-form .kr-form {
+                display: grid;
+                width: 100%;
+                gap: 12px;
+            }
+
+            .izipay-smart-shell .kr-smart-form .kr-field,
+            .izipay-smart-shell .kr-smart-form .kr-pan,
+            .izipay-smart-shell .kr-smart-form .kr-expiry,
+            .izipay-smart-shell .kr-smart-form .kr-security-code,
+            .izipay-smart-shell .kr-smart-form .kr-card-holder-name,
+            .izipay-smart-shell .kr-smart-form .kr-card-holder-mail,
+            .izipay-smart-shell .kr-smart-form .kr-installment-number,
+            .izipay-smart-shell .kr-smart-form .kr-first-installment-delay,
+            .izipay-smart-shell .kr-smart-form input,
+            .izipay-smart-shell .kr-smart-form select {
+                width: 100% !important;
+                min-height: 48px !important;
+                margin: 0 !important;
+                border: 1px solid #d7dedc !important;
+                border-radius: 8px !important;
+                background-color: #ffffff !important;
+                color: #1f2937 !important;
+                font-size: 15px !important;
+                line-height: 20px !important;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, .05) !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form .kr-field,
+            .izipay-smart-shell .kr-smart-form .kr-pan,
+            .izipay-smart-shell .kr-smart-form .kr-expiry,
+            .izipay-smart-shell .kr-smart-form .kr-security-code,
+            .izipay-smart-shell .kr-smart-form .kr-card-holder-name,
+            .izipay-smart-shell .kr-smart-form .kr-card-holder-mail,
+            .izipay-smart-shell .kr-smart-form .kr-installment-number,
+            .izipay-smart-shell .kr-smart-form .kr-first-installment-delay {
+                display: flex !important;
+                align-items: center !important;
+                padding: 0 12px !important;
+                overflow: hidden !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form .kr-expiry,
+            .izipay-smart-shell .kr-smart-form .kr-security-code {
+                min-width: 0 !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form select,
+            .izipay-smart-shell .kr-smart-form input {
+                padding: 0 12px !important;
+                outline: none !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form select {
+                appearance: auto !important;
+                cursor: pointer;
+            }
+
+            .izipay-smart-shell .kr-smart-form input:focus,
+            .izipay-smart-shell .kr-smart-form select:focus,
+            .izipay-smart-shell .kr-smart-form .kr-field.kr-focus,
+            .izipay-smart-shell .kr-smart-form .kr-field:focus-within {
+                border-color: #19aaa2 !important;
+                box-shadow: 0 0 0 3px rgba(25, 170, 162, .16) !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form .kr-pan {
+                margin-top: 4px !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form .kr-expiry + .kr-security-code,
+            .izipay-smart-shell .kr-smart-form .kr-installment-number + .kr-first-installment-delay {
+                margin-top: 0 !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form label,
+            .izipay-smart-shell .kr-smart-form .kr-label {
+                display: block;
+                margin: 2px 0 6px;
+                color: #6b7280;
+                font-size: 12px;
+                font-weight: 600;
             }
 
             .izipay-smart-shell .kr-payment-button {
                 width: 100%;
                 min-height: 48px;
-                margin-top: 12px;
+                margin-top: 14px;
                 border: 0;
-                border-radius: 6px;
-                background: #49aaa1;
+                border-radius: 8px;
+                background: #16a6a0;
                 color: #fff;
                 font-weight: 700;
+                font-size: 16px;
                 box-shadow: none;
                 cursor: pointer;
                 transition: background .15s ease;
