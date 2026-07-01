@@ -61,7 +61,7 @@
                     </div>
                     <div class="page-metric">
                         <strong>{{ $categories->count() }}</strong>
-                        <span>Categorias</span>
+                        <span>Categorías</span>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                 </div>
 
                 <div>
-                    <label for="categoria" class="label">Categoria</label>
+                    <label for="categoria" class="label">Categoría</label>
                     <select id="categoria" name="categoria" class="input">
                         <option value="0">Todas las categorias</option>
                         @foreach ($categories as $category)

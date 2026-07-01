@@ -12,7 +12,7 @@
 
         @if ($token === '')
             <div class="flash-error">
-                El enlace de recuperación no es valido. Solicita uno nuevo.
+                El enlace de recuperación no es válido. Solicita uno nuevo.
             </div>
             <a href="{{ route('web.password.forgot') }}" class="mt-5 inline-flex font-semibold text-amber-700 underline underline-offset-4">
                 Solicitar otro enlace

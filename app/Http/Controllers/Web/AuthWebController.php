@@ -75,15 +75,15 @@ class AuthWebController extends Controller
             'password' => ['required', 'string'],
         ], [
             'email.required' => 'El email es obligatorio.',
-            'email.email' => 'Ingresa un email valido.',
-            'password.required' => 'La contrasena es obligatoria.',
+            'email.email' => 'Ingresa un email válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
         $response = $this->api->post('auth/login', $credentials);
         if (!$response->successful()) {
             return back()
                 ->withInput($request->except('password'))
-                ->withErrors(['email' => 'Email o contrasena incorrectos.']);
+                ->withErrors(['email' => 'Email o contraseña incorrectos.']);
         }
         $payload = $response->json();
         $user = (array) data_get($payload, 'user', []);
@@ -125,13 +125,13 @@ class AuthWebController extends Controller
             'email' => ['required', 'email', 'max:191'],
         ], [
             'email.required' => 'El email es obligatorio.',
-            'email.email' => 'Ingresa un email valido.',
+            'email.email' => 'Ingresa un email válido.',
         ]);
 
         try {
             $response = $this->api->post('auth/password/forgot', $data);
         } catch (Throwable $exception) {
-            Log::error('No se pudo solicitar el enlace de recuperacion.', [
+            Log::error('No se pudo solicitar el enlace de recuperación.', [
                 'error' => $exception->getMessage(),
             ]);
 
@@ -148,7 +148,7 @@ class AuthWebController extends Controller
 
         return back()->with(
             'success',
-            'Si el correo pertenece a una cuenta activa, recibiras un enlace para crear una nueva contrasena.'
+            'Si el correo pertenece a una cuenta activa, recibirás un enlace para crear una nueva contraseña.'
         );
     }
 
@@ -166,14 +166,14 @@ class AuthWebController extends Controller
             'password' => ['required', 'confirmed', PasswordRules::userPassword()],
             'password_confirmation' => ['required', 'string'],
         ], [
-            'token.required' => 'El enlace de recuperacion no es valido.',
-            'password.confirmed' => 'La confirmacion de contrasena no coincide.',
+            'token.required' => 'El enlace de recuperación no es válido.',
+            'password.confirmed' => 'La confirmación de contraseña no coincide.',
         ]);
 
         try {
             $response = $this->api->post('auth/password/reset', $data);
         } catch (Throwable $exception) {
-            Log::error('No se pudo restablecer la contrasena.', [
+            Log::error('No se pudo restablecer la contraseña.', [
                 'error' => $exception->getMessage(),
             ]);
 
@@ -188,14 +188,14 @@ class AuthWebController extends Controller
                 ->withErrors([
                     'password' => $this->api->errorMessage(
                         $response,
-                        'El enlace es invalido, ya fue utilizado o ha vencido.'
+                        'El enlace es inválido, ya fue utilizado o ha vencido.'
                     ),
                 ]);
         }
 
         return redirect()
             ->route('web.login')
-            ->with('success', 'Tu contrasena fue actualizada. Ya puedes iniciar sesion.');
+            ->with('success', 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.');
     }
 
     public function showRegister(Request $request): View|RedirectResponse
@@ -223,7 +223,7 @@ class AuthWebController extends Controller
             'email' => ['required', 'email', 'max:191'],
         ], [
             'email.required' => 'El email es obligatorio.',
-            'email.email' => 'Ingresa un email valido.',
+            'email.email' => 'Ingresa un email válido.',
         ]);
 
         $mailer = (string) config('mail.default');
@@ -232,13 +232,13 @@ class AuthWebController extends Controller
         if (in_array($mailer, ['log', 'array'], true)) {
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['email' => 'El servidor sigue usando un mailer de prueba. Configura MAIL_MAILER=resend y limpia la cache de configuracion.']);
+                ->withErrors(['email' => 'El servidor sigue usando un mailer de prueba. Configura MAIL_MAILER=resend y limpia la caché de configuración.']);
         }
 
         if ($fromAddress === '' || str_contains($fromAddress, 'example.com')) {
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['email' => 'La direccion remitente del servidor no esta configurada correctamente. Revisa MAIL_FROM_ADDRESS.']);
+                ->withErrors(['email' => 'La dirección remitente del servidor no está configurada correctamente. Revisa MAIL_FROM_ADDRESS.']);
         }
 
         $code = (string) random_int(100000, 999999);
@@ -247,7 +247,7 @@ class AuthWebController extends Controller
         try {
             Mail::to($data['email'])->send(new RegistroCodigoVerificacionMail($code, $expiresAt));
         } catch (Throwable $exception) {
-            Log::error('No se pudo enviar el codigo de verificacion por correo.', [
+            Log::error('No se pudo enviar el código de verificación por correo.', [
                 'mailer' => $mailer,
                 'from_address' => $fromAddress,
                 'to' => $data['email'],
@@ -256,10 +256,10 @@ class AuthWebController extends Controller
 
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['email' => 'No se pudo enviar el correo de verificacion. Revisa la configuracion del mailer o los logs del servidor.']);
+                ->withErrors(['email' => 'No se pudo enviar el correo de verificación. Revisa la configuración del mailer o los logs del servidor.']);
         }
 
-        Log::info('Codigo de verificacion enviado.', [
+        Log::info('Código de verificación enviado.', [
             'mailer' => $mailer,
             'from_address' => $fromAddress,
             'to' => $data['email'],
@@ -275,7 +275,7 @@ class AuthWebController extends Controller
 
         return back()
             ->withInput($request->except('_token'))
-            ->with('success', 'Te enviamos un codigo de verificacion a tu correo.');
+            ->with('success', 'Te enviamos un código de verificación a tu correo.');
     }
 
     public function verifyRegistrationCode(Request $request): RedirectResponse
@@ -284,8 +284,8 @@ class AuthWebController extends Controller
             'email' => ['required', 'email', 'max:191'],
             'verification_code' => ['required', 'digits:6'],
         ], [
-            'verification_code.required' => 'Ingresa el codigo que recibiste por correo.',
-            'verification_code.digits' => 'El codigo debe tener 6 digitos.',
+            'verification_code.required' => 'Ingresa el código que recibiste por correo.',
+            'verification_code.digits' => 'El código debe tener 6 dígitos.',
         ]);
 
         $verification = $request->session()->get(self::EMAIL_VERIFICATION_SESSION_KEY);
@@ -293,7 +293,7 @@ class AuthWebController extends Controller
         if (!is_array($verification) || ($verification['email'] ?? null) !== $data['email']) {
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['email' => 'Primero solicita un codigo para este correo.']);
+                ->withErrors(['email' => 'Primero solicita un código para este correo.']);
         }
 
         $expiresAt = Carbon::parse((string) ($verification['expires_at'] ?? now()->toIso8601String()));
@@ -302,13 +302,13 @@ class AuthWebController extends Controller
 
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['verification_code' => 'El codigo vencio. Solicita uno nuevo.']);
+                ->withErrors(['verification_code' => 'El código venció. Solicita uno nuevo.']);
         }
 
         if (!hash_equals((string) ($verification['code'] ?? ''), hash('sha256', $data['verification_code']))) {
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['verification_code' => 'El codigo ingresado no es correcto.']);
+                ->withErrors(['verification_code' => 'El código ingresado no es correcto.']);
         }
 
         $verification['verified_at'] = now()->toIso8601String();
@@ -331,13 +331,13 @@ class AuthWebController extends Controller
             'distrito' => ['required', 'string', 'min:2', 'max:120'],
             'numero_casa' => ['required', 'string', 'max:20'],
         ], [
-            'password.confirmed' => 'La confirmacion de contrasena no coincide.',
+            'password.confirmed' => 'La confirmación de contraseña no coincide.',
         ]);
 
         if (!$this->emailIsVerifiedForRegistration($request, $data['email'])) {
             return back()
                 ->withInput($request->except('password', 'password_confirmation'))
-                ->withErrors(['email' => 'Verifica primero tu correo o continua con Google antes de crear la cuenta.']);
+                ->withErrors(['email' => 'Verifica primero tu correo o continúa con Google antes de crear la cuenta.']);
         }
 
         $response = $this->api->post('auth/register', [
@@ -401,7 +401,7 @@ class AuthWebController extends Controller
         if ($clientId === '' || $redirectUri === '') {
             return redirect()
                 ->route($returnRoute)
-                ->with('error', 'Google no esta configurado todavia. Completa las variables GOOGLE_CLIENT_ID y GOOGLE_REDIRECT_URI.');
+                ->with('error', 'Google no está configurado todavía. Completa las variables GOOGLE_CLIENT_ID y GOOGLE_REDIRECT_URI.');
         }
 
         $state = Str::random(40);
@@ -438,13 +438,13 @@ class AuthWebController extends Controller
         ) {
             return redirect()
                 ->route($returnRoute)
-                ->withErrors(['email' => 'No se pudo validar la sesion de Google. Intenta nuevamente.']);
+                ->withErrors(['email' => 'No se pudo validar la sesión de Google. Intenta nuevamente.']);
         }
 
         if ($request->filled('error')) {
             return redirect()
                 ->route($returnRoute)
-                ->withErrors(['email' => 'Google cancelo el acceso o no autorizo los permisos solicitados.']);
+                ->withErrors(['email' => 'Google canceló el acceso o no autorizó los permisos solicitados.']);
         }
 
         try {
@@ -464,7 +464,7 @@ class AuthWebController extends Controller
             if ($accessToken === '' || $idToken === '') {
                 return redirect()
                     ->route($returnRoute)
-                    ->withErrors(['email' => 'Google no devolvio credenciales de acceso validas.']);
+                    ->withErrors(['email' => 'Google no devolvió credenciales de acceso válidas.']);
             }
 
             $profile = Http::withToken($accessToken)
@@ -476,7 +476,7 @@ class AuthWebController extends Controller
         } catch (RequestException) {
             return redirect()
                 ->route($returnRoute)
-                ->withErrors(['email' => 'No se pudo completar la validacion con Google en este momento.']);
+                ->withErrors(['email' => 'No se pudo completar la validación con Google en este momento.']);
         }
 
         $email = (string) data_get($profile, 'email', '');
@@ -485,7 +485,7 @@ class AuthWebController extends Controller
         if ($email === '' || !$emailVerified) {
             return redirect()
                 ->route($returnRoute)
-                ->withErrors(['email' => 'La cuenta de Google no devolvio un correo verificado.']);
+                ->withErrors(['email' => 'La cuenta de Google no devolvió un correo verificado.']);
         }
 
         if ($intent === self::GOOGLE_INTENT_LOGIN) {
@@ -521,7 +521,7 @@ class AuthWebController extends Controller
                 'id_token' => $idToken,
             ]);
         } catch (Throwable $exception) {
-            Log::error('No se pudo conectar con el backend para iniciar sesion con Google.', [
+            Log::error('No se pudo conectar con la API para iniciar sesión con Google.', [
                 'email' => $email,
                 'error' => $exception->getMessage(),
             ]);
@@ -529,7 +529,7 @@ class AuthWebController extends Controller
             return redirect()
                 ->route('web.login')
                 ->withInput(['email' => $email])
-                ->withErrors(['email' => 'No se pudo iniciar sesion con Google en este momento.']);
+                ->withErrors(['email' => 'No se pudo iniciar sesión con Google en este momento.']);
         }
 
         if (!$response->successful()) {
@@ -539,7 +539,7 @@ class AuthWebController extends Controller
                 ->withErrors([
                     'email' => $this->api->errorMessage(
                         $response,
-                        'No existe una cuenta registrada con este correo. Registrate primero.'
+                        'No existe una cuenta registrada con este correo. Regístrate primero.'
                     ),
                 ]);
         }
@@ -552,7 +552,7 @@ class AuthWebController extends Controller
             return redirect()
                 ->route('web.login')
                 ->withInput(['email' => $email])
-                ->withErrors(['email' => 'El backend no devolvio una sesion de Google valida.']);
+                ->withErrors(['email' => 'La API no devolvió una sesión de Google válida.']);
         }
 
         $request->session()->put([
@@ -572,7 +572,7 @@ class AuthWebController extends Controller
         $request->session()->regenerate();
         $this->clearRegistrationVerificationState($request);
 
-        return redirect()->route('web.home')->with('success', 'Sesion iniciada correctamente con Google.');
+        return redirect()->route('web.home')->with('success', 'Sesión iniciada correctamente con Google.');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -581,7 +581,7 @@ class AuthWebController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('web.login')->with('success', 'Sesion cerrada correctamente.');
+        return redirect()->route('web.login')->with('success', 'Sesión cerrada correctamente.');
     }
 
     private function mapDistricts(mixed $districts): \Illuminate\Support\Collection

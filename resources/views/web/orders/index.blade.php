@@ -26,7 +26,7 @@
                     type="text"
                     value="{{ $filters['buscar'] }}"
                     class="input"
-                    placeholder="{{ $activeTab === 'orders' ? 'ID o estado' : 'Numero o pedido' }}"
+                    placeholder="{{ $activeTab === 'orders' ? 'ID o estado' : 'Número o pedido' }}"
                 >
             </div>
 

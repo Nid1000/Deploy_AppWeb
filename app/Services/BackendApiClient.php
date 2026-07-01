@@ -120,7 +120,7 @@ class BackendApiClient
         }
 
         if ($response->serverError()) {
-            return $fallback . ' El backend devolvio error ' . $response->status() . '. Revisa logs y cache del backend.';
+            return $fallback . ' La API devolvió error ' . $response->status() . '. Revisa logs y caché de la API.';
         }
 
         return $message !== '' ? $message : $fallback;

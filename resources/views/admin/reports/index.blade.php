@@ -31,7 +31,7 @@
             <div>
                 <p class="eyebrow">Semana 4</p>
                 <h3 class="mt-2 text-2xl font-semibold text-stone-950">Reportes con data para Excel</h3>
-                <p class="mt-1 text-sm text-stone-600">Descarga ventas, pedidos y productos vendidos segun el rango de fecha aplicado.</p>
+                <p class="mt-1 text-sm text-stone-600">Descarga ventas, pedidos y productos vendidos según el rango de fecha aplicado.</p>
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('web.admin.reports.export', array_merge(['tipo' => 'ventas'], request()->only(['modo', 'desde', 'hasta']))) }}" class="btn btn-outline-secondary">Excel ventas</a>

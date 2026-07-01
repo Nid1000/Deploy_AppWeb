@@ -26,9 +26,9 @@
                     <p class="mt-2 font-medium text-stone-900">{{ !empty($order->fecha_entrega ?? null) ? \Illuminate\Support\Carbon::parse($order->fecha_entrega)->format('d/m/Y') : 'Por confirmar' }}</p>
                 </div>
                 <div class="rounded-[1.5rem] border border-amber-100 bg-white p-4 md:col-span-2">
-                    <p class="text-sm text-stone-500">Direccion</p>
+                    <p class="text-sm text-stone-500">Dirección</p>
                     <p class="mt-2 font-medium text-stone-900">
-                        {{ $order->direccion_entrega ?: 'Sin direccion registrada' }}
+                        {{ $order->direccion_entrega ?: 'Sin dirección registrada' }}
                         @if ($order->numero_casa_entrega)
                             , {{ $order->numero_casa_entrega }}
                         @endif
@@ -94,7 +94,7 @@
             <section class="rounded-[2rem] border border-dashed border-amber-300 bg-amber-50 p-6">
                 <p class="text-sm font-semibold text-stone-900">Siguiente paso</p>
                 <p class="mt-2 text-sm leading-6 text-stone-600">
-                    Puedes volver al menu para seguir agregando productos o regresar al historial para revisar pedidos anteriores.
+                    Puedes volver al menú para seguir agregando productos o regresar al historial para revisar pedidos anteriores.
                 </p>
                 <div class="mt-4 flex flex-wrap gap-3">
                     <a href="{{ route('web.products') }}" class="btn btn-outline-secondary">Seguir comprando</a>

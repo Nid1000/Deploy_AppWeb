@@ -4,8 +4,8 @@
     <div class="auth-shell">
         <div class="mb-6">
             <p class="text-sm uppercase tracking-[0.25em] text-amber-700">Acceso</p>
-            <h2 class="mt-2 text-2xl font-semibold text-stone-900">Iniciar sesion</h2>
-            <p class="mt-2 text-sm text-stone-600">Ingresa a tu cuenta para revisar pedidos, carrito e informacion personal.</p>
+            <h2 class="mt-2 text-2xl font-semibold text-stone-900">Iniciar sesión</h2>
+            <p class="mt-2 text-sm text-stone-600">Ingresa a tu cuenta para revisar pedidos, carrito e información personal.</p>
         </div>
 
         <form action="{{ route('web.login.submit') }}" method="POST" class="space-y-4">
@@ -25,7 +25,7 @@
                 @enderror
                 <div class="mt-2 text-right">
                     <a href="{{ route('web.password.forgot') }}" class="text-sm font-semibold text-amber-700 underline underline-offset-4">
-                        Olvidaste tu contraseña?
+                        ¿Olvidaste tu contraseña?
                     </a>
                 </div>
             </div>
@@ -37,8 +37,8 @@
         </a>
 
         <p class="mt-5 text-sm text-stone-600">
-            No tienes cuenta?
-            <a href="{{ route('web.register') }}" class="font-semibold text-amber-700 underline underline-offset-4">Registrate</a>
+            ¿No tienes cuenta?
+            <a href="{{ route('web.register') }}" class="font-semibold text-amber-700 underline underline-offset-4">Regístrate</a>
         </p>
     </div>
 @endsection

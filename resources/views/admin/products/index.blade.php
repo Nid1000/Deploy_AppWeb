@@ -9,7 +9,7 @@
                     <input id="buscar" name="buscar" value="{{ $filters['buscar'] }}" class="input">
                 </div>
                 <div>
-                    <label class="label" for="categoria">Categoria</label>
+                    <label class="label" for="categoria">Categoría</label>
                     <select id="categoria" name="categoria" class="input">
                         <option value="0">Todas</option>
                         @foreach ($categories as $category)
@@ -36,7 +36,7 @@
             <thead>
                 <tr>
                     <th>Producto</th>
-                    <th>Categoria</th>
+                    <th>Categoría</th>
                     <th>Precio</th>
                     <th>Stock</th>
                     <th>Estado</th>

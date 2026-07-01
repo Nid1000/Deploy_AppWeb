@@ -79,8 +79,8 @@ class ProfileWebController extends Controller
             'password_actual' => ['required', 'string'],
             'password_nueva' => ['required', 'confirmed', 'different:password_actual', PasswordRules::userPassword()],
         ], [
-            'password_nueva.confirmed' => 'La confirmacion de contrasena no coincide.',
-            'password_nueva.different' => 'La nueva contrasena debe ser diferente a la actual.',
+            'password_nueva.confirmed' => 'La confirmación de contraseña no coincide.',
+            'password_nueva.different' => 'La nueva contraseña debe ser diferente a la actual.',
         ]);
 
         $response = $this->api->put('usuarios/cambiar-password', [
@@ -89,10 +89,10 @@ class ProfileWebController extends Controller
             'confirmarPassword' => $request->input('password_nueva_confirmation'),
         ]);
         if (!$response->successful()) {
-            return back()->withErrors(['password_actual' => $this->api->errorMessage($response, 'No se pudo actualizar la contrasena.')]);
+            return back()->withErrors(['password_actual' => $this->api->errorMessage($response, 'No se pudo actualizar la contraseña.')]);
         }
 
-        return back()->with('success', 'Contrasena actualizada correctamente.');
+        return back()->with('success', 'Contraseña actualizada correctamente.');
     }
 
     public function markNotificationsSeen(Request $request): RedirectResponse

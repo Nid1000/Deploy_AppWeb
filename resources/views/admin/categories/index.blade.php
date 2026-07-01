@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => 'Categorias'])
+@extends('layouts.admin', ['title' => 'Categorías'])
 
 @section('content')
     <section class="admin-card">
@@ -30,7 +30,7 @@
         <table class="table-ui">
             <thead>
                 <tr>
-                    <th>Categoria</th>
+                    <th>Categoría</th>
                     <th>Descripcion</th>
                     <th>Estado</th>
                     <th class="text-right">Acciones</th>

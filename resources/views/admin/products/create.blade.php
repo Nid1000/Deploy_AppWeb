@@ -17,7 +17,7 @@
                 <input id="stock" name="stock" type="number" min="0" value="{{ old('stock', 0) }}" required class="input">
             </div>
             <div>
-                <label class="label" for="categoria_id">Categoria</label>
+                <label class="label" for="categoria_id">Categoría</label>
                 <select id="categoria_id" name="categoria_id" required class="input">
                     <option value="">Selecciona</option>
                     @foreach ($categories as $category)

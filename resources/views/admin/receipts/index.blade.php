@@ -13,7 +13,7 @@
             </div>
             <div>
                 <label class="label" for="buscar">Buscar</label>
-                <input id="buscar" name="buscar" value="{{ $filters['buscar'] }}" class="input" placeholder="Numero o cliente">
+                <input id="buscar" name="buscar" value="{{ $filters['buscar'] }}" class="input" placeholder="Número o cliente">
             </div>
             <div class="mt-8 flex gap-3">
                 <button class="btn btn-primary">Filtrar</button>
@@ -26,7 +26,7 @@
         <table class="table-ui">
             <thead>
                 <tr>
-                    <th>Numero</th>
+                    <th>Número</th>
                     <th>Cliente</th>
                     <th>Tipo</th>
                     <th>Total</th>

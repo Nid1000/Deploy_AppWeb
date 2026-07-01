@@ -1,10 +1,10 @@
-@extends('layouts.storefront', ['title' => 'Categorias'])
+@extends('layouts.storefront', ['title' => 'Categorías'])
 
 @section('content')
     <section class="page-hero">
         <div class="max-w-3xl">
-            <span class="eyebrow">Categorias</span>
-            <h2 class="headline mt-4">Explora todas las categorias de nuestra panaderia y descubre lo mejor de cada seccion.</h2>
+            <span class="eyebrow">Categorías</span>
+            <h2 class="headline mt-4">Explora todas las categorías de nuestra panadería y descubre lo mejor de cada sección.</h2>
             <p class="subheadline mt-4">
                 Recorre panes, postres, tortas y especialidades con una presentacion clara y atractiva.
             </p>
@@ -15,7 +15,7 @@
         @if ($categories->isEmpty())
             <div class="empty-state">
                 <h3 class="text-xl font-semibold text-stone-900">No hay categorias disponibles.</h3>
-                <p class="mt-2 text-sm text-stone-600">Cuando agregues categorias en el sistema, apareceran aqui automaticamente.</p>
+                <p class="mt-2 text-sm text-stone-600">Cuando agregues categorías en el sistema, aparecerán aquí automáticamente.</p>
             </div>
         @else
             <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">

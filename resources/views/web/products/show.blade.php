@@ -7,7 +7,7 @@
         </div>
 
         <div class="detail-sidebar">
-            <a href="{{ route('web.products') }}" class="eyebrow">Volver al menu</a>
+            <a href="{{ route('web.products') }}" class="eyebrow">Volver al menú</a>
             <div>
                 <h2 class="headline text-[var(--color-secondary)]">{{ $product->nombre }}</h2>
                 @if ($product->categoria_nombre)

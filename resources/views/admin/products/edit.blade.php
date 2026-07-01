@@ -19,7 +19,7 @@
                     <input id="stock" name="stock" type="number" min="0" value="{{ old('stock', $product->stock) }}" required class="input">
                 </div>
                 <div>
-                    <label class="label" for="categoria_id">Categoria</label>
+                    <label class="label" for="categoria_id">Categoría</label>
                     <select id="categoria_id" name="categoria_id" required class="input">
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" @selected((int) old('categoria_id', $product->categoria_id) === (int) $category->id)>{{ $category->nombre }}</option>

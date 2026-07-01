@@ -25,12 +25,12 @@ class EnsureWebUserAuthenticated
             if ($request->expectsJson()) {
                 return response()->json([
                     'ok' => false,
-                    'message' => 'Tu sesion expiro. Inicia sesion nuevamente.',
+                    'message' => 'Tu sesión expiró. Inicia sesión nuevamente.',
                 ], 401);
             }
 
             return redirect()->route('web.login')
-                ->with('error', 'Debes iniciar sesion para continuar.');
+                ->with('error', 'Debes iniciar sesión para continuar.');
         }
 
         $response = $this->api->get('auth/verify');
@@ -39,12 +39,12 @@ class EnsureWebUserAuthenticated
             if ($request->expectsJson()) {
                 return response()->json([
                     'ok' => false,
-                    'message' => 'Tu sesion expiro. Inicia sesion nuevamente.',
+                    'message' => 'Tu sesión expiró. Inicia sesión nuevamente.',
                 ], 401);
             }
 
             return redirect()->route('web.login')
-                ->with('error', 'Tu sesion expiro. Inicia sesion nuevamente.');
+                ->with('error', 'Tu sesión expiró. Inicia sesión nuevamente.');
         }
 
         return $next($request);

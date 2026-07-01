@@ -35,7 +35,7 @@ class AdminAuthWebController extends Controller
         if (!$response->successful()) {
             $request->session()->forget(['web_admin', 'auth_token', 'auth_tipo']);
             return back()->withInput($request->except('password'))->withErrors([
-                'email' => $this->api->errorMessage($response, 'Email o contrasena incorrectos.'),
+                'email' => $this->api->errorMessage($response, 'Email o contraseña incorrectos.'),
             ]);
         }
         $payload = $response->json();
@@ -44,7 +44,7 @@ class AdminAuthWebController extends Controller
         if ($token === '') {
             $request->session()->forget(['web_admin', 'auth_token', 'auth_tipo']);
             return back()->withInput($request->except('password'))->withErrors([
-                'email' => 'El backend no emitio un JWT valido para administrador.',
+                'email' => 'La API no emitió una sesión válida para administrador.',
             ]);
         }
 
@@ -69,6 +69,6 @@ class AdminAuthWebController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('web.admin.login')->with('success', 'Sesion de administrador cerrada.');
+        return redirect()->route('web.admin.login')->with('success', 'Sesión de administrador cerrada.');
     }
 }

@@ -3,8 +3,8 @@
 @section('content')
     <section class="admin-login-shell mx-auto max-w-3xl">
         <div class="admin-warning-banner">
-            No estas autenticado como administrador.
-            <a href="#admin-login-form">Inicia sesion.</a>
+            No estás autenticado como administrador.
+            <a href="#admin-login-form">Inicia sesión.</a>
         </div>
 
         <div class="admin-login-card">
@@ -14,7 +14,7 @@
                 @csrf
 
                 <div>
-                    <label for="email" class="label">Correo electronico</label>
+                    <label for="email" class="label">Correo electrónico</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required class="input admin-input">
                     @error('email')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -22,7 +22,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="label">Contrasena</label>
+                    <label for="password" class="label">Contraseña</label>
                     <input id="password" name="password" type="password" required class="input admin-input">
                     @error('password')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

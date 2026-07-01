@@ -13,7 +13,7 @@
                     Descubre panes crujientes, dulces irresistibles y tortas personalizadas con una experiencia web mas elegante, clara y lista para vender mejor.
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('web.products') }}" class="btn btn-primary">Ver menu</a>
+                    <a href="{{ route('web.products') }}" class="btn btn-primary">Ver menú</a>
                     <a href="#contacto" class="btn btn-outline-secondary">Pedir ahora</a>
                 </div>
 
@@ -24,7 +24,7 @@
                     </div>
                     <div class="hero-stat">
                         <p class="hero-stat-value">{{ $homeCategories->count() }}</p>
-                        <p class="hero-stat-label">Categorias visibles</p>
+                        <p class="hero-stat-label">Categorías visibles</p>
                     </div>
                     <div class="hero-stat">
                         <p class="hero-stat-value">7AM - 9PM</p>
@@ -57,7 +57,7 @@
 
     <section id="categorias" class="section-space">
         <div class="max-w-2xl">
-            <span class="eyebrow">Categorias</span>
+            <span class="eyebrow">Categorías</span>
             <h3 class="mt-3 text-xl font-semibold text-stone-950 sm:text-2xl" style="font-family: 'Poppins', var(--font-sans);">
                 Tres clasicos de la casa para empezar.
             </h3>
@@ -101,7 +101,7 @@
                     <li class="feature-item">Hecho con carino por nuestro equipo</li>
                 </ul>
                 <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="{{ route('web.products') }}" class="btn btn-outline-secondary">Ver el menu</a>
+                    <a href="{{ route('web.products') }}" class="btn btn-outline-secondary">Ver el menú</a>
                     <a href="#contacto" class="btn btn-primary">Contacto</a>
                 </div>
             </div>
@@ -128,7 +128,7 @@
                 </div>
                 <div class="map-card mt-6">
                     <iframe
-                        title="Ubicacion Delicias"
+                        title="Ubicación Delicias"
                         src="https://www.google.com/maps?q=Jr.+Parra+del+Riego+164,+El+Tambo,+Huancayo&output=embed"
                         width="100%"
                         height="280"
@@ -187,10 +187,10 @@
             <div class="text-center">
                 <span class="eyebrow">Contacto</span>
                 <h3 class="mt-3 text-xl font-semibold text-stone-950 sm:text-2xl" style="font-family: 'Poppins', var(--font-sans);">
-                    Cuentanos tu pedido especial.
+                    Cuéntanos tu pedido especial.
                 </h3>
                 <p class="subheadline mt-3">
-                    Escribenos para pedidos especiales, tortas personalizadas o consultas sobre nuestros productos.
+                    Escríbenos para pedidos especiales, tortas personalizadas o consultas sobre nuestros productos.
                 </p>
             </div>
 
@@ -213,7 +213,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="telefono" class="label">Telefono</label>
+                        <label for="telefono" class="label">Teléfono</label>
                         <input id="telefono" name="telefono" type="tel" value="{{ old('telefono') }}" required class="input" placeholder="9XXXXXXXX">
                         @error('telefono')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

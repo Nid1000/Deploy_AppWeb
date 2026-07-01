@@ -19,11 +19,11 @@
                     <input id="email" name="email" value="{{ old('email', $user->email) }}" class="input">
                 </div>
                 <div>
-                    <label class="label" for="telefono">Telefono</label>
+                    <label class="label" for="telefono">Teléfono</label>
                     <input id="telefono" name="telefono" value="{{ old('telefono', $user->telefono) }}" class="input">
                 </div>
                 <div>
-                    <label class="label" for="numero_casa">Numero de casa</label>
+                    <label class="label" for="numero_casa">Número de casa</label>
                     <input id="numero_casa" name="numero_casa" value="{{ old('numero_casa', $user->numero_casa) }}" class="input">
                 </div>
                 <div>
@@ -31,7 +31,7 @@
                     <input id="distrito" name="distrito" value="{{ old('distrito', $user->distrito) }}" class="input">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="label" for="direccion">Direccion</label>
+                    <label class="label" for="direccion">Dirección</label>
                     <input id="direccion" name="direccion" value="{{ old('direccion', $user->direccion) }}" class="input">
                 </div>
                 <button class="btn btn-primary md:col-span-2 w-fit">Guardar cambios</button>

@@ -23,14 +23,14 @@ class EnsureWebAdminAuthenticated
         if (!$admin || $token === '' || $tipo !== 'admin') {
             $request->session()->forget(['web_admin', 'auth_token', 'auth_tipo']);
             return redirect()->route('web.admin.login')
-                ->with('error', 'Debes iniciar sesion como administrador.');
+                ->with('error', 'Debes iniciar sesión como administrador.');
         }
 
         $response = $this->api->get('auth/verify');
         if (!$response->successful() || data_get($response->json(), 'tipo') !== 'admin') {
             $request->session()->forget(['web_admin', 'auth_token', 'auth_tipo']);
             return redirect()->route('web.admin.login')
-                ->with('error', 'Tu sesion de administrador expiro. Inicia sesion nuevamente.');
+                ->with('error', 'Tu sesión de administrador expiró. Inicia sesión nuevamente.');
         }
 
         return $next($request);

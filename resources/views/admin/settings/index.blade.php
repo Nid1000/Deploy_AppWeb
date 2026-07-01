@@ -18,7 +18,7 @@
                     <label class="label" for="branding">Branding</label>
                     <input id="branding" name="branding" value="{{ old('branding', $settings['branding'] ?? 'Delicias') }}" class="input">
                 </div>
-                <button class="btn btn-primary">Guardar configuracion</button>
+                <button class="btn btn-primary">Guardar configuración</button>
             </form>
         </article>
 

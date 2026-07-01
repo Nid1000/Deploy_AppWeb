@@ -92,7 +92,7 @@
                             <p class="text-xs text-stone-500">{{ data_get($order, 'usuario.nombre') }} {{ data_get($order, 'usuario.apellido') }}</p>
                         </td>
                         <td>
-                            <p>{{ $order->direccion_entrega ?: 'Sin direccion' }}</p>
+                            <p>{{ $order->direccion_entrega ?: 'Sin dirección' }}</p>
                             <p class="text-xs text-stone-500">{{ $order->fecha_entrega ?: 'Sin fecha' }}</p>
                         </td>
                         <td>

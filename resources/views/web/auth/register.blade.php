@@ -32,13 +32,13 @@
                 <span class="register-step-number">{{ $isVerified ? '✓' : '1' }}</span>
                 <div>
                     <h3>Verifica tu correo</h3>
-                    <p>Elige Google o recibe un codigo de 6 digitos.</p>
+                    <p>Elige Google o recibe un código de 6 dígitos.</p>
                 </div>
             </div>
 
             <div class="register-google-row">
                 <div>
-                    <p class="text-sm font-semibold text-stone-900">Registro rapido con Google</p>
+                    <p class="text-sm font-semibold text-stone-900">Registro rápido con Google</p>
                     <p class="mt-1 text-xs text-stone-500">Usaremos el Gmail verificado de tu cuenta.</p>
                 </div>
                 <a href="{{ route('web.register.google.redirect') }}" class="register-google-button">Continuar con Google</a>
@@ -50,21 +50,21 @@
                 <form action="{{ route('web.register.email.send-code') }}" method="POST" class="contents">
                     @csrf
                     <div>
-                        <label for="verification_email" class="label">Correo electronico</label>
+                        <label for="verification_email" class="label">Correo electrónico</label>
                         <input id="verification_email" name="email" type="email" value="{{ $prefillEmail }}" required class="input" @disabled($isVerified) placeholder="tu@email.com">
                         @error('email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <button type="submit" class="register-secondary-button @if($isVerified) opacity-60 @endif" @disabled($isVerified)>
-                        {{ $isVerified ? 'Correo verificado' : 'Enviar codigo' }}
+                        {{ $isVerified ? 'Correo verificado' : 'Enviar código' }}
                     </button>
                 </form>
 
                 <form action="{{ route('web.register.email.verify-code') }}" method="POST" class="contents">
                     @csrf
                     <div>
-                        <label for="verification_code" class="label">Codigo recibido</label>
+                        <label for="verification_code" class="label">Código recibido</label>
                         <input id="verification_code" name="verification_code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" class="input text-center tracking-[0.3em]" placeholder="123456" @disabled($isVerified)>
                         @error('verification_code')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -82,7 +82,7 @@
                     Correo verificado: <strong>{{ $verifiedEmail }}</strong>. Ya puedes completar el registro.
                 </p>
             @else
-                <p class="register-pending-message">Primero verifica el correo para habilitar el boton Crear cuenta.</p>
+                <p class="register-pending-message">Primero verifica el correo para habilitar el botón Crear cuenta.</p>
             @endif
         </section>
 
@@ -94,7 +94,7 @@
                     <span class="register-step-number">2</span>
                     <div>
                         <h3>Datos personales</h3>
-                        <p>Informacion basica para identificar tu cuenta.</p>
+                        <p>Información básica para identificar tu cuenta.</p>
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@
                         @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="telefono" class="label">Telefono <span class="text-stone-400">(opcional)</span></label>
+                        <label for="telefono" class="label">Teléfono <span class="text-stone-400">(opcional)</span></label>
                         <input id="telefono" name="telefono" type="tel" value="{{ old('telefono') }}" class="input" placeholder="987654321" autocomplete="tel">
                         @error('telefono')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
@@ -127,7 +127,7 @@
                     <span class="register-step-number">3</span>
                     <div>
                         <h3>Seguridad</h3>
-                        <p>Crea una contrasena segura para proteger tu cuenta.</p>
+                        <p>Crea una contraseña segura para proteger tu cuenta.</p>
                     </div>
                 </div>
 
@@ -145,9 +145,9 @@
                         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">Debe incluir</p>
                         <ul class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs lg:grid-cols-1">
                             <li data-rule="length">6 caracteres</li>
-                            <li data-rule="upper">Una mayuscula</li>
-                            <li data-rule="lower">Una minuscula</li>
-                            <li data-rule="digit">Un numero</li>
+                            <li data-rule="upper">Una mayúscula</li>
+                            <li data-rule="lower">Una minúscula</li>
+                            <li data-rule="digit">Un número</li>
                         </ul>
                     </div>
                 </div>
@@ -157,19 +157,19 @@
                 <div class="register-section-heading">
                     <span class="register-step-number">4</span>
                     <div>
-                        <h3>Direccion de entrega</h3>
-                        <p>La usaremos como direccion principal para tus pedidos.</p>
+                        <h3>Dirección de entrega</h3>
+                        <p>La usaremos como dirección principal para tus pedidos.</p>
                     </div>
                 </div>
 
                 <div class="mt-5 grid gap-4 md:grid-cols-[1fr_0.55fr]">
                     <div>
-                        <label for="direccion" class="label">Direccion</label>
-                        <input id="direccion" name="direccion" type="text" value="{{ old('direccion') }}" required class="input" placeholder="Jiron, avenida o calle" autocomplete="street-address">
+                        <label for="direccion" class="label">Dirección</label>
+                        <input id="direccion" name="direccion" type="text" value="{{ old('direccion') }}" required class="input" placeholder="Jirón, avenida o calle" autocomplete="street-address">
                         @error('direccion')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label for="numero_casa" class="label">Numero de casa</label>
+                        <label for="numero_casa" class="label">Número de casa</label>
                         <input id="numero_casa" name="numero_casa" type="text" value="{{ old('numero_casa') }}" required class="input" placeholder="123">
                         @error('numero_casa')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
@@ -198,7 +198,7 @@
 
         <p class="mt-6 text-center text-sm text-stone-600">
             Ya tienes cuenta?
-            <a href="{{ route('web.login') }}" class="font-semibold text-amber-700 underline underline-offset-4">Inicia sesion</a>
+            <a href="{{ route('web.login') }}" class="font-semibold text-amber-700 underline underline-offset-4">Inicia sesión</a>
         </p>
     </div>
 

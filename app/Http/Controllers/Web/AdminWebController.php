@@ -251,11 +251,11 @@ class AdminWebController extends Controller
             $imageResponse = $this->api->postMultipart('categorias/admin/' . $id . '/imagen', [], 'imagen', $request->file('imagen'));
             if (!$imageResponse->successful()) {
                 return redirect()->route('web.admin.categories.edit', $id)
-                    ->with('error', $this->api->errorMessage($imageResponse, 'Categoria creada, pero no se pudo subir la imagen.'));
+                    ->with('error', $this->api->errorMessage($imageResponse, 'Categoría creada, pero no se pudo subir la imagen.'));
             }
         }
 
-        return redirect()->route('web.admin.categories.edit', $id)->with('success', 'Categoria creada correctamente.');
+        return redirect()->route('web.admin.categories.edit', $id)->with('success', 'Categoría creada correctamente.');
     }
 
     public function categoriesEdit(int $id): View
@@ -284,18 +284,18 @@ class AdminWebController extends Controller
         if ($request->hasFile('imagen')) {
             $imageResponse = $this->api->postMultipart('categorias/admin/' . $id . '/imagen', [], 'imagen', $request->file('imagen'));
             if (!$imageResponse->successful()) {
-                return back()->with('error', $this->api->errorMessage($imageResponse, 'Categoria actualizada, pero no se pudo subir la imagen.'));
+                return back()->with('error', $this->api->errorMessage($imageResponse, 'Categoría actualizada, pero no se pudo subir la imagen.'));
             }
         }
 
-        return back()->with('success', 'Categoria actualizada.');
+        return back()->with('success', 'Categoría actualizada.');
     }
 
     public function categoriesToggle(int $id): RedirectResponse
     {
         $response = $this->api->get('categorias/admin/' . $id);
         if (!$response->successful()) {
-            return back()->with('error', 'Categoria no encontrada.');
+            return back()->with('error', 'Categoría no encontrada.');
         }
         $current = (bool) data_get($response->json(), 'categoria.activo', false);
         $toggle = $this->api->patch('categorias/admin/' . $id . '/estado', ['activo' => !$current]);
@@ -313,7 +313,7 @@ class AdminWebController extends Controller
             return back()->with('error', $this->api->errorMessage($response, 'No se pudo desactivar la categoria.'));
         }
 
-        return redirect()->route('web.admin.categories.index')->with('success', 'Categoria desactivada.');
+        return redirect()->route('web.admin.categories.index')->with('success', 'Categoría desactivada.');
     }
 
     public function productsIndex(Request $request): View
@@ -627,7 +627,7 @@ class AdminWebController extends Controller
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
         ], [
-            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 digitos.',
+            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 dígitos.',
         ]);
 
         $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
@@ -676,7 +676,7 @@ class AdminWebController extends Controller
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
         ], [
-            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 digitos.',
+            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 dígitos.',
         ]);
         $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
         if (!$response->successful()) {
@@ -957,7 +957,7 @@ class AdminWebController extends Controller
         $rows = $this->parseCsvRows($response->body());
 
         if ($rows === []) {
-            return back()->with('error', 'El archivo exportado esta vacio.');
+            return back()->with('error', 'El archivo exportado está vacío.');
         }
 
         $html = $this->renderExcelHtmlReport($report, $rows);
@@ -1209,7 +1209,7 @@ class AdminWebController extends Controller
     private function reportInstructions(string $reportKey): string
     {
         return match ($reportKey) {
-            'ventas' => 'Plantilla de informe de ventas diarias basicas. Revise los totales y el detalle por pedido.',
+            'ventas' => 'Plantilla de informe de ventas diarias básicas. Revise los totales y el detalle por pedido.',
             'pedidos' => 'Reporte de pedidos organizado para seguimiento y revision de estados.',
             'productos' => 'Catalogo de productos con informacion para analisis y control.',
             'almacen' => 'Movimientos de almacen ordenados por fecha, producto y tipo.',
@@ -1232,7 +1232,7 @@ class AdminWebController extends Controller
                 ['type' => 'Context', 'span' => 2, 'value' => 'Estado: pendiente/listo/entregado'],
             ],
             'productos' => [
-                ['type' => 'Context', 'span' => 2, 'value' => 'Categoria: general'],
+                ['type' => 'Context', 'span' => 2, 'value' => 'Categoría: general'],
                 ['type' => 'Context', 'span' => 2, 'value' => 'Fecha: ' . $generatedAt],
                 ['type' => 'Context', 'span' => 2, 'value' => 'Inventario: activo'],
             ],

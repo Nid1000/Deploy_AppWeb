@@ -17,93 +17,85 @@
             kr-post-url-refused="{{ $izipayPayment['cancelUrl'] }}"
         ></script>
         <style>
-            .izipay-embedded-shell {
-                background: linear-gradient(180deg, rgba(240, 253, 250, .92), rgba(255, 255, 255, .96));
-            }
-
-            .izipay-embedded-shell .kr-smart-form,
-            .izipay-embedded-shell .kr-embedded {
-                display: block;
-                width: 100%;
-                max-width: 620px;
+            .izipay-smart-shell {
+                max-width: 360px;
                 margin: 0 auto;
-            }
-
-            .izipay-embedded-shell .kr-pan,
-            .izipay-embedded-shell .kr-expiry,
-            .izipay-embedded-shell .kr-security-code,
-            .izipay-embedded-shell .kr-installment-number,
-            .izipay-embedded-shell .kr-first-installment-delay {
-                width: 100%;
-                height: 48px !important;
-                min-height: 48px !important;
-                max-height: 48px !important;
-                margin: 10px 0;
-                border: 1px solid #d6d3d1;
-                border-radius: 0.75rem;
+                border: 1px solid #d7f0ea;
+                border-radius: 8px;
                 background: #fff;
-                padding: 0;
+                box-shadow: 0 18px 36px rgba(15, 118, 110, .12);
                 overflow: hidden;
-                box-shadow: 0 1px 2px rgba(28, 25, 23, .04);
             }
 
-            .izipay-embedded-shell .kr-pan:focus-within,
-            .izipay-embedded-shell .kr-expiry:focus-within,
-            .izipay-embedded-shell .kr-security-code:focus-within,
-            .izipay-embedded-shell .kr-installment-number:focus-within,
-            .izipay-embedded-shell .kr-first-installment-delay:focus-within {
-                border-color: #14b8a6;
-                box-shadow: 0 0 0 3px rgba(20, 184, 166, .15);
+            .izipay-smart-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px 8px;
+                background: #fff;
+                border-bottom: 1px solid #edf3f1;
             }
 
-            .izipay-embedded-shell .kr-pan iframe,
-            .izipay-embedded-shell .kr-expiry iframe,
-            .izipay-embedded-shell .kr-security-code iframe,
-            .izipay-embedded-shell .kr-installment-number iframe,
-            .izipay-embedded-shell .kr-first-installment-delay iframe {
-                width: 100% !important;
-                height: 48px !important;
-                min-height: 48px !important;
-                max-height: 48px !important;
+            .izipay-smart-brand {
+                font-size: 30px;
+                line-height: 1;
+                font-weight: 800;
+                letter-spacing: -.04em;
+                color: #ff3b43;
+            }
+
+            .izipay-smart-brand span {
+                color: #16b8aa;
+            }
+
+            .izipay-smart-order {
+                text-align: right;
+                font-size: 10px;
+                line-height: 1.15;
+                color: #3f3f46;
+            }
+
+            .izipay-smart-body {
+                padding: 10px 18px 12px;
+            }
+
+            .izipay-smart-shell .kr-smart-form {
                 display: block;
-            }
-
-            .izipay-embedded-shell select,
-            .izipay-embedded-shell input {
                 width: 100%;
-                min-height: 46px;
-                border: 0;
-                background: transparent;
-                padding: 0 12px;
-                color: #292524;
-                font-size: 0.925rem;
-                outline: none;
             }
 
-            .izipay-embedded-shell .kr-payment-button {
+            .izipay-smart-shell .kr-payment-button {
                 width: 100%;
                 min-height: 48px;
-                margin-top: 14px;
+                margin-top: 12px;
                 border: 0;
-                border-radius: 999px;
-                background: #0ea5a4;
+                border-radius: 6px;
+                background: #49aaa1;
                 color: #fff;
                 font-weight: 700;
-                box-shadow: 0 14px 26px rgba(14, 165, 164, .22);
+                box-shadow: none;
                 cursor: pointer;
-                transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+                transition: background .15s ease;
             }
 
-            .izipay-embedded-shell .kr-payment-button:hover {
-                background: #0f9695;
-                box-shadow: 0 16px 30px rgba(14, 165, 164, .28);
-                transform: translateY(-1px);
+            .izipay-smart-shell .kr-payment-button:hover {
+                background: #3e9d95;
             }
 
-            .izipay-embedded-shell .kr-form-error {
+            .izipay-smart-shell .kr-form-error {
                 margin-top: 12px;
                 color: #dc2626;
-                font-size: 0.875rem;
+                font-size: 12px;
+            }
+
+            .izipay-smart-footer {
+                padding: 8px 14px 10px;
+                border-top: 1px solid #edf3f1;
+                text-align: center;
+                font-size: 10px;
+                color: #6b7280;
+                text-transform: uppercase;
             }
         </style>
     @endpush
@@ -120,8 +112,8 @@
 
     @if ($cartItems->isEmpty())
         <section class="empty-state mt-8">
-            <h3 class="text-2xl font-semibold text-stone-900">Tu carrito esta vacio.</h3>
-            <p class="mt-2 text-sm text-stone-600">Agrega algunos productos desde el menu para continuar con tu compra.</p>
+            <h3 class="text-2xl font-semibold text-stone-900">Tu carrito está vacío.</h3>
+            <p class="mt-2 text-sm text-stone-600">Agrega algunos productos desde el menú para continuar con tu compra.</p>
             <a href="{{ route('web.products') }}" class="btn btn-primary mt-5">Explorar productos</a>
         </section>
     @else
@@ -193,19 +185,19 @@
                             </select>
                         </div>
                         <div>
-                            <label for="numero_casa_entrega" class="label">Numero de casa</label>
+                            <label for="numero_casa_entrega" class="label">Número de casa</label>
                             <input id="numero_casa_entrega" name="numero_casa_entrega" type="text" required value="{{ old('numero_casa_entrega', $user['numero_casa'] ?? '') }}" class="input">
                         </div>
                     </div>
 
                     <div>
-                        <label for="direccion_entrega" class="label">Direccion de entrega</label>
+                        <label for="direccion_entrega" class="label">Dirección de entrega</label>
                         <input id="direccion_entrega" name="direccion_entrega" type="text" required value="{{ old('direccion_entrega', $user['direccion'] ?? '') }}" class="input">
                     </div>
 
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label for="telefono_contacto" class="label">Telefono</label>
+                            <label for="telefono_contacto" class="label">Teléfono</label>
                             <input id="telefono_contacto" name="telefono_contacto" type="tel" required value="{{ old('telefono_contacto', $user['telefono'] ?? '') }}" class="input" placeholder="9XXXXXXXX">
                         </div>
                         <div>
@@ -235,14 +227,14 @@
                             </select>
                         </div>
                         <div>
-                            <label for="numero_documento" class="label">Numero</label>
+                            <label for="numero_documento" class="label">Número</label>
                             <div class="flex gap-2">
                                 <input id="numero_documento" name="numero_documento" type="text" value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
                                 <button type="button" class="btn btn-outline-secondary shrink-0" data-document-lookup>Validar</button>
                             </div>
                         </div>
                         <p class="md:col-span-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone-600" data-document-message>
-                            <span data-document-message-text>Ingresa un DNI de 8 digitos o un RUC valido de 11 digitos.</span>
+                            <span data-document-message-text>Ingresa un DNI de 8 dígitos o un RUC válido de 11 dígitos.</span>
                             <span class="hidden font-semibold text-emerald-700" data-document-inline-name></span>
                         </p>
                         <div class="md:col-span-3 hidden rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-900" data-document-details></div>
@@ -272,22 +264,27 @@
                             <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
                                 <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Completa el pago seguro con tarjeta.</p>
-                                <div class="izipay-embedded-shell mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
-                                    <div class="kr-embedded" kr-form-token="{{ $izipayPayment['formToken'] }}">
-                                        <div class="kr-pan"></div>
-                                        <div class="grid gap-3 md:grid-cols-2">
-                                            <div class="kr-expiry"></div>
-                                            <div class="kr-security-code"></div>
+                                <div class="mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
+                                    <div class="izipay-smart-shell">
+                                        <div class="izipay-smart-header">
+                                            <div class="izipay-smart-brand">izi<span>pay</span></div>
+                                            <div class="izipay-smart-order">
+                                                <strong>Número de pedido</strong><br>
+                                                {{ $izipayPayment['pedidoId'] }}
+                                            </div>
                                         </div>
-                                        <div class="kr-installment-number"></div>
-                                        <div class="kr-first-installment-delay"></div>
-                                        <button class="kr-payment-button"></button>
-                                        <div class="kr-form-error"></div>
+                                        <div class="izipay-smart-body">
+                                            <div class="kr-smart-form" kr-form-token="{{ $izipayPayment['formToken'] }}"></div>
+                                            <div class="kr-form-error"></div>
+                                        </div>
+                                        <div class="izipay-smart-footer">
+                                            Powered by <strong>izipay</strong>
+                                        </div>
                                     </div>
                                     <p class="mt-3 text-center text-xs text-stone-500">Recuerda activar tus compras por internet.</p>
                                 </div>
                             @else
-                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aqui el formulario seguro de Izipay.</p>
+                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aquí el formulario seguro de Izipay.</p>
                             @endif
                         </div>
 
@@ -298,16 +295,16 @@
                                     <img src="{{ $yapeQrUrl }}" alt="QR de Yape Delicias del centro" class="mx-auto aspect-square w-full max-w-[170px] rounded-xl object-contain">
                                 </div>
                                 <div>
-                                    <p class="text-sm text-stone-600">Escanea el QR y paga al numero:</p>
+                                    <p class="text-sm text-stone-600">Escanea el QR y paga al número:</p>
                                     <p class="mt-1 text-2xl font-semibold text-purple-900">{{ $yapePhone }}</p>
-                                    <p class="mt-3 text-sm text-stone-600">Luego confirma el pedido. Delicias verificara el pago y lo marcara como pagado.</p>
+                                    <p class="mt-3 text-sm text-stone-600">Luego confirma el pedido. Delicias verificará el pago y lo marcará como pagado.</p>
                                 </div>
                             </div>
                         </div>
 
                         <label class="mt-4 flex items-start gap-3 text-sm text-stone-700">
                             <input type="checkbox" name="acepta_pago" value="1" required class="mt-1" @checked(old('acepta_pago') || $izipayPayment) @disabled($izipayPayment)>
-                            <span>Acepto que Delicias registre este metodo de pago y confirme el pedido segun disponibilidad.</span>
+                            <span>Acepto que Delicias registre este método de pago y confirme el pedido según disponibilidad.</span>
                         </label>
                     </div>
 
@@ -415,13 +412,18 @@
 
             const setInlineName = (payload) => {
                 if (!inlineName) return;
+                if (type.value === 'DNI') {
+                    clearInlineName();
+                    return;
+                }
+
                 const name = documentDisplayName(payload);
                 if (name === '') {
                     clearInlineName();
                     return;
                 }
 
-                inlineName.textContent = `${type.value === 'DNI' ? 'Nombre' : 'Empresa'}: ${name}`;
+                inlineName.textContent = `Empresa: ${name}`;
                 inlineName.classList.remove('hidden');
             };
 
@@ -451,6 +453,11 @@
 
             const setDetails = (payload) => {
                 if (!details) return;
+                if (type.value === 'DNI') {
+                    clearDetails();
+                    return;
+                }
+
                 const data = payload?.data || {};
                 const rows = type.value === 'DNI'
                     ? [
@@ -459,10 +466,10 @@
                         ['Apellido materno', data.second_last_name || data.apellido_materno],
                     ]
                     : [
-                        ['Razon social', data.razon_social || data.nombre_o_razon_social],
+                        ['Razón social', data.razon_social || data.nombre_o_razon_social],
                         ['Nombre comercial', data.nombre_comercial],
-                        ['Estado / condicion', [data.estado, data.condicion].filter(Boolean).join(' / ')],
-                        ['Direccion', data.direccion],
+                        ['Estado / condición', [data.estado, data.condicion].filter(Boolean).join(' / ')],
+                        ['Dirección', data.direccion],
                     ];
                 const visibleRows = rows.filter(([, value]) => String(value || '').trim() !== '');
 
@@ -500,8 +507,8 @@
                     ok
                         ? 'Formato correcto. Presiona Validar para consultar los datos.'
                         : (type.value === 'DNI'
-                        ? 'El DNI debe tener exactamente 8 digitos.'
-                        : 'El RUC debe tener 11 digitos y digito verificador correcto.'),
+                        ? 'El DNI debe tener exactamente 8 dígitos.'
+                        : 'El RUC debe tener 11 dígitos y dígito verificador correcto.'),
                     ok ? 'neutral' : 'error'
                 );
 
@@ -562,7 +569,7 @@
                     lookupKey = '';
                     clearInlineName();
                     clearDetails();
-                    setMessage('No se pudo conectar con el servicio de validacion.', 'error');
+                    setMessage('No se pudo conectar con el servicio de validación.', 'error');
                 } finally {
                     lookup.disabled = false;
                 }

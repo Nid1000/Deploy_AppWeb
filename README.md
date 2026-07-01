@@ -1,51 +1,49 @@
 # Frontend Laravel
 
-Este `frontend` es la aplicacion web en Laravel que conserva el diseno del sistema y consume el backend por API.
+Este proyecto es la aplicacion web en Laravel que conserva el diseno del sistema y consume la API real por HTTP.
 
 ## Arquitectura
 
 - `/`: interfaz web Laravel + Blade + Vite
-- `/backend`: API Laravel independiente
-- Conexion API: `BACKEND_API_BASE_URL`
+- Conexion API externa: `BACKEND_API_BASE_URL`
 
 En produccion:
 
 - Frontend: `https://delicias.saborcentral.com`
-- Backend: `https://api.saborcentral.com`
+- API: `https://api.saborcentral.com`
 
-Consulta [`DEPLOY-CPANEL.md`](DEPLOY-CPANEL.md) para configurar ambos dominios
-desde este mismo repositorio.
+Consulta [`DEPLOY-CPANEL.md`](DEPLOY-CPANEL.md) para desplegar el frontend.
 
 La interfaz Blade usa:
 
 - `app/Http/Controllers/Web` para la logica web
 - `resources/views` para las vistas Blade
 - `resources/css/app.css` para estilos
-- `app/Services/BackendApiClient.php` para consumir el backend
+- `app/Services/BackendApiClient.php` para consumir la API
 
 ## Registro con correo real
 
 El frontend ahora puede:
 
-- enviar un codigo de verificacion por correo antes del alta
+- enviar un código de verificación por correo antes del alta
 - validar cuentas Gmail reales usando Google OAuth
 - completar el registro web solo cuando el correo ya fue verificado
 
 Importante:
 
-- esta validacion ocurre en el `frontend`
-- la creacion final del usuario sigue delegada al backend en `auth/register`
-- el login completo con Google como reemplazo de password requerira tambien soporte equivalente en el backend API
+- esta validación ocurre en el `frontend`
+- la creacion final del usuario sigue delegada a la API en `auth/register`
+- el login completo con Google como reemplazo de password requiere soporte equivalente en la API
 
 ## Puertos
 
 - Frontend Laravel: `http://127.0.0.1:3000`
-- Backend API: `http://127.0.0.1:5001`
+- API de produccion: `https://api.saborcentral.com`
 
 ## Configuracion
 
 1. Copia `.env.example` a `.env`
-2. Ajusta `BACKEND_API_BASE_URL` si tu backend usa otra URL
+2. Ajusta `BACKEND_API_BASE_URL` si necesitas usar una API distinta
 3. Instala dependencias:
 
 ```bash

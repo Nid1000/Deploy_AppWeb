@@ -40,15 +40,15 @@
                     <input id="email" type="email" value="{{ $user->email }}" disabled class="input bg-stone-100">
                 </div>
                 <div>
-                    <label for="telefono" class="label">Telefono</label>
+                    <label for="telefono" class="label">Teléfono</label>
                     <input id="telefono" name="telefono" type="tel" value="{{ old('telefono', $user->telefono) }}" class="input" placeholder="9XXXXXXXX">
                 </div>
                 <div>
-                    <label for="numero_casa" class="label">Numero de casa</label>
+                    <label for="numero_casa" class="label">Número de casa</label>
                     <input id="numero_casa" name="numero_casa" type="text" value="{{ old('numero_casa', $user->numero_casa) }}" required class="input">
                 </div>
                 <div class="md:col-span-2">
-                    <label for="direccion" class="label">Direccion</label>
+                    <label for="direccion" class="label">Dirección</label>
                     <input id="direccion" name="direccion" type="text" value="{{ old('direccion', $user->direccion) }}" required class="input">
                 </div>
                 <div class="md:col-span-2">
@@ -68,30 +68,30 @@
         <div class="space-y-6">
             <section class="rounded-[2rem] border border-amber-200 bg-white/90 p-8 shadow-sm">
                 <p class="eyebrow">Seguridad</p>
-                <h3 class="mt-3 text-3xl font-semibold text-stone-900">Cambiar contrasena</h3>
-                <p class="mt-2 text-sm text-stone-600">La nueva contrasena debe llevar mayuscula, minuscula, numero y minimo 6 caracteres.</p>
+                <h3 class="mt-3 text-3xl font-semibold text-stone-900">Cambiar contraseña</h3>
+                <p class="mt-2 text-sm text-stone-600">La nueva contraseña debe llevar mayúscula, minúscula, número y mínimo 6 caracteres.</p>
 
                 <form action="{{ route('web.profile.password') }}" method="POST" class="mt-6 space-y-4">
                     @csrf
                     @method('PATCH')
                     <div>
-                        <label for="password_actual" class="label">Contrasena actual</label>
+                        <label for="password_actual" class="label">Contraseña actual</label>
                         <input id="password_actual" name="password_actual" type="password" required class="input">
                     </div>
                     <div>
-                        <label for="password_nueva" class="label">Nueva contrasena</label>
+                        <label for="password_nueva" class="label">Nueva contraseña</label>
                         <input id="password_nueva" name="password_nueva" type="password" required class="input" placeholder="Ejemplo: Delicias1">
                     </div>
                     <div>
-                        <label for="password_nueva_confirmation" class="label">Confirmar nueva contrasena</label>
+                        <label for="password_nueva_confirmation" class="label">Confirmar nueva contraseña</label>
                         <input id="password_nueva_confirmation" name="password_nueva_confirmation" type="password" required class="input">
                     </div>
-                    <button type="submit" class="btn btn-primary">Actualizar contrasena</button>
+                    <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
                 </form>
             </section>
 
             <section class="rounded-[2rem] border border-dashed border-amber-300 bg-amber-50 p-6">
-                <p class="text-sm font-semibold text-stone-900">Accesos rapidos</p>
+                <p class="text-sm font-semibold text-stone-900">Accesos rápidos</p>
                 <div class="mt-4 flex flex-wrap gap-3">
                     <a href="{{ route('web.checkout') }}" class="btn btn-outline-secondary">Ir al checkout</a>
                     <a href="{{ route('web.orders') }}" class="btn btn-outline-secondary">Ver pedidos</a>

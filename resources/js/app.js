@@ -96,7 +96,7 @@ const chatReplies = {
     contacto: 'Puedes contactarnos al 993560096 o al correo deliciasdelcentro@gmail.com.',
     torta: 'Si, realizamos tortas personalizadas. Puedes escribirnos por contacto y contarnos el diseno o sabor que deseas.',
     carrito: 'Si ya elegiste productos, revisa tu carrito y continua al checkout para completar el pedido.',
-    checkout: 'En checkout debes confirmar direccion, fecha de entrega, metodo de pago y comprobante.',
+    checkout: 'En checkout debes confirmar dirección, fecha de entrega, método de pago y comprobante.',
     historial: 'En tu historial puedes revisar pedidos, comprobantes y el estado de cada compra.',
     default: 'Puedo ayudarte con horarios, delivery, pagos, pedidos y contacto. Si prefieres, usa el boton de WhatsApp.',
 };
@@ -209,10 +209,10 @@ if (chatRoot) {
     const page = document.body?.dataset.page ?? '';
     if (messages && page) {
         const welcomeByPage = {
-            'web.products': 'Estas viendo el menu. Si quieres, te ayudo a encontrar productos o explicarte como comprar.',
+            'web.products': 'Estás viendo el menú. Si quieres, te ayudo a encontrar productos o explicarte cómo comprar.',
             'web.products.show': 'Puedo ayudarte con este producto, el carrito o el proceso de compra.',
-            'web.checkout': 'Estas en checkout. Si tienes dudas con pago, direccion o comprobante, preguntame aqui.',
-            'web.orders': 'Desde aqui puedes revisar tus pedidos y comprobantes.',
+            'web.checkout': 'Estás en checkout. Si tienes dudas con pago, dirección o comprobante, pregúntame aquí.',
+            'web.orders': 'Desde aquí puedes revisar tus pedidos y comprobantes.',
             'web.history': 'Puedo ayudarte a entender tu historial de compras.',
         };
 

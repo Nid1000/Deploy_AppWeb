@@ -21,14 +21,14 @@ class PasswordResetWebTest extends TestCase
     {
         $this->get('/password/forgot')
             ->assertOk()
-            ->assertSee('Olvidaste tu contrasena?');
+            ->assertSee('Olvidaste tu contraseña?');
     }
 
     public function test_reset_password_page_keeps_token_in_form(): void
     {
         $this->get('/password/reset?token=test-token')
             ->assertOk()
-            ->assertSee('Crea una nueva contrasena')
+            ->assertSee('Crea una nueva contraseña')
             ->assertSee('test-token');
     }
 

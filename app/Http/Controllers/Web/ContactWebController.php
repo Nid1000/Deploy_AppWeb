@@ -22,8 +22,8 @@ class ContactWebController extends Controller
             'telefono' => ['required', 'regex:/^9\d{8}$/'],
             'mensaje' => ['required', 'string', 'min:5', 'max:1000'],
         ], [
-            'telefono.required' => 'Ingresa tu numero de celular.',
-            'telefono.regex' => 'El numero debe tener 9 digitos y empezar con 9.',
+            'telefono.required' => 'Ingresa tu número de celular.',
+            'telefono.regex' => 'El número debe tener 9 dígitos y empezar con 9.',
         ]);
 
         $response = $this->api->post('contacto', $data);

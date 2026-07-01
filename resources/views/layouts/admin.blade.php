@@ -79,7 +79,7 @@
                     <span class="admin-sidebar-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7a3 3 0 0 1 3-3h10l3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/></svg>
                     </span>
-                    Categorias
+                    Categorías
                 </a>
                 <a href="{{ route('web.admin.users.index') }}" class="admin-sidebar-link {{ str_starts_with((string) $routeName, 'web.admin.users') ? 'admin-sidebar-link-active' : '' }}">
                     <span class="admin-sidebar-icon">

@@ -26,7 +26,7 @@ class CheckoutWebController extends Controller
     {
         $cartItems = StorefrontCart::items($request);
         if ($cartItems->isEmpty()) {
-            return back()->with('error', 'Tu carrito esta vacio.');
+            return back()->with('error', 'Tu carrito está vacío.');
         }
 
         $data = $request->validate([
@@ -43,7 +43,7 @@ class CheckoutWebController extends Controller
             'acepta_pago' => ['accepted'],
         ], [
             'fecha_entrega.after_or_equal' => 'La fecha de entrega debe ser desde manana en adelante.',
-            'telefono_contacto.regex' => 'El telefono debe tener 9 digitos y empezar con 9.',
+            'telefono_contacto.regex' => 'El teléfono debe tener 9 dígitos y empezar con 9.',
             'acepta_pago.accepted' => 'Debes aceptar las condiciones del pago.',
         ]);
 
@@ -55,11 +55,11 @@ class CheckoutWebController extends Controller
             }
 
             if ($data['tipo_documento'] === 'DNI' && !preg_match('/^\d{8}$/', $data['numero_documento'])) {
-                return back()->withInput()->with('error', 'El DNI debe tener 8 digitos.');
+                return back()->withInput()->with('error', 'El DNI debe tener 8 dígitos.');
             }
 
             if ($data['tipo_documento'] === 'RUC' && !preg_match('/^\d{11}$/', $data['numero_documento'])) {
-                return back()->withInput()->with('error', 'El RUC debe tener 11 digitos.');
+                return back()->withInput()->with('error', 'El RUC debe tener 11 dígitos.');
             }
 
             $documentPath = $data['tipo_documento'] === 'DNI'
@@ -131,7 +131,7 @@ class CheckoutWebController extends Controller
             if ($formToken === '' || $publicKey === '') {
                 return redirect()->route('web.orders.show', $pedidoId)
                     ->with('success', 'Pedido creado correctamente.')
-                    ->with('error', 'Izipay no devolvio los datos para mostrar el formulario de pago.');
+                    ->with('error', 'Izipay no devolvió los datos para mostrar el formulario de pago.');
             }
 
             $backendUrl = rtrim((string) config('services.backend.url'), '/');
@@ -207,14 +207,14 @@ class CheckoutWebController extends Controller
         if ($data['tipo_documento'] === 'DNI' && !preg_match('/^\d{8}$/', $number)) {
             return response()->json([
                 'ok' => false,
-                'message' => 'El DNI debe tener exactamente 8 digitos.',
+                'message' => 'El DNI debe tener exactamente 8 dígitos.',
             ], 422);
         }
 
         if ($data['tipo_documento'] === 'RUC' && !$this->isValidRuc($number)) {
             return response()->json([
                 'ok' => false,
-                'message' => 'El RUC debe tener 11 digitos y un digito verificador correcto.',
+                'message' => 'El RUC debe tener 11 dígitos y un dígito verificador correcto.',
             ], 422);
         }
 
@@ -247,8 +247,8 @@ class CheckoutWebController extends Controller
             return response()->json([
                 'ok' => false,
                 'message' => $data['tipo_documento'] === 'DNI'
-                    ? 'La validacion en linea del DNI no devolvio datos reales.'
-                    : 'La validacion en linea del RUC no devolvio datos reales.',
+                    ? 'La validación en línea del DNI no devolvió datos reales.'
+                    : 'La validación en línea del RUC no devolvió datos reales.',
                 'numero' => $number,
                 'validacion_real' => false,
                 'validation_unavailable' => true,
@@ -298,11 +298,6 @@ class CheckoutWebController extends Controller
             'yapePhone' => env('YAPE_PHONE', '974268690'),
             'izipayPayment' => $izipayPayment,
         ];
-    }
-
-    private function requiresRealDocumentValidation(): bool
-    {
-        return filter_var(env('DOCUMENT_VALIDATION_REQUIRED', true), FILTER_VALIDATE_BOOLEAN);
     }
 
     private function documentDisplayName(array $payload, string $type): string
