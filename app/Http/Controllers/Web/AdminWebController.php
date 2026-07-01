@@ -173,6 +173,40 @@ class AdminWebController extends Controller
         }
     }
 
+    private function driverControlState(object $order): string
+    {
+        if (!empty($order->regreso_reparto_at ?? null)) {
+            return 'retornado';
+        }
+
+        if (!empty($order->salida_reparto_at ?? null)) {
+            return 'en_ruta';
+        }
+
+        return 'sin_salida';
+    }
+
+    private function driverControlDate(object $order): ?Carbon
+    {
+        foreach ([
+            $order->regreso_reparto_at ?? null,
+            $order->salida_reparto_at ?? null,
+            $order->fecha_entrega ?? null,
+            $order->created_at ?? null,
+        ] as $value) {
+            if (empty($value)) {
+                continue;
+            }
+
+            try {
+                return Carbon::parse((string) $value);
+            } catch (Throwable) {
+            }
+        }
+
+        return null;
+    }
+
     public function categoriesIndex(Request $request): View
     {
         $filters = [
@@ -509,6 +543,101 @@ class AdminWebController extends Controller
         ]);
     }
 
+    public function driversIndex(Request $request): View
+    {
+        $filters = [
+            'buscar' => trim((string) $request->query('buscar', '')),
+            'desde' => (string) $request->query('desde', ''),
+            'hasta' => (string) $request->query('hasta', ''),
+            'estado_control' => (string) $request->query('estado_control', ''),
+        ];
+
+        $response = $this->api->get('pedidos/admin/todos', [
+            'pagina' => 1,
+            'limite' => 200,
+        ]);
+
+        $orders = collect($this->api->okData($response, 'pedidos', []))
+            ->map(fn ($item) => (object) $item)
+            ->filter(function ($order) use ($filters) {
+                $needle = mb_strtolower($filters['buscar']);
+                if ($needle !== '') {
+                    $haystack = mb_strtolower(implode(' ', [
+                        (string) ($order->id ?? ''),
+                        (string) ($order->conductor ?? ''),
+                        (string) ($order->conductor_dni ?? ''),
+                        (string) ($order->vehiculo ?? ''),
+                        (string) data_get($order, 'usuario.nombre', ''),
+                        (string) data_get($order, 'usuario.apellido', ''),
+                        (string) data_get($order, 'usuario.email', ''),
+                    ]));
+
+                    if (!str_contains($haystack, $needle)) {
+                        return false;
+                    }
+                }
+
+                $controlState = $this->driverControlState($order);
+                if ($filters['estado_control'] !== '' && $filters['estado_control'] !== $controlState) {
+                    return false;
+                }
+
+                $controlDate = $this->driverControlDate($order);
+                if ($controlDate && $filters['desde'] !== '') {
+                    try {
+                        if ($controlDate->lt(Carbon::parse($filters['desde'])->startOfDay())) {
+                            return false;
+                        }
+                    } catch (Throwable) {
+                    }
+                }
+                if ($controlDate && $filters['hasta'] !== '') {
+                    try {
+                        if ($controlDate->gt(Carbon::parse($filters['hasta'])->endOfDay())) {
+                            return false;
+                        }
+                    } catch (Throwable) {
+                    }
+                }
+
+                return true;
+            })
+            ->values();
+
+        $metrics = [
+            'programados' => $orders->count(),
+            'sin_salida' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'sin_salida')->count(),
+            'en_ruta' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'en_ruta')->count(),
+            'retornados' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'retornado')->count(),
+        ];
+
+        return view('admin.drivers.index', [
+            'orders' => $orders,
+            'filters' => $filters,
+            'metrics' => $metrics,
+        ]);
+    }
+
+    public function driversUpdate(Request $request, int $id): RedirectResponse
+    {
+        $data = $request->validate([
+            'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:salida_reparto_at'],
+            'conductor' => ['nullable', 'string', 'max:191'],
+            'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
+            'vehiculo' => ['nullable', 'string', 'max:191'],
+        ], [
+            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 digitos.',
+        ]);
+
+        $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
+        if (!$response->successful()) {
+            return back()->withInput()->with('error', $this->api->errorMessage($response, 'No se pudo actualizar el control del conductor.'));
+        }
+
+        return back()->with('success', 'Control del conductor actualizado.');
+    }
+
     public function ordersShow(int $id): View
     {
         $response = $this->api->get('pedidos/admin/' . $id);
@@ -544,7 +673,10 @@ class AdminWebController extends Controller
             'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
             'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:salida_reparto_at'],
             'conductor' => ['nullable', 'string', 'max:191'],
+            'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
+        ], [
+            'conductor_dni.regex' => 'El DNI del conductor debe tener 8 digitos.',
         ]);
         $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
         if (!$response->successful()) {

@@ -76,16 +76,20 @@
                     </div>
                     <div>
                         <label class="label" for="conductor">Conductor</label>
-                        <input id="conductor" name="conductor" value="{{ $order->conductor }}" class="input" placeholder="Nombre del conductor">
+                        <input id="conductor" name="conductor" value="{{ $order->conductor ?? '' }}" class="input" placeholder="Nombre del conductor">
+                    </div>
+                    <div>
+                        <label class="label" for="conductor_dni">DNI del conductor</label>
+                        <input id="conductor_dni" name="conductor_dni" value="{{ $order->conductor_dni ?? '' }}" class="input" inputmode="numeric" maxlength="8" placeholder="DNI">
                     </div>
                     <div>
                         <label class="label" for="vehiculo">Vehiculo</label>
-                        <input id="vehiculo" name="vehiculo" value="{{ $order->vehiculo }}" class="input" placeholder="Moto, auto o placa">
+                        <input id="vehiculo" name="vehiculo" value="{{ $order->vehiculo ?? '' }}" class="input" placeholder="Moto, auto o placa">
                     </div>
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div>
                             <label class="label" for="salida_reparto_at">Hora de salida</label>
-                            <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" value="{{ $order->salida_reparto_at ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input">
+                            <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" value="{{ ($order->salida_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input">
                         </div>
                         <div>
                             <label class="label" for="regreso_reparto_at">Hora de regreso</label>

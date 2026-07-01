@@ -51,6 +51,12 @@
                     </span>
                     Pedidos
                 </a>
+                <a href="{{ route('web.admin.drivers.index') }}" class="admin-sidebar-link {{ str_starts_with((string) $routeName, 'web.admin.drivers') ? 'admin-sidebar-link-active' : '' }}">
+                    <span class="admin-sidebar-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 11h5"/></svg>
+                    </span>
+                    Conductores
+                </a>
                 <a href="{{ route('web.admin.reservations.index') }}" class="admin-sidebar-link {{ str_starts_with((string) $routeName, 'web.admin.reservations') ? 'admin-sidebar-link-active' : '' }}">
                     <span class="admin-sidebar-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><path d="M8 14h3M13 14h3M8 17h3"/></svg>

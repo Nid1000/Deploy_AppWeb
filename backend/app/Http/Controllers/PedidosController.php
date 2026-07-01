@@ -36,7 +36,7 @@ class PedidosController extends Controller
         }
 
         $need = [];
-        foreach (['salida_reparto_at', 'regreso_reparto_at', 'conductor', 'vehiculo'] as $col) {
+        foreach (['salida_reparto_at', 'regreso_reparto_at', 'conductor', 'conductor_dni', 'vehiculo'] as $col) {
             $exists = DB::selectOne(
                 "SELECT 1 as ok FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'pedidos' AND COLUMN_NAME = ? LIMIT 1",
                 [$dbName, $col]
@@ -62,6 +62,10 @@ class PedidosController extends Controller
             }
             if ($col === 'conductor') {
                 DB::statement("ALTER TABLE pedidos ADD COLUMN conductor VARCHAR(191) NULL");
+                continue;
+            }
+            if ($col === 'conductor_dni') {
+                DB::statement("ALTER TABLE pedidos ADD COLUMN conductor_dni VARCHAR(20) NULL AFTER conductor");
                 continue;
             }
             if ($col === 'vehiculo') {
@@ -543,6 +547,7 @@ class PedidosController extends Controller
                 'salida_reparto_at' => property_exists($p, 'salida_reparto_at') ? ($p->salida_reparto_at ?? null) : null,
                 'regreso_reparto_at' => property_exists($p, 'regreso_reparto_at') ? ($p->regreso_reparto_at ?? null) : null,
                 'conductor' => property_exists($p, 'conductor') ? ($p->conductor ?? null) : null,
+                'conductor_dni' => property_exists($p, 'conductor_dni') ? ($p->conductor_dni ?? null) : null,
                 'vehiculo' => property_exists($p, 'vehiculo') ? ($p->vehiculo ?? null) : null,
                 'metodo_pago' => $pago?->metodo ?? null,
                 'estado_pago' => $pago?->estado ?? null,
@@ -607,6 +612,7 @@ class PedidosController extends Controller
                 'salida_reparto_at' => property_exists($p, 'salida_reparto_at') ? ($p->salida_reparto_at ?? null) : null,
                 'regreso_reparto_at' => property_exists($p, 'regreso_reparto_at') ? ($p->regreso_reparto_at ?? null) : null,
                 'conductor' => property_exists($p, 'conductor') ? ($p->conductor ?? null) : null,
+                'conductor_dni' => property_exists($p, 'conductor_dni') ? ($p->conductor_dni ?? null) : null,
                 'vehiculo' => property_exists($p, 'vehiculo') ? ($p->vehiculo ?? null) : null,
                 'metodo_pago' => $pago?->metodo ?? null,
                 'estado_pago' => $pago?->estado ?? null,
@@ -636,6 +642,7 @@ class PedidosController extends Controller
                 'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\\TH:i'],
                 'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\\TH:i', 'after_or_equal:salida_reparto_at'],
                 'conductor' => ['nullable', 'string', 'max:191'],
+                'conductor_dni' => ['nullable', 'regex:/^\\d{8}$/'],
                 'vehiculo' => ['nullable', 'string', 'max:191'],
             ]);
         } catch (ValidationException $e) {
@@ -666,6 +673,7 @@ class PedidosController extends Controller
             'salida_reparto_at' => $salidaDb,
             'regreso_reparto_at' => $regresoDb,
             'conductor' => isset($data['conductor']) ? trim((string) $data['conductor']) : null,
+            'conductor_dni' => isset($data['conductor_dni']) ? trim((string) $data['conductor_dni']) : null,
             'vehiculo' => isset($data['vehiculo']) ? trim((string) $data['vehiculo']) : null,
             'updated_at' => now(),
         ]);
@@ -677,6 +685,7 @@ class PedidosController extends Controller
             'salida_reparto_at' => $salidaDb,
             'regreso_reparto_at' => $regresoDb,
             'conductor' => isset($data['conductor']) ? trim((string) $data['conductor']) : null,
+            'conductor_dni' => isset($data['conductor_dni']) ? trim((string) $data['conductor_dni']) : null,
             'vehiculo' => isset($data['vehiculo']) ? trim((string) $data['vehiculo']) : null,
         ], 200);
     }

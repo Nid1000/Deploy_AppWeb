@@ -88,6 +88,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/pedidos/{id}/estado', [AdminWebController::class, 'ordersUpdateState'])->whereNumber('id')->name('web.admin.orders.state');
         Route::post('/pedidos/{id}/reparto', [AdminWebController::class, 'ordersUpdateShipping'])->whereNumber('id')->name('web.admin.orders.shipping');
         Route::post('/pedidos/{id}/fecha-entrega', [AdminWebController::class, 'ordersUpdateDeliveryDate'])->whereNumber('id')->name('web.admin.orders.delivery');
+        Route::get('/conductores', [AdminWebController::class, 'driversIndex'])->name('web.admin.drivers.index');
+        Route::post('/conductores/{id}/control', [AdminWebController::class, 'driversUpdate'])->whereNumber('id')->name('web.admin.drivers.update');
 
         Route::get('/comprobantes', [AdminWebController::class, 'receiptsIndex'])->name('web.admin.receipts.index');
         Route::get('/reservas', [AdminWebController::class, 'reservationsIndex'])->name('web.admin.reservations.index');
