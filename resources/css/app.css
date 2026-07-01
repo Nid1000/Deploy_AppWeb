@@ -491,6 +491,133 @@
         @apply mx-auto mt-8 max-w-md rounded-[2.25rem] border border-amber-200/80 bg-white/92 p-8 shadow-xl shadow-amber-100/35;
     }
 
+    .register-shell {
+        @apply mx-auto mt-8 max-w-5xl rounded-[2.25rem] border border-amber-200/80 bg-white/92 p-5 shadow-xl shadow-amber-100/35 sm:p-8;
+    }
+
+    .register-header {
+        @apply flex flex-col gap-6 border-b border-stone-200 pb-6 lg:flex-row lg:items-end lg:justify-between;
+    }
+
+    .register-section {
+        @apply mt-6 rounded-[1.75rem] border border-stone-200 bg-white/80 p-5 sm:p-6;
+    }
+
+    .register-section-highlight {
+        @apply border-amber-200 bg-amber-50/45;
+    }
+
+    .register-section-heading {
+        @apply flex items-start gap-3;
+    }
+
+    .register-section-heading h3 {
+        @apply text-lg font-semibold text-stone-950;
+    }
+
+    .register-section-heading p {
+        @apply mt-1 text-sm text-stone-500;
+    }
+
+    .register-step-number {
+        @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-sm font-semibold text-white;
+    }
+
+    .register-google-row {
+        @apply mt-5 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .register-google-button,
+    .register-secondary-button,
+    .register-primary-button {
+        @apply inline-flex min-h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition;
+    }
+
+    .register-google-button,
+    .register-secondary-button {
+        @apply border border-stone-300 bg-white text-stone-800 hover:border-amber-400 hover:text-amber-800;
+    }
+
+    .register-primary-button {
+        @apply bg-stone-900 text-white hover:bg-amber-700;
+    }
+
+    .register-divider {
+        @apply my-5 flex items-center gap-4 text-xs uppercase tracking-[0.16em] text-stone-400;
+    }
+
+    .register-divider::before,
+    .register-divider::after {
+        @apply h-px flex-1 bg-stone-200;
+        content: '';
+    }
+
+    .register-verified-message,
+    .register-pending-message {
+        @apply mt-4 rounded-2xl px-4 py-3 text-sm;
+    }
+
+    .register-verified-message {
+        @apply border border-emerald-200 bg-emerald-50 text-emerald-800;
+    }
+
+    .register-pending-message {
+        @apply border border-stone-200 bg-white text-stone-600;
+    }
+
+    .register-password-rules {
+        @apply rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-stone-600;
+    }
+
+    .register-password-rules li::before {
+        content: '\25CB';
+        @apply mr-2 text-stone-400;
+    }
+
+    .register-password-rules li.text-emerald-700::before {
+        content: '\2713';
+        @apply text-emerald-600;
+    }
+
+    .register-submit-row {
+        @apply flex flex-col gap-4 rounded-[1.75rem] border border-stone-200 bg-stone-50 p-5 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .register-submit-button {
+        @apply inline-flex min-h-12 min-w-52 items-center justify-center rounded-2xl bg-stone-900 px-6 text-sm font-semibold text-white transition hover:bg-amber-700;
+    }
+
+    .theme-dark .register-shell,
+    .theme-dark .register-section,
+    .theme-dark .register-google-row,
+    .theme-dark .register-submit-row,
+    .theme-dark .register-pending-message {
+        background: var(--panel-bg);
+        border-color: var(--panel-border);
+        box-shadow: 0 20px 45px var(--panel-shadow);
+    }
+
+    .theme-dark .register-section-highlight,
+    .theme-dark .register-password-rules {
+        @apply border-amber-900/55 bg-amber-950/25;
+    }
+
+    .theme-dark .register-google-button,
+    .theme-dark .register-secondary-button {
+        @apply border-amber-900/45 bg-stone-900/70 text-amber-50;
+    }
+
+    .theme-dark .register-primary-button,
+    .theme-dark .register-submit-button,
+    .theme-dark .register-step-number {
+        @apply bg-amber-500 text-stone-950;
+    }
+
+    .theme-dark .register-divider::before,
+    .theme-dark .register-divider::after {
+        @apply bg-amber-900/45;
+    }
+
     .product-card {
         @apply overflow-hidden rounded-[1.5rem] border border-amber-200/80 bg-white/95 shadow-md shadow-amber-100/25 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-100/50;
     }

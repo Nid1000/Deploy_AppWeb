@@ -38,6 +38,7 @@
                     <th>Pedido</th>
                     <th>Cliente</th>
                     <th>Entrega</th>
+                    <th>Reparto</th>
                     <th>Total</th>
                     <th>Estado</th>
                     <th class="text-right">Acciones</th>
@@ -58,6 +59,11 @@
                             <p>{{ $order->direccion_entrega ?: 'Sin direccion' }}</p>
                             <p class="text-xs text-stone-500">{{ $order->fecha_entrega ?: 'Sin fecha' }}</p>
                         </td>
+                        <td>
+                            <p class="font-medium text-stone-800">{{ $order->conductor ?: 'Sin conductor' }}</p>
+                            <p class="text-xs text-stone-500">Sale: {{ $order->salida_reparto_at ?: 'Sin hora' }}</p>
+                            <p class="text-xs text-stone-500">Regresa: {{ ($order->regreso_reparto_at ?? null) ?: 'Sin hora' }}</p>
+                        </td>
                         <td>S/ {{ number_format((float) $order->total, 2) }}</td>
                         <td><span class="badge badge-surface">{{ ucfirst($order->estado) }}</span></td>
                         <td class="text-right">
@@ -66,7 +72,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-10 text-center text-stone-500">No hay pedidos en este filtro.</td>
+                        <td colspan="7" class="py-10 text-center text-stone-500">No hay pedidos en este filtro.</td>
                     </tr>
                 @endforelse
             </tbody>

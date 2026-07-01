@@ -36,7 +36,7 @@ class PedidosController extends Controller
         }
 
         $need = [];
-        foreach (['salida_reparto_at', 'conductor', 'vehiculo'] as $col) {
+        foreach (['salida_reparto_at', 'regreso_reparto_at', 'conductor', 'vehiculo'] as $col) {
             $exists = DB::selectOne(
                 "SELECT 1 as ok FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'pedidos' AND COLUMN_NAME = ? LIMIT 1",
                 [$dbName, $col]
@@ -54,6 +54,10 @@ class PedidosController extends Controller
         foreach ($need as $col) {
             if ($col === 'salida_reparto_at') {
                 DB::statement("ALTER TABLE pedidos ADD COLUMN salida_reparto_at DATETIME NULL");
+                continue;
+            }
+            if ($col === 'regreso_reparto_at') {
+                DB::statement("ALTER TABLE pedidos ADD COLUMN regreso_reparto_at DATETIME NULL");
                 continue;
             }
             if ($col === 'conductor') {
@@ -484,6 +488,7 @@ class PedidosController extends Controller
                 'direccion_entrega' => $p->direccion_entrega ?? null,
                 'telefono_contacto' => $p->telefono_contacto ?? null,
                 'salida_reparto_at' => property_exists($p, 'salida_reparto_at') ? ($p->salida_reparto_at ?? null) : null,
+                'regreso_reparto_at' => property_exists($p, 'regreso_reparto_at') ? ($p->regreso_reparto_at ?? null) : null,
                 'conductor' => property_exists($p, 'conductor') ? ($p->conductor ?? null) : null,
                 'vehiculo' => property_exists($p, 'vehiculo') ? ($p->vehiculo ?? null) : null,
                 'total_productos' => $ds->reduce(fn ($acc, $d) => $acc + (int) $d->cantidad, 0),
@@ -542,6 +547,7 @@ class PedidosController extends Controller
                 'direccion_entrega' => $p->direccion_entrega ?? null,
                 'telefono_contacto' => $p->telefono_contacto ?? null,
                 'salida_reparto_at' => property_exists($p, 'salida_reparto_at') ? ($p->salida_reparto_at ?? null) : null,
+                'regreso_reparto_at' => property_exists($p, 'regreso_reparto_at') ? ($p->regreso_reparto_at ?? null) : null,
                 'conductor' => property_exists($p, 'conductor') ? ($p->conductor ?? null) : null,
                 'vehiculo' => property_exists($p, 'vehiculo') ? ($p->vehiculo ?? null) : null,
             ],
@@ -566,6 +572,7 @@ class PedidosController extends Controller
             $data = $request->validate([
                 // Formato HTML datetime-local: YYYY-MM-DDTHH:MM
                 'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\\TH:i'],
+                'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\\TH:i', 'after_or_equal:salida_reparto_at'],
                 'conductor' => ['nullable', 'string', 'max:191'],
                 'vehiculo' => ['nullable', 'string', 'max:191'],
             ]);
@@ -588,11 +595,14 @@ class PedidosController extends Controller
         }
 
         $salida = $data['salida_reparto_at'] ?? null;
+        $regreso = $data['regreso_reparto_at'] ?? null;
         // Persistir como 'Y-m-d H:i:s' (DB)
         $salidaDb = $salida ? str_replace('T', ' ', $salida).':00' : null;
+        $regresoDb = $regreso ? str_replace('T', ' ', $regreso).':00' : null;
 
         DB::table('pedidos')->where('id', $id)->update([
             'salida_reparto_at' => $salidaDb,
+            'regreso_reparto_at' => $regresoDb,
             'conductor' => isset($data['conductor']) ? trim((string) $data['conductor']) : null,
             'vehiculo' => isset($data['vehiculo']) ? trim((string) $data['vehiculo']) : null,
             'updated_at' => now(),
@@ -603,6 +613,7 @@ class PedidosController extends Controller
             'ok' => true,
             'message' => 'Reparto actualizado',
             'salida_reparto_at' => $salidaDb,
+            'regreso_reparto_at' => $regresoDb,
             'conductor' => isset($data['conductor']) ? trim((string) $data['conductor']) : null,
             'vehiculo' => isset($data['vehiculo']) ? trim((string) $data['vehiculo']) : null,
         ], 200);

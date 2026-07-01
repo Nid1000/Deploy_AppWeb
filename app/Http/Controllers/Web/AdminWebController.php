@@ -542,6 +542,7 @@ class AdminWebController extends Controller
     {
         $data = $request->validate([
             'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:salida_reparto_at'],
             'conductor' => ['nullable', 'string', 'max:191'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
         ]);
