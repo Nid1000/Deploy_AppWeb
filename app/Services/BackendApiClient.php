@@ -62,6 +62,10 @@ class BackendApiClient
             ->baseUrl(rtrim((string) config('services.backend.url'), '/'));
 
         $token = (string) $this->request->session()->get('auth_token', '');
+        if ($token === '') {
+            $token = (string) $this->request->bearerToken();
+        }
+
         if ($token !== '') {
             $client = $client->withToken($token);
         }
