@@ -17,11 +17,11 @@ Route::get('/categorias', [StorefrontController::class, 'categories'])->name('we
 Route::get('/productos', [StorefrontController::class, 'products'])->name('web.products');
 Route::get('/productos/{id}', [StorefrontController::class, 'showProduct'])->whereNumber('id')->name('web.products.show');
 Route::get('/contacto', [StorefrontController::class, 'contact'])->name('web.contact');
+Route::get('/storage', [StorefrontController::class, 'storage'])->name('web.storage');
 Route::post('/contacto', [ContactWebController::class, 'store'])->name('web.contact.submit');
 Route::post('/carrito/agregar', [CartWebController::class, 'add'])->name('web.cart.add');
 Route::patch('/carrito/{id}', [CartWebController::class, 'update'])->whereNumber('id')->name('web.cart.update');
 Route::post('/carrito/vaciar', [CartWebController::class, 'clear'])->name('web.cart.clear');
-Route::redirect('/storage', '/admin/storage')->name('web.storage.redirect');
 
 Route::get('/login', [AuthWebController::class, 'showLogin'])->name('web.login');
 Route::post('/login', [AuthWebController::class, 'login'])->name('web.login.submit');

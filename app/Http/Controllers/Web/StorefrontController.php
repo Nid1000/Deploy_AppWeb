@@ -123,6 +123,14 @@ class StorefrontController extends Controller
         return view('web.contact.index');
     }
 
+    public function storage(): View
+    {
+        return view('web.storage.index', [
+            'bucketName' => (string) config('services.gcs.bucket', 'almacendelicias'),
+            'uploadPrefix' => (string) config('services.gcs.upload_prefix', 'uploads'),
+        ]);
+    }
+
     public function showProduct(Request $request, int $id): View
     {
         $productResponse = $this->api->get('productos/' . $id);
