@@ -45,4 +45,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'gcs' => [
+        'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+        'bucket' => env('GCS_BUCKET_NAME', 'almacendelicias'),
+        'key_file' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+        'upload_prefix' => env('GCS_UPLOAD_PREFIX', 'uploads'),
+        'signed_url_ttl' => (int) env('GCS_SIGNED_URL_TTL', 60),
+    ],
+
 ];

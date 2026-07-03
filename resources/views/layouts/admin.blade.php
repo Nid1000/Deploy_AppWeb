@@ -75,6 +75,12 @@
                     </span>
                     Almacen
                 </a>
+                <a href="{{ route('web.admin.storage.index') }}" class="admin-sidebar-link {{ str_starts_with((string) $routeName, 'web.admin.storage') ? 'admin-sidebar-link-active' : '' }}">
+                    <span class="admin-sidebar-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 19h14"/></svg>
+                    </span>
+                    Storage
+                </a>
                 <a href="{{ route('web.admin.categories.index') }}" class="admin-sidebar-link {{ str_starts_with((string) $routeName, 'web.admin.categories') ? 'admin-sidebar-link-active' : '' }}">
                     <span class="admin-sidebar-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7a3 3 0 0 1 3-3h10l3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/></svg>

@@ -14,6 +14,10 @@ public/error_log
 public/build.zip
 app.zip
 storage/*.key
+storage/*.json
+service-account*.json
+gcp-service-account*.json
+google-credentials*.json
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*

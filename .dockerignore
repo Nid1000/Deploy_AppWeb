@@ -7,6 +7,10 @@ node_modules
 vendor
 .phpunit.cache
 storage/*.key
+storage/*.json
+service-account*.json
+gcp-service-account*.json
+google-credentials*.json
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*

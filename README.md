@@ -107,6 +107,18 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=https://tu-dominio.com/register/google/callback
 ```
 
+10. Para subir archivos al bucket privado `almacendelicias` desde el panel admin, configura:
+
+```env
+GOOGLE_CLOUD_PROJECT_ID=
+GOOGLE_APPLICATION_CREDENTIALS=/ruta/segura/gcp-service-account.json
+GCS_BUCKET_NAME=almacendelicias
+GCS_UPLOAD_PREFIX=uploads
+GCS_SIGNED_URL_TTL=60
+```
+
+La cuenta de servicio necesita permisos para crear y leer objetos en el bucket. No guardes el JSON dentro de `public`.
+
 Si vas a usar SQLite, crea un volumen persistente para `/var/www/html/database` y deja:
 
 ```env

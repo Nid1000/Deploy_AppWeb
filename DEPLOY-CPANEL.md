@@ -50,6 +50,20 @@ GOOGLE_CLIENT_SECRET=
 
 Nunca subas `.env` a Git.
 
+## Google Cloud Storage
+
+Para usar el bucket privado `almacendelicias` desde el panel admin, configura:
+
+```env
+GOOGLE_CLOUD_PROJECT_ID=
+GOOGLE_APPLICATION_CREDENTIALS=/home/USUARIO/apps/delicias-web/storage/app/gcp-service-account.json
+GCS_BUCKET_NAME=almacendelicias
+GCS_UPLOAD_PREFIX=uploads
+GCS_SIGNED_URL_TTL=60
+```
+
+La cuenta de servicio debe tener permisos sobre el bucket para crear y leer objetos. No guardes el JSON de credenciales dentro de `public`.
+
 ## Instalacion
 
 Desde Terminal de cPanel:
