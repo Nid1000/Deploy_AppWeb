@@ -239,6 +239,7 @@ class TicketController extends Controller
             ),
             'total' => $total,
             'total_formateado' => 'S/ ' . number_format($total, 2),
+            'items' => $this->ticketItems($requestPayload, $receipt, $total),
         ];
     }
 
@@ -278,27 +279,128 @@ class TicketController extends Controller
         ];
     }
 
+    private function ticketCompany(): array
+    {
+        return [
+            'nombre' => env('EMPRESA_RAZON_SOCIAL', 'DELICIAS EIRLTDA'),
+            'nombre_comercial' => env('EMPRESA_NOMBRE_COMERCIAL', 'Delicias'),
+            'ruc' => env('EMPRESA_RUC', '20215106536'),
+            'direccion' => env('EMPRESA_DIRECCION', 'JR. PARRA DEL RIEGO'),
+            'telefono' => env('YAPE_PHONE', '993560096'),
+        ];
+    }
+
+    private function ticketLogoDataUri(): string
+    {
+        $path = public_path('images/logos/logo 1.png');
+        if (!is_file($path)) {
+            return '';
+        }
+
+        return 'data:image/png;base64,' . base64_encode((string) file_get_contents($path));
+    }
+
+    private function ticketItems(array $requestPayload, array $receipt, float $total): array
+    {
+        $items = data_get($requestPayload, 'details')
+            ?: data_get($requestPayload, 'items')
+            ?: data_get($receipt, 'items')
+            ?: [];
+
+        $items = collect(is_array($items) ? $items : [])->map(function ($item, int $index) {
+            $cantidad = (float) (
+                data_get($item, 'cantidad')
+                ?? data_get($item, 'qty')
+                ?? data_get($item, 'quantity')
+                ?? 1
+            );
+            $descripcion = (string) (
+                data_get($item, 'descripcion')
+                ?? data_get($item, 'description')
+                ?? data_get($item, 'producto_nombre')
+                ?? data_get($item, 'nombre')
+                ?? 'VENTA'
+            );
+            $precio = (float) (
+                data_get($item, 'mtoPrecioUnitario')
+                ?? data_get($item, 'precio_unitario')
+                ?? data_get($item, 'precio')
+                ?? data_get($item, 'unit_price')
+                ?? 0
+            );
+            $subtotal = (float) (
+                data_get($item, 'subtotal')
+                ?? data_get($item, 'mtoValorVenta')
+                ?? ($precio * max(1, $cantidad))
+            );
+
+            return [
+                'codigo' => (string) (
+                    data_get($item, 'codigo')
+                    ?? data_get($item, 'codProducto')
+                    ?? data_get($item, 'producto_id')
+                    ?? 'P' . str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT)
+                ),
+                'descripcion' => $descripcion,
+                'cantidad' => max(1, $cantidad),
+                'precio' => $precio > 0 ? $precio : $subtotal,
+                'subtotal' => $subtotal,
+            ];
+        })->values()->all();
+
+        if ($items !== []) {
+            return $items;
+        }
+
+        return [[
+            'codigo' => 'VENTA',
+            'descripcion' => 'VENTA',
+            'cantidad' => 1,
+            'precio' => $total,
+            'subtotal' => $total,
+        ]];
+    }
+
     private function boletaHtml(array $boleta): string
     {
         $escape = fn ($value) => e((string) $value);
+        $company = $this->ticketCompany();
+        $logo = $this->ticketLogoDataUri();
+        $logoHtml = $logo !== ''
+            ? '<img src="' . $logo . '" alt="Logo" style="width:70px;height:70px;object-fit:contain">'
+            : '<strong>' . $escape($company['nombre_comercial']) . '</strong>';
+        $opGravada = round(((float) $boleta['total']) / 1.18, 2);
+        $igv = round(((float) $boleta['total']) - $opGravada, 2);
+
+        $rows = '';
+        foreach ($boleta['items'] as $item) {
+            $rows .= '<tr>'
+                . '<td>' . $escape($item['codigo']) . '</td>'
+                . '<td>' . $escape(mb_strtoupper((string) $item['descripcion'])) . '<br><span>' . number_format((float) $item['cantidad'], 0) . ' UND x S/ ' . number_format((float) $item['precio'], 2) . '</span></td>'
+                . '<td class="right">S/ ' . number_format((float) $item['subtotal'], 2) . '</td>'
+                . '</tr>';
+        }
 
         return '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Boleta</title>'
-            . '<style>body{font-family:Arial,sans-serif;margin:40px;color:#000;font-size:18px}'
-            . 'h1{font-size:28px;margin:0 0 10px}.line{border-top:2px solid #aaa;margin:14px 0 10px}'
-            . 'p{margin:4px 0}strong{font-weight:700}</style></head><body>'
-            . '<h1>Comprobante electronico</h1>'
-            . '<p>Tipo: <strong>' . $escape($boleta['tipo']) . '</strong></p>'
-            . '<p>Serie: <strong>' . $escape($boleta['serie']) . '</strong></p>'
-            . '<p>Numero: <strong>' . $escape($boleta['numero']) . '</strong></p>'
-            . '<p>Correlativo: <strong>' . $escape($boleta['correlativo']) . '</strong></p>'
-            . '<div class="line"></div>'
-            . '<p>Documento: <strong>' . $escape($boleta['documento']) . '</strong></p>'
-            . '<p>Cliente: <strong>' . $escape($boleta['cliente']) . '</strong></p>'
-            . '<p>Verificado en RENIEC: <strong>' . $escape($boleta['verificado_reniec']) . '</strong></p>'
-            . '<div class="line"></div>'
-            . '<p>Fecha de emision: <strong>' . $escape($boleta['fecha_emision']) . '</strong></p>'
-            . '<p>Total: <strong>' . $escape($boleta['total_formateado']) . '</strong></p>'
-            . '</body></html>';
+            . '<style>@page{margin:10px;size:80mm auto}body{font-family:"Courier New",monospace;color:#1c1917;font-size:11px;margin:0}'
+            . '.ticket{width:280px;margin:0 auto;padding:10px}.center{text-align:center}.line{border-top:1px dashed #444;margin:8px 0}'
+            . 'h1,h2,p{margin:0}h1{font-size:14px;text-transform:uppercase}h2{font-size:12px;text-transform:uppercase;margin-top:4px}'
+            . '.small{font-size:10px;line-height:1.35}.row{display:table;width:100%}.label,.value{display:table-cell}.value{text-align:right}'
+            . 'table{width:100%;border-collapse:collapse}th{border-bottom:1px dashed #444;border-top:1px dashed #444;text-align:left;padding:4px 0;font-size:9px}'
+            . 'td{padding:4px 0;vertical-align:top}td span{font-size:9px;color:#57534e}.right{text-align:right;white-space:nowrap}.total{font-size:13px;font-weight:700}'
+            . '.footer{text-align:center;font-size:9px;line-height:1.35;margin-top:10px}</style></head><body><div class="ticket">'
+            . '<div class="center">' . $logoHtml . '</div>'
+            . '<div class="center"><h1>' . $escape($company['nombre']) . '</h1><p class="small">RUC ' . $escape($company['ruc']) . '</p>'
+            . '<p class="small">' . $escape($company['direccion']) . '</p><p class="small">TEL: ' . $escape($company['telefono']) . '</p></div>'
+            . '<div class="line"></div><div class="center"><h2>' . $escape($boleta['tipo']) . ' ELECTRONICA</h2><h2>NRO. ' . $escape($boleta['correlativo']) . '</h2></div>'
+            . '<div class="line"></div><p class="small">FECHA: ' . $escape($boleta['fecha_emision']) . '</p>'
+            . '<p class="small">DOCUMENTO: ' . $escape($boleta['documento']) . '</p><p class="small">CLIENTE: ' . $escape($boleta['cliente']) . '</p>'
+            . '<div class="line"></div><table><thead><tr><th>CODIGO</th><th>DESCRIPCION</th><th class="right">MONTO</th></tr></thead><tbody>' . $rows . '</tbody></table>'
+            . '<div class="line"></div><div class="row small"><span class="label">OP. GRAVADA</span><span class="value">S/ ' . number_format($opGravada, 2) . '</span></div>'
+            . '<div class="row small"><span class="label">IGV 18%</span><span class="value">S/ ' . number_format($igv, 2) . '</span></div>'
+            . '<div class="row total"><span class="label">TOTAL</span><span class="value">' . $escape($boleta['total_formateado']) . '</span></div>'
+            . '<div class="line"></div><div class="footer">Gracias por su compra<br>Representacion impresa generada por Delicias<br>Formato tipo APISPERU/SUNAT</div>'
+            . '</div></body></html>';
     }
 
     private function receiptNumber(array $receipt, array $requestPayload): string
