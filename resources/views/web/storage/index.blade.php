@@ -49,9 +49,15 @@
                         <span class="font-semibold text-white">URI:</span>
                         <span class="break-all">{{ $uploaded['gs_uri'] }}</span>
                     </p>
-                    <a href="{{ $uploaded['signed_url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">
-                        Abrir archivo
-                    </a>
+                    @if (!empty($uploaded['signed_url']))
+                        <a href="{{ $uploaded['signed_url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">
+                            Abrir archivo
+                        </a>
+                    @else
+                        <p class="rounded-xl border border-amber-300/40 bg-amber-300/10 p-3 text-amber-100">
+                            {{ $uploaded['signed_url_error'] ?? 'El archivo fue subido, pero no se pudo crear el enlace temporal.' }}
+                        </p>
+                    @endif
                 </div>
             </div>
         @endif

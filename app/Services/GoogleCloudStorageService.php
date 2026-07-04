@@ -6,6 +6,7 @@ use Google\Cloud\Storage\StorageClient;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 class GoogleCloudStorageService
 {
@@ -34,13 +35,23 @@ class GoogleCloudStorageService
             }
         }
 
+        $signedUrl = null;
+        $signedUrlError = null;
+
+        try {
+            $signedUrl = $object->signedUrl($this->signedUrlExpiration(), [
+                'version' => 'v4',
+            ]);
+        } catch (Throwable) {
+            $signedUrlError = 'El archivo fue subido, pero Cloud Run no tiene permiso para crear enlaces temporales.';
+        }
+
         return [
             'bucket' => $bucketName,
             'object' => $objectName,
             'gs_uri' => 'gs://' . $bucketName . '/' . $objectName,
-            'signed_url' => $object->signedUrl($this->signedUrlExpiration(), [
-                'version' => 'v4',
-            ]),
+            'signed_url' => $signedUrl,
+            'signed_url_error' => $signedUrlError,
         ];
     }
 
