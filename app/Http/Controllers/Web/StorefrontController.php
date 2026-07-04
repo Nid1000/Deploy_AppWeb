@@ -143,6 +143,7 @@ class StorefrontController extends Controller
             'prefijo' => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_\\-\\/]+$/'],
         ], [
             'archivo.required' => 'Selecciona un archivo para subir.',
+            'archivo.uploaded' => 'No se pudo recibir el archivo. Revisa que no supere los 10 MB y vuelve a intentarlo.',
             'archivo.max' => 'El archivo no debe superar los 10 MB.',
             'prefijo.regex' => 'El prefijo solo puede contener letras, numeros, guiones, guion bajo y slash.',
         ]);

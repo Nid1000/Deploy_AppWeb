@@ -13,6 +13,8 @@ FROM php:8.4-cli-alpine AS app
 
 WORKDIR /var/www/html
 
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 RUN apk add --no-cache \
         bash \
         curl \
