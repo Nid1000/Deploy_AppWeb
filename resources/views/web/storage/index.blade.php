@@ -37,28 +37,21 @@
         </form>
 
         @if ($uploaded)
-            <div class="mt-10 w-full max-w-3xl rounded-2xl border border-emerald-500 bg-stone-950 px-6 py-8 text-center text-white shadow-xl shadow-emerald-900/10">
-                <h3 class="text-xl font-semibold text-emerald-400">¡Archivo subido exitosamente!</h3>
+            <div class="mt-10 w-full max-w-3xl rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-8 text-center shadow-xl shadow-emerald-900/8">
+                <h3 class="text-xl font-semibold text-emerald-700">Archivo subido exitosamente</h3>
+                <p class="mt-2 text-base leading-7 text-stone-700">
+                    Tu archivo ha sido subido al bucket {{ $bucketName }}. Puedes descargarlo desde este enlace:
+                </p>
 
-                @if (!empty($uploaded['signed_url']))
-                    <p class="mt-2 text-base leading-7 text-white">
-                        Tu archivo ha sido subido a Google Cloud Storage. Puedes verlo usando este enlace firmado válido por {{ $signedUrlTtl }} minutos:
-                    </p>
-                    <a href="{{ $uploaded['signed_url'] }}" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-sm font-semibold uppercase text-stone-950 transition hover:bg-emerald-50">
+                @if (!empty($uploaded['download_url']))
+                    <a href="{{ $uploaded['download_url'] }}" download class="mt-5 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-8 py-3 text-sm font-semibold uppercase text-white shadow-lg shadow-amber-200/40 transition hover:-translate-y-0.5 hover:bg-[var(--color-secondary)]">
                         Ver archivo
                         <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 3h7v7" />
-                            <path d="M10 14 21 3" />
-                            <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+                            <path d="M12 3v12" />
+                            <path d="m7 10 5 5 5-5" />
+                            <path d="M5 21h14" />
                         </svg>
                     </a>
-                @else
-                    <p class="mt-2 text-base leading-7 text-white">
-                        Tu archivo ha sido subido al bucket {{ $bucketName }}.
-                    </p>
-                    <p class="mt-4 rounded-xl border border-amber-300/45 bg-amber-300/10 p-3 text-sm text-amber-100">
-                        {{ $uploaded['signed_url_error'] ?? 'No se pudo crear el enlace temporal.' }}
-                    </p>
                 @endif
             </div>
         @endif

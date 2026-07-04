@@ -55,6 +55,30 @@ class GoogleCloudStorageService
         ];
     }
 
+    public function download(string $objectName): array
+    {
+        $objectName = trim($objectName, '/');
+        if ($objectName === '') {
+            throw new RuntimeException('Archivo no encontrado.');
+        }
+
+        $object = $this->client()
+            ->bucket($this->bucketName())
+            ->object($objectName);
+
+        if (!$object->exists()) {
+            throw new RuntimeException('El archivo no existe en Google Cloud Storage.');
+        }
+
+        $info = $object->info();
+
+        return [
+            'contents' => $object->downloadAsString(),
+            'filename' => basename($objectName) ?: 'archivo',
+            'content_type' => (string) ($info['contentType'] ?? 'application/octet-stream'),
+        ];
+    }
+
     private function client(): StorageClient
     {
         $options = array_filter([

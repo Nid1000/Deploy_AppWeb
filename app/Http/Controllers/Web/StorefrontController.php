@@ -9,6 +9,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\URL;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class StorefrontController extends Controller
@@ -153,7 +155,33 @@ class StorefrontController extends Controller
                 ->with('error', 'No se pudo subir el archivo a Google Cloud Storage: ' . $exception->getMessage());
         }
 
+        $uploaded['download_url'] = URL::temporarySignedRoute(
+            'web.storage.download',
+            now()->addMinutes((int) config('services.gcs.signed_url_ttl', 60)),
+            ['object' => $uploaded['object']],
+            false
+        );
+
         return back()->with('gcs_uploaded', $uploaded);
+    }
+
+    public function storageDownload(Request $request): Response|RedirectResponse
+    {
+        try {
+            $download = $this->storage->download((string) $request->query('object', ''));
+        } catch (Throwable $exception) {
+            return redirect()
+                ->route('web.storage')
+                ->with('error', 'No se pudo descargar el archivo: ' . $exception->getMessage());
+        }
+
+        $filename = str_replace('"', '', (string) $download['filename']);
+
+        return response($download['contents'], 200, [
+            'Content-Type' => (string) $download['content_type'],
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"; filename*=UTF-8\'\'' . rawurlencode($filename),
+            'Content-Length' => (string) strlen((string) $download['contents']),
+        ]);
     }
 
     public function showProduct(Request $request, int $id): View

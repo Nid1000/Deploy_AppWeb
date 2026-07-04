@@ -18,6 +18,9 @@ Route::get('/productos', [StorefrontController::class, 'products'])->name('web.p
 Route::get('/productos/{id}', [StorefrontController::class, 'showProduct'])->whereNumber('id')->name('web.products.show');
 Route::get('/contacto', [StorefrontController::class, 'contact'])->name('web.contact');
 Route::get('/storage', [StorefrontController::class, 'storage'])->name('web.storage');
+Route::get('/storage/descargar', [StorefrontController::class, 'storageDownload'])
+    ->middleware('signed:relative')
+    ->name('web.storage.download');
 Route::post('/storage', [StorefrontController::class, 'storageUpload'])
     ->middleware('throttle:10,1')
     ->name('web.storage.upload');
