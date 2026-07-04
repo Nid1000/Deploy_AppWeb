@@ -29,7 +29,9 @@ class GoogleCloudStorageService
                     ],
                 ]);
         } finally {
-            fclose($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
         }
 
         return [
