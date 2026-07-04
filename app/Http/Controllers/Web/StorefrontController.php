@@ -131,34 +131,29 @@ class StorefrontController extends Controller
     {
         return view('web.storage.index', [
             'bucketName' => (string) config('services.gcs.bucket', 'almacendelicias'),
-            'uploadPrefix' => (string) config('services.gcs.upload_prefix', 'uploads'),
             'signedUrlTtl' => (int) config('services.gcs.signed_url_ttl', 60),
         ]);
     }
 
     public function storageUpload(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $request->validate([
             'archivo' => ['required', 'file', 'max:10240'],
-            'prefijo' => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_\\-\\/]+$/'],
         ], [
             'archivo.required' => 'Selecciona un archivo para subir.',
             'archivo.uploaded' => 'No se pudo recibir el archivo. Revisa que no supere los 10 MB y vuelve a intentarlo.',
             'archivo.max' => 'El archivo no debe superar los 10 MB.',
-            'prefijo.regex' => 'El prefijo solo puede contener letras, numeros, guiones, guion bajo y slash.',
         ]);
 
         try {
-            $uploaded = $this->storage->upload($request->file('archivo'), $data['prefijo'] ?? null);
+            $uploaded = $this->storage->upload($request->file('archivo'), '');
         } catch (Throwable $exception) {
             return back()
                 ->withInput($request->except('archivo'))
                 ->with('error', 'No se pudo subir el archivo a Google Cloud Storage: ' . $exception->getMessage());
         }
 
-        return back()
-            ->with('success', 'Archivo subido correctamente a Google Cloud Storage.')
-            ->with('gcs_uploaded', $uploaded);
+        return back()->with('gcs_uploaded', $uploaded);
     }
 
     public function showProduct(Request $request, int $id): View

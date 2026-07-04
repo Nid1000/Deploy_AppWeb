@@ -77,7 +77,9 @@ class GoogleCloudStorageService
 
     private function objectName(UploadedFile $file, ?string $prefix): string
     {
-        $configuredPrefix = trim((string) ($prefix ?: config('services.gcs.upload_prefix', 'uploads')), '/');
+        $configuredPrefix = $prefix === null
+            ? trim((string) config('services.gcs.upload_prefix', 'uploads'), '/')
+            : trim($prefix, '/');
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = strtolower((string) $file->getClientOriginalExtension());
         $safeName = Str::slug($originalName) ?: 'archivo';
