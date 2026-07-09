@@ -130,13 +130,7 @@ class OrdersWebController extends Controller
         });
         $receiptsResponse = $this->api->get('facturacion/mis-comprobantes');
         $receipt = collect($this->api->okData($receiptsResponse, 'comprobantes', []))
-            ->first(fn ($item) =>
-                (int) ($item['pedido_id'] ?? 0) === $id
-                || (
-                    !empty($order->comprobante_numero)
-                    && (string) ($item['numero_formateado'] ?? '') === (string) $order->comprobante_numero
-                )
-            );
+            ->first(fn ($item) => (string) ($item['numero_formateado'] ?? '') === (string) ($order->comprobante_numero ?? ''));
         $receipt = is_array($receipt) ? (object) $receipt : null;
         if ($receipt && isset($receipt->archivos)) {
             $receipt->pdf_url = !empty($receipt->archivos['pdf'] ?? null) ? $this->api->publicUrl($receipt->archivos['pdf']) : null;
