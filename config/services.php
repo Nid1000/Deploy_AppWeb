@@ -39,6 +39,10 @@ return [
         'url' => env('BACKEND_API_BASE_URL', 'https://api.saborcentral.com'),
     ],
 
+    'izipay' => [
+        'test_mode' => (bool) env('IZIPAY_TEST_MODE', false),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

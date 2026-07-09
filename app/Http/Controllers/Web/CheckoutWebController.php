@@ -36,9 +36,9 @@ class CheckoutWebController extends Controller
             'numero_casa_entrega' => ['required', 'string', 'min:1'],
             'telefono_contacto' => ['required', 'regex:/^9\d{8}$/'],
             'notas' => ['nullable', 'string', 'max:500'],
-            'comprobante_tipo' => ['nullable', 'required_unless:metodo_pago,izipay', 'in:boleta,factura'],
-            'tipo_documento' => ['nullable', 'required_unless:metodo_pago,izipay', 'in:DNI,RUC'],
-            'numero_documento' => ['nullable', 'required_unless:metodo_pago,izipay', 'string'],
+            'comprobante_tipo' => ['required', 'in:boleta,factura'],
+            'tipo_documento' => ['required', 'in:DNI,RUC'],
+            'numero_documento' => ['required', 'string'],
             'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,izipay,yape'],
             'acepta_pago' => ['accepted'],
         ], [
@@ -47,49 +47,46 @@ class CheckoutWebController extends Controller
             'acepta_pago.accepted' => 'Debes aceptar las condiciones del pago.',
         ]);
 
-        if ($data['metodo_pago'] !== 'izipay') {
-            $data['numero_documento'] = $this->normalizeDocumentNumber((string) $data['numero_documento']);
+        $data['numero_documento'] = $this->normalizeDocumentNumber((string) $data['numero_documento']);
 
-            if ($data['comprobante_tipo'] === 'factura' && $data['tipo_documento'] !== 'RUC') {
-                return back()->withInput()->with('error', 'Para emitir factura, el documento debe ser RUC.');
-            }
-
-            if ($data['tipo_documento'] === 'DNI' && !preg_match('/^\d{8}$/', $data['numero_documento'])) {
-                return back()->withInput()->with('error', 'El DNI debe tener 8 dígitos.');
-            }
-
-            if ($data['tipo_documento'] === 'RUC' && !preg_match('/^\d{11}$/', $data['numero_documento'])) {
-                return back()->withInput()->with('error', 'El RUC debe tener 11 dígitos.');
-            }
-
-            $documentPath = $data['tipo_documento'] === 'DNI'
-                ? 'facturacion/consulta-dni'
-                : 'facturacion/consulta-ruc';
-            $documentResponse = $this->api->get($documentPath, ['numero' => $data['numero_documento']]);
-            if (!$documentResponse->successful()) {
-                return back()
-                    ->withInput()
-                    ->with('error', $data['tipo_documento'] === 'DNI'
-                        ? 'No se pudo consultar el nombre real del DNI en este momento.'
-                        : 'No se pudo consultar la razon social real del RUC en este momento.');
-            }
-            if ((bool) data_get($documentResponse->json(), 'validacion_real', false) !== true) {
-                return back()
-                    ->withInput()
-                    ->with('error', $data['tipo_documento'] === 'DNI'
-                        ? 'No se pudo obtener el nombre real del DNI. Configura APIPERU_TOKEN.'
-                        : 'No se pudo obtener la razon social real del RUC. Configura APIPERU_TOKEN.');
-            }
-            $documentName = $this->documentDisplayName($documentResponse->json(), $data['tipo_documento']);
-            if ($documentName === '') {
-                return back()
-                    ->withInput()
-                    ->with('error', $data['tipo_documento'] === 'DNI'
-                        ? 'No se pudo obtener el nombre del DNI consultado.'
-                        : 'No se pudo obtener la razon social del RUC consultado.');
-            }
+        if ($data['comprobante_tipo'] === 'factura' && $data['tipo_documento'] !== 'RUC') {
+            return back()->withInput()->with('error', 'Para emitir factura, el documento debe ser RUC.');
         }
 
+        if ($data['tipo_documento'] === 'DNI' && !preg_match('/^\d{8}$/', $data['numero_documento'])) {
+            return back()->withInput()->with('error', 'El DNI debe tener 8 dígitos.');
+        }
+
+        if ($data['tipo_documento'] === 'RUC' && !preg_match('/^\d{11}$/', $data['numero_documento'])) {
+            return back()->withInput()->with('error', 'El RUC debe tener 11 dígitos.');
+        }
+
+        $documentPath = $data['tipo_documento'] === 'DNI'
+            ? 'facturacion/consulta-dni'
+            : 'facturacion/consulta-ruc';
+        $documentResponse = $this->api->get($documentPath, ['numero' => $data['numero_documento']]);
+        if (!$documentResponse->successful()) {
+            return back()
+                ->withInput()
+                ->with('error', $data['tipo_documento'] === 'DNI'
+                    ? 'No se pudo consultar el nombre real del DNI en este momento.'
+                    : 'No se pudo consultar la razon social real del RUC en este momento.');
+        }
+        if ((bool) data_get($documentResponse->json(), 'validacion_real', false) !== true) {
+            return back()
+                ->withInput()
+                ->with('error', $data['tipo_documento'] === 'DNI'
+                    ? 'No se pudo obtener el nombre real del DNI. Configura APIPERU_TOKEN.'
+                    : 'No se pudo obtener la razon social real del RUC. Configura APIPERU_TOKEN.');
+        }
+        $documentName = $this->documentDisplayName($documentResponse->json(), $data['tipo_documento']);
+        if ($documentName === '') {
+            return back()
+                ->withInput()
+                ->with('error', $data['tipo_documento'] === 'DNI'
+                    ? 'No se pudo obtener el nombre del DNI consultado.'
+                    : 'No se pudo obtener la razon social del RUC consultado.');
+        }
         $orderResponse = $this->api->post('pedidos', [
             'productos' => $cartItems->map(fn ($item) => ['id' => $item->id, 'cantidad' => $item->cantidad])->values()->all(),
             'fecha_entrega' => $data['fecha_entrega'],
@@ -115,6 +112,13 @@ class CheckoutWebController extends Controller
             $paymentResponse = $this->api->post('pagos/izipay/crear', [
                 'pedido_id' => $pedidoId,
                 'metodo_pago' => 'tarjeta',
+                'comprobante_tipo' => $data['comprobante_tipo'],
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+                'cliente_nombre' => $documentName,
+                'emitir_comprobante_al_confirmar' => true,
+                'modo_prueba' => (bool) config('services.izipay.test_mode'),
+                'return_url' => route('web.orders.show', $pedidoId),
             ]);
 
             if ($paymentResponse->failed()) {
@@ -155,6 +159,7 @@ class CheckoutWebController extends Controller
                 'successUrl' => (string) data_get($payment, 'successUrl', $backendUrl.'/api/pagos/izipay/confirmar'),
                 'cancelUrl' => (string) data_get($payment, 'cancelUrl', $backendUrl.'/api/pagos/izipay/cancelado'),
                 'method' => $data['metodo_pago'],
+                'testMode' => (bool) data_get($payment, 'testMode', config('services.izipay.test_mode')),
             ]));
         }
 

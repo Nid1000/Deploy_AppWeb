@@ -145,6 +145,27 @@ DB_USERNAME=usuario
 DB_PASSWORD=clave
 ```
 
+## Izipay en ambiente de prueba
+
+El frontend envía a `POST /api/pagos/izipay/crear` los datos de la boleta junto con `modo_prueba`, `emitir_comprobante_al_confirmar` y la URL de retorno al pedido.
+
+La API backend debe crear el `formToken` con credenciales de integración de Izipay, validar la firma de la respuesta o IPN y emitir la boleta solamente cuando el estado verificado sea pagado. No se debe confiar únicamente en la redirección del navegador.
+
+Configura en ambos despliegues:
+
+```env
+IZIPAY_TEST_MODE=true
+```
+
+Después limpia la caché:
+
+```bash
+php artisan config:clear
+php artisan config:cache
+```
+
+Obtén las credenciales sandbox y tarjetas vigentes desde el Backoffice Izipay. No mezcles una llave pública sandbox con credenciales API de producción.
+
 ## Nota
 
 El frontend ya quedo enfocado solo en Laravel Blade.

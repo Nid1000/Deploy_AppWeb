@@ -307,14 +307,14 @@
                     <div class="grid gap-4 md:grid-cols-[1fr_1fr_1.45fr]" data-document-validation data-document-url="{{ route('web.checkout.validate-document') }}">
                         <div>
                             <label for="comprobante_tipo" class="label">Comprobante</label>
-                            <select id="comprobante_tipo" name="comprobante_tipo" class="input">
+                            <select id="comprobante_tipo" name="comprobante_tipo" required class="input">
                                 <option value="boleta" @selected(old('comprobante_tipo', 'boleta') === 'boleta')>Boleta</option>
                                 <option value="factura" @selected(old('comprobante_tipo') === 'factura')>Factura</option>
                             </select>
                         </div>
                         <div>
                             <label for="tipo_documento" class="label">Documento</label>
-                            <select id="tipo_documento" name="tipo_documento" class="input">
+                            <select id="tipo_documento" name="tipo_documento" required class="input">
                                 <option value="DNI" @selected(old('tipo_documento', 'DNI') === 'DNI')>DNI</option>
                                 <option value="RUC" @selected(old('tipo_documento') === 'RUC')>RUC</option>
                             </select>
@@ -322,7 +322,7 @@
                         <div>
                             <label for="numero_documento" class="label">Número</label>
                             <div class="flex gap-2">
-                                <input id="numero_documento" name="numero_documento" type="text" value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
+                                <input id="numero_documento" name="numero_documento" type="text" required value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
                                 <button type="button" class="btn btn-outline-secondary shrink-0" data-document-lookup>Validar</button>
                             </div>
                         </div>
@@ -356,7 +356,12 @@
                         <div class="mt-4 {{ $selectedPayment === 'izipay' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
                             <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
-                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Completa el pago seguro con tarjeta.</p>
+                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Al aprobarse el pago se emitirá la boleta automáticamente.</p>
+                                @if (!empty($izipayPayment['testMode']))
+                                    <div class="mt-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                                        <strong>Ambiente de prueba:</strong> usa una tarjeta de prueba habilitada en tu Backoffice Izipay. No uses una tarjeta bancaria real.
+                                    </div>
+                                @endif
                                 <div class="mt-4 rounded-2xl border border-teal-100 bg-teal-50/40 p-4">
                                     <div class="izipay-smart-shell">
                                         <div class="izipay-smart-header">
@@ -453,8 +458,6 @@
             let lookupTimer = null;
             let lookupKey = '';
 
-            const selectedPayment = () => document.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
-            const skipsDocumentValidation = () => selectedPayment() === 'izipay';
             const onlyDigits = (value) => value.replace(/\D+/g, '');
             const validRuc = (value) => {
                 const ruc = onlyDigits(value);
@@ -527,21 +530,7 @@
             };
 
             const syncDocumentRequirement = () => {
-                const skip = skipsDocumentValidation();
-                form.classList.toggle('opacity-60', skip);
-                [receipt, type, number, lookup].forEach((element) => {
-                    if (!element) return;
-                    element.disabled = skip;
-                });
-
-                if (skip) {
-                    lookupKey = '';
-                    clearDetails();
-                    clearInlineName();
-                    setMessage('Para continuar con tarjeta no necesitas validar DNI/RUC en este paso.');
-                }
-
-                return skip;
+                return false;
             };
 
             const setDetails = (payload) => {
