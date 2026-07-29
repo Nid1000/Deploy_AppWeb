@@ -17,6 +17,13 @@ Route::get('/categorias', [StorefrontController::class, 'categories'])->name('we
 Route::get('/productos', [StorefrontController::class, 'products'])->name('web.products');
 Route::get('/productos/{id}', [StorefrontController::class, 'showProduct'])->whereNumber('id')->name('web.products.show');
 Route::get('/contacto', [StorefrontController::class, 'contact'])->name('web.contact');
+Route::get('/storage', [StorefrontController::class, 'storage'])->name('web.storage');
+Route::get('/storage/descargar', [StorefrontController::class, 'storageDownload'])
+    ->middleware('signed:relative')
+    ->name('web.storage.download');
+Route::post('/storage', [StorefrontController::class, 'storageUpload'])
+    ->middleware('throttle:10,1')
+    ->name('web.storage.upload');
 Route::post('/contacto', [ContactWebController::class, 'store'])->name('web.contact.submit');
 Route::post('/carrito/agregar', [CartWebController::class, 'add'])->name('web.cart.add');
 Route::patch('/carrito/{id}', [CartWebController::class, 'update'])->whereNumber('id')->name('web.cart.update');
@@ -34,12 +41,8 @@ Route::post('/password/reset', [AuthWebController::class, 'resetPassword'])
     ->middleware('throttle:10,1')
     ->name('web.password.update');
 Route::get('/register', [AuthWebController::class, 'showRegister'])->name('web.register');
-Route::post('/register/email/send-code', [AuthWebController::class, 'sendRegistrationCode'])
-    ->middleware('throttle:3,10')
-    ->name('web.register.email.send-code');
-Route::post('/register/email/verify-code', [AuthWebController::class, 'verifyRegistrationCode'])
-    ->middleware('throttle:10,10')
-    ->name('web.register.email.verify-code');
+Route::post('/register/email/send-code', [AuthWebController::class, 'sendRegistrationCode'])->name('web.register.email.send-code');
+Route::post('/register/email/verify-code', [AuthWebController::class, 'verifyRegistrationCode'])->name('web.register.email.verify-code');
 Route::get('/register/google', [AuthWebController::class, 'redirectToGoogleRegistration'])->name('web.register.google.redirect');
 Route::get('/register/google/callback', [AuthWebController::class, 'handleGoogleCallback'])->name('web.register.google.callback');
 Route::post('/register', [AuthWebController::class, 'register'])->name('web.register.submit');
@@ -57,13 +60,6 @@ Route::middleware('web.user')->group(function () {
     Route::get('/historial', [OrdersWebController::class, 'index'])->name('web.history');
     Route::get('/orders/{id}', [OrdersWebController::class, 'show'])->whereNumber('id')->name('web.orders.show');
     Route::post('/orders/{id}/cancel', [OrdersWebController::class, 'cancel'])->whereNumber('id')->name('web.orders.cancel');
-    Route::get('/storage', [StorefrontController::class, 'storage'])->name('web.storage');
-    Route::get('/storage/descargar', [StorefrontController::class, 'storageDownload'])
-        ->middleware('signed:relative')
-        ->name('web.storage.download');
-    Route::post('/storage', [StorefrontController::class, 'storageUpload'])
-        ->middleware('throttle:5,1')
-        ->name('web.storage.upload');
 });
 
 Route::prefix('admin')->group(function () {
