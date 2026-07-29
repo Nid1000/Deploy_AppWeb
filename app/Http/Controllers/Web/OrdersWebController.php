@@ -142,7 +142,6 @@ class OrdersWebController extends Controller
             'order' => $order,
             'details' => $details,
             'receipt' => $receipt,
-            'confirmedMetaPurchase' => $this->confirmedMetaPurchasePayload($order, $details),
         ]);
     }
 
@@ -154,38 +153,5 @@ class OrdersWebController extends Controller
         }
 
         return back()->with('success', 'Pedido cancelado correctamente.');
-    }
-
-    private function confirmedMetaPurchasePayload(object $order, \Illuminate\Support\Collection $details): ?array
-    {
-        $paymentStatus = mb_strtolower((string) ($order->estado_pago ?? ''));
-        $orderStatus = mb_strtolower((string) ($order->estado ?? ''));
-        $paymentMethod = mb_strtolower((string) ($order->metodo_pago ?? ''));
-
-        $isPaid = in_array($paymentStatus, ['pagado', 'aprobado', 'paid', 'approved'], true);
-        $isTrackablePayment = in_array($paymentMethod, ['izipay', 'tarjeta', 'yape'], true);
-
-        if (!$isPaid || !$isTrackablePayment || $orderStatus === 'cancelado') {
-            return null;
-        }
-
-        return [
-            'content_ids' => $details
-                ->map(fn ($detail) => (string) ($detail->producto_id ?? $detail->id ?? ''))
-                ->filter()
-                ->values()
-                ->all(),
-            'content_type' => 'product',
-            'contents' => $details->map(fn ($detail) => [
-                'id' => (string) ($detail->producto_id ?? $detail->id ?? ''),
-                'quantity' => (int) ($detail->cantidad ?? 1),
-                'item_price' => (float) ($detail->precio_unitario ?? 0),
-            ])->values()->all(),
-            'currency' => 'PEN',
-            'num_items' => (int) $details->sum(fn ($detail) => (int) ($detail->cantidad ?? 1)),
-            'order_id' => (string) ($order->id ?? ''),
-            'payment_method' => $paymentMethod,
-            'value' => (float) ($order->total ?? $details->sum('subtotal')),
-        ];
     }
 }
