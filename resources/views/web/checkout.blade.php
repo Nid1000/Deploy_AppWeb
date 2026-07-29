@@ -668,3 +668,22 @@
         });
     </script>
 @endsection
+
+@if (!$cartItems->isEmpty())
+    @push('scripts')
+        <script>
+            window.deliciasTrackMeta?.('InitiateCheckout', {
+                content_ids: @json($cartItems->pluck('id')->map(fn ($id) => (string) $id)->values()->all()),
+                content_type: 'product',
+                contents: @json($cartItems->map(fn ($item) => [
+                    'id' => (string) $item->id,
+                    'quantity' => (int) $item->cantidad,
+                    'item_price' => (float) $item->precio,
+                ])->values()->all()),
+                currency: 'PEN',
+                num_items: {{ (int) $cartItems->sum('cantidad') }},
+                value: {{ number_format((float) $cartTotal, 2, '.', '') }},
+            });
+        </script>
+    @endpush
+@endif

@@ -61,4 +61,8 @@ return [
         'token' => env('TICKETS_API_TOKEN'),
     ],
 
+    'meta_pixel' => [
+        'id' => env('META_PIXEL_ID'),
+    ],
+
 ];

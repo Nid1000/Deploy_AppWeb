@@ -36,7 +36,16 @@
 
                 <div class="mt-6 flex flex-wrap gap-3">
                     @if (!$product->agotado)
-                        <form action="{{ route('web.cart.add') }}" method="POST">
+                        <form
+                            action="{{ route('web.cart.add') }}"
+                            method="POST"
+                            data-meta-add-to-cart
+                            data-meta-product-id="{{ $product->id }}"
+                            data-meta-product-name="{{ e($product->nombre) }}"
+                            data-meta-value="{{ number_format((float) $product->precio, 2, '.', '') }}"
+                            data-meta-quantity="1"
+                            data-meta-currency="PEN"
+                        >
                             @csrf
                             <input type="hidden" name="producto_id" value="{{ $product->id }}">
                             <input type="hidden" name="cantidad" value="1">
@@ -74,3 +83,15 @@
         </section>
     @endif
 @endsection
+
+@push('scripts')
+    <script>
+        window.deliciasTrackMeta?.('ViewContent', {
+            content_ids: [@json((string) $product->id)],
+            content_name: @json((string) $product->nombre),
+            content_type: 'product',
+            currency: 'PEN',
+            value: {{ number_format((float) $product->precio, 2, '.', '') }},
+        });
+    </script>
+@endpush

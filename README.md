@@ -166,6 +166,16 @@ php artisan config:cache
 
 Obtén las credenciales sandbox y tarjetas vigentes desde el Backoffice Izipay. No mezcles una llave pública sandbox con credenciales API de producción.
 
+## Meta Pixel
+
+Para activar Meta Pixel en el frontend, configura el ID del pixel en el `.env`:
+
+```env
+META_PIXEL_ID=123456789012345
+```
+
+El frontend dispara `PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout` y `Purchase` para pedidos creados sin Izipay. Las compras con Izipay deben confirmarse desde el backend cuando el pago sea aprobado.
+
 ## Nota
 
 El frontend ya quedo enfocado solo en Laravel Blade.
