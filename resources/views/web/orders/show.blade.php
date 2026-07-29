@@ -105,10 +105,26 @@
     </section>
 @endsection
 
-@if (session('meta_purchase'))
+@php
+    $metaPurchasePayload = session('meta_purchase') ?? ($confirmedMetaPurchase ?? null);
+@endphp
+
+@if ($metaPurchasePayload)
     @push('scripts')
         <script>
-            window.deliciasTrackMeta?.('Purchase', @json(session('meta_purchase')));
+            (() => {
+                const payload = @json($metaPurchasePayload);
+                const orderId = payload?.order_id || @json((string) $order->id);
+                const storageKey = `delicias-meta-purchase-${orderId}`;
+
+                if (sessionStorage.getItem(storageKey) === 'tracked' || localStorage.getItem(storageKey) === 'tracked') {
+                    return;
+                }
+
+                window.deliciasTrackMeta?.('Purchase', payload);
+                sessionStorage.setItem(storageKey, 'tracked');
+                localStorage.setItem(storageKey, 'tracked');
+            })();
         </script>
     @endpush
 @endif
