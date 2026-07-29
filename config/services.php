@@ -57,4 +57,8 @@ return [
         'signed_url_ttl' => (int) env('GCS_SIGNED_URL_TTL', 60),
     ],
 
+    'tickets' => [
+        'token' => env('TICKETS_API_TOKEN'),
+    ],
+
 ];

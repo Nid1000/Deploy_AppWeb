@@ -35,7 +35,7 @@ class CartWebController extends Controller
 
         StorefrontCart::add($request, (int) $product['id'], (int) ($data['cantidad'] ?? 1));
 
-        $target = !empty($data['redirect_to']) ? $data['redirect_to'] : url()->previous();
+        $target = $this->safeRedirectTarget($request, $data['redirect_to'] ?? null);
 
         return redirect()->to($target)->with('success', (string) $product['nombre'] . ' fue agregado al carrito.');
     }
@@ -56,5 +56,24 @@ class CartWebController extends Controller
         StorefrontCart::clear($request);
 
         return back()->with('success', 'Carrito vaciado.');
+    }
+
+    private function safeRedirectTarget(Request $request, ?string $target): string
+    {
+        $target = trim((string) $target);
+        if ($target === '') {
+            return url()->previous();
+        }
+
+        if (str_starts_with($target, '/') && !str_starts_with($target, '//')) {
+            return url($target);
+        }
+
+        $targetHost = parse_url($target, PHP_URL_HOST);
+        if (is_string($targetHost) && strcasecmp($targetHost, $request->getHost()) === 0) {
+            return $target;
+        }
+
+        return route('web.products');
     }
 }

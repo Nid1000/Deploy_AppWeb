@@ -18,7 +18,43 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
+        $token = trim((string) config('services.tickets.token', ''));
+        if ($token === '' || !hash_equals($token, (string) $request->header('X-Tickets-Token', ''))) {
+            return response()->json(['error' => 'No autorizado.'], 401);
+        }
+
+        $request->validate([
+            'serie' => ['nullable', 'string', 'max:20'],
+            'numero' => ['nullable', 'string', 'max:40'],
+            'correlativo' => ['nullable', 'string', 'max:40'],
+            'comprobante_tipo' => ['nullable', 'in:boleta,factura'],
+            'tipo' => ['nullable', 'in:boleta,factura'],
+            'tipo_documento' => ['nullable', 'in:DNI,RUC'],
+            'numero_documento' => ['nullable', 'string', 'max:20'],
+            'cliente' => ['nullable'],
+            'client' => ['nullable', 'array'],
+            'email' => ['nullable', 'email', 'max:191'],
+            'total' => ['nullable', 'numeric', 'min:0'],
+            'mtoImpVenta' => ['nullable', 'numeric', 'min:0'],
+            'items' => ['nullable', 'array'],
+            'details' => ['nullable', 'array'],
+            'correo' => ['nullable', 'array'],
+            'enviar_correo' => ['nullable', 'boolean'],
+            'validacion_real' => ['nullable', 'boolean'],
+            'fechaEmision' => ['nullable', 'date'],
+        ]);
+
         $payload = $request->all();
+
+        if (
+            (float) ($payload['total'] ?? $payload['mtoImpVenta'] ?? 0) <= 0
+            && empty($payload['items'])
+            && empty($payload['details'])
+        ) {
+            return response()->json([
+                'error' => 'El comprobante requiere un total positivo o detalle de items.',
+            ], 422);
+        }
 
         // Si está configurado APISPERU_ENABLED usaremos su API para emitir comprobantes
         if ((bool) env('APISPERU_ENABLED', false)) {
