@@ -104,11 +104,3 @@
         </div>
     </section>
 @endsection
-
-@if (session('meta_purchase'))
-    @push('scripts')
-        <script>
-            window.deliciasTrackMeta?.('Purchase', @json(session('meta_purchase')));
-        </script>
-    @endpush
-@endif

@@ -107,7 +107,6 @@ class CheckoutWebController extends Controller
         }
 
         $pedidoId = (int) data_get($orderResponse->json(), 'pedido.id', 0);
-        $metaPurchase = $this->metaPurchasePayload($pedidoId, $cartItems, $data['metodo_pago']);
 
         if ($data['metodo_pago'] === 'izipay') {
             $paymentResponse = $this->api->post('pagos/izipay/crear', [
@@ -176,7 +175,6 @@ class CheckoutWebController extends Controller
         if ($invoiceResponse->failed()) {
             return redirect()->route('web.orders.show', $pedidoId)
                 ->with('success', 'Pedido creado correctamente. El comprobante podra emitirse despues.')
-                ->with('meta_purchase', $metaPurchase)
                 ->with('error', $this->api->errorMessage($invoiceResponse, 'No se pudo emitir el comprobante.'));
         }
 
@@ -184,7 +182,6 @@ class CheckoutWebController extends Controller
         if ($emailSent === false) {
             return redirect()->route('web.orders.show', $pedidoId)
                 ->with('success', 'Pedido creado y comprobante emitido correctamente.')
-                ->with('meta_purchase', $metaPurchase)
                 ->with(
                     'error',
                     (string) data_get(
@@ -197,13 +194,11 @@ class CheckoutWebController extends Controller
 
         if ($emailSent !== true) {
             return redirect()->route('web.orders.show', $pedidoId)
-                ->with('success', 'Pedido creado y comprobante emitido correctamente.')
-                ->with('meta_purchase', $metaPurchase);
+                ->with('success', 'Pedido creado y comprobante emitido correctamente.');
         }
 
         return redirect()->route('web.orders.show', $pedidoId)
-            ->with('success', 'Pedido creado. El comprobante fue enviado a tu correo registrado.')
-            ->with('meta_purchase', $metaPurchase);
+            ->with('success', 'Pedido creado. El comprobante fue enviado a tu correo registrado.');
     }
 
     public function validateDocument(Request $request): JsonResponse
@@ -307,24 +302,6 @@ class CheckoutWebController extends Controller
             'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.png')),
             'yapePhone' => env('YAPE_PHONE', '974268690'),
             'izipayPayment' => $izipayPayment,
-        ];
-    }
-
-    private function metaPurchasePayload(int $pedidoId, mixed $cartItems, string $paymentMethod): array
-    {
-        return [
-            'content_ids' => $cartItems->pluck('id')->map(fn ($id) => (string) $id)->values()->all(),
-            'content_type' => 'product',
-            'contents' => $cartItems->map(fn ($item) => [
-                'id' => (string) $item->id,
-                'quantity' => (int) $item->cantidad,
-                'item_price' => (float) $item->precio,
-            ])->values()->all(),
-            'currency' => 'PEN',
-            'num_items' => (int) $cartItems->sum('cantidad'),
-            'order_id' => (string) $pedidoId,
-            'payment_method' => $paymentMethod,
-            'value' => (float) $cartItems->sum('subtotal'),
         ];
     }
 

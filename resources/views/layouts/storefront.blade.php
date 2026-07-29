@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-@php
-    $metaPixelId = trim((string) config('services.meta_pixel.id', ''));
-@endphp
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,36 +14,11 @@
             const theme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.classList.add(theme === 'dark' ? 'theme-dark' : 'theme-light');
         })();
-        window.deliciasTrackMeta = window.deliciasTrackMeta || ((eventName, payload = {}) => {
-            if (typeof window.fbq === 'function') {
-                window.fbq('track', eventName, payload);
-            }
-        });
     </script>
-    @if ($metaPixelId !== '')
-        <script>
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', @json($metaPixelId));
-            fbq('track', 'PageView');
-        </script>
-    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
 <body class="storefront-body" data-page="{{ request()->route()?->getName() }}">
-    @if ($metaPixelId !== '')
-        <noscript>
-            <img height="1" width="1" style="display:none" alt=""
-                src="https://www.facebook.com/tr?id={{ urlencode($metaPixelId) }}&ev=PageView&noscript=1">
-        </noscript>
-    @endif
     <div class="storefront-bg" aria-hidden="true">
         <div class="storefront-glow storefront-glow-left"></div>
         <div class="storefront-glow storefront-glow-right"></div>

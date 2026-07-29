@@ -16,35 +16,6 @@ const savedTheme = localStorage.getItem(storageKey);
 const preferredTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 applyTheme(preferredTheme);
 
-const trackMetaPixel = (eventName, payload = {}) => {
-    if (typeof window.fbq !== 'function') {
-        return;
-    }
-
-    window.fbq('track', eventName, payload);
-};
-
-window.deliciasTrackMeta = trackMetaPixel;
-
-document.addEventListener('submit', (event) => {
-    const form = event.target.closest('[data-meta-add-to-cart]');
-    if (!form) {
-        return;
-    }
-
-    trackMetaPixel('AddToCart', {
-        content_ids: [form.dataset.metaProductId],
-        content_name: form.dataset.metaProductName,
-        content_type: 'product',
-        contents: [{
-            id: form.dataset.metaProductId,
-            quantity: Number(form.dataset.metaQuantity || 1),
-        }],
-        currency: form.dataset.metaCurrency || 'PEN',
-        value: Number(form.dataset.metaValue || 0),
-    });
-});
-
 document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-theme-toggle]');
     if (!button) {
