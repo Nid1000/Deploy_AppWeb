@@ -2091,6 +2091,7 @@
 
     .theme-dark .btn-primary,
     .theme-dark .btn-order,
+    .theme-dark .auth-shell button[type="submit"],
     .theme-dark .register-primary-button,
     .theme-dark .register-submit-button,
     .theme-dark .admin-shell .btn-primary,
@@ -2101,6 +2102,12 @@
         color: #111827 !important;
         text-shadow: none !important;
         box-shadow: 0 14px 30px rgba(245, 158, 11, 0.24) !important;
+    }
+
+    .theme-dark .auth-shell button[type="submit"]:hover {
+        background: linear-gradient(135deg, #fbbf24, #fcd34d) !important;
+        color: #111827 !important;
+        transform: translateY(-1px);
     }
 
     .theme-dark .btn-outline-secondary,
