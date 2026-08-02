@@ -94,7 +94,6 @@
     }
 
     .theme-dark .navbar-brand h1,
-    .theme-dark .navbar-shell nav a,
     .theme-dark .navbar-actions > a,
     .theme-dark .topbar,
     .theme-dark .topbar a {
@@ -120,6 +119,14 @@
 
     .navbar-actions {
         @apply flex flex-wrap items-center gap-3 xl:flex-nowrap;
+    }
+
+    .storefront-nav-link {
+        @apply inline-flex items-center rounded-full border border-transparent px-3 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-300 hover:bg-amber-50 hover:text-[var(--color-secondary)];
+    }
+
+    .storefront-nav-link-active {
+        @apply border-amber-400 bg-amber-100/70 text-amber-900 shadow-sm shadow-amber-100/40;
     }
 
     .search-shell {
@@ -160,6 +167,10 @@
 
     .category-pill {
         @apply inline-flex rounded-full border border-amber-200/80 bg-white/90 px-4 py-2 text-sm font-medium text-stone-700 transition hover:-translate-y-0.5 hover:border-amber-400 hover:text-[var(--color-secondary)];
+    }
+
+    .category-pill-active {
+        @apply border-amber-500 bg-amber-100 text-amber-900 shadow-md shadow-amber-100/45;
     }
 
     .theme-dark .category-pill,
@@ -293,6 +304,7 @@
 
     .theme-dark .feature-item,
     .theme-dark .btn-outline-secondary,
+    .theme-dark .storefront-nav-link,
     .theme-dark .category-pill,
     .theme-dark .account-nav-link,
     .theme-dark .social-link,
@@ -305,6 +317,7 @@
 
     .theme-dark .feature-item:hover,
     .theme-dark .btn-outline-secondary:hover,
+    .theme-dark .storefront-nav-link:hover,
     .theme-dark .category-pill:hover,
     .theme-dark .account-nav-link:hover,
     .theme-dark .social-link:hover {
@@ -914,7 +927,7 @@
     }
 
     .badge-danger {
-        @apply bg-red-100 text-red-700;
+        @apply border border-red-600 bg-red-600 text-white shadow-sm shadow-red-200/35;
     }
 
     .badge-surface {
@@ -2179,8 +2192,23 @@
 
     .theme-dark .text-amber-700,
     .theme-dark .text-\[var\(--color-secondary\)\],
-    .theme-dark a:not(.btn):not(.category-pill):not(.cart-icon-pill):not(.social-link):not(.account-nav-link) {
+    .theme-dark a:not(.btn):not(.storefront-nav-link):not(.category-pill):not(.cart-icon-pill):not(.social-link):not(.account-nav-link) {
         color: #fbbf24 !important;
+    }
+
+    .theme-dark .storefront-nav-link-active,
+    .theme-dark .category-pill-active {
+        background: rgba(245, 158, 11, 0.16) !important;
+        border-color: rgba(245, 158, 11, 0.9) !important;
+        color: #fcd34d !important;
+        box-shadow: inset 0 1px 0 rgba(254, 243, 199, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.08) !important;
+    }
+
+    .theme-dark .badge-danger {
+        background: #e11d48 !important;
+        border-color: #fb7185 !important;
+        color: #fff1f2 !important;
+        box-shadow: 0 8px 18px rgba(225, 29, 72, 0.28) !important;
     }
 
     .theme-dark .text-emerald-600,

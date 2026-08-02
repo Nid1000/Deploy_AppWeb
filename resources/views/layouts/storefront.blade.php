@@ -47,11 +47,11 @@
                     </div>
                 </a>
 
-                <nav class="hidden items-center gap-6 text-sm lg:flex">
-                    <a href="{{ route('web.home') }}" class="hover:text-[var(--color-secondary)]">Inicio</a>
-                    <a href="{{ route('web.products') }}" class="hover:text-[var(--color-secondary)]">Productos</a>
-                    <a href="{{ route('web.home') }}#nosotros" class="hover:text-[var(--color-secondary)]">Nosotros</a>
-                    <a href="{{ route('web.home') }}#contacto" class="hover:text-[var(--color-secondary)]">Contactanos</a>
+                <nav class="hidden items-center gap-3 text-sm lg:flex">
+                    <a href="{{ route('web.home') }}" class="storefront-nav-link @if (request()->routeIs('web.home')) storefront-nav-link-active @endif">Inicio</a>
+                    <a href="{{ route('web.products') }}" class="storefront-nav-link @if (request()->routeIs('web.products') || request()->routeIs('web.products.show')) storefront-nav-link-active @endif">Productos</a>
+                    <a href="{{ route('web.home') }}#nosotros" class="storefront-nav-link">Nosotros</a>
+                    <a href="{{ route('web.home') }}#contacto" class="storefront-nav-link">Contactanos</a>
                 </nav>
 
                 <div class="navbar-actions">
@@ -136,10 +136,10 @@
                                 </div>
                             </div>
                         </details>
-                        <a href="{{ route('web.orders') }}" class="hidden text-sm font-medium text-stone-700 transition hover:text-[var(--color-secondary)] xl:inline-flex">
+                        <a href="{{ route('web.orders') }}" class="storefront-nav-link hidden xl:inline-flex @if (request()->routeIs('web.orders') || request()->routeIs('web.orders.show') || request()->routeIs('web.history')) storefront-nav-link-active @endif">
                             Historial
                         </a>
-                        <a href="{{ route('web.profile') }}" class="hidden rounded-full border border-amber-200 bg-white/90 px-4 py-2 font-medium text-stone-700 shadow-sm xl:inline-flex">
+                        <a href="{{ route('web.profile') }}" class="storefront-nav-link hidden xl:inline-flex @if (request()->routeIs('web.profile')) storefront-nav-link-active @endif">
                             {{ trim(($storefrontUser['nombre'] ?? '') . ' ' . ($storefrontUser['apellido'] ?? '')) ?: 'Mi cuenta' }}
                         </a>
                         <form action="{{ route('web.logout') }}" method="POST">
@@ -147,8 +147,8 @@
                             <button type="submit" class="btn btn-outline-secondary">Salir</button>
                         </form>
                     @else
-                        <a href="{{ route('web.login') }}" class="text-sm font-medium text-stone-700 transition hover:text-[var(--color-secondary)]">Mi cuenta</a>
-                        <a href="{{ route('web.register') }}" class="text-sm font-medium text-stone-700 transition hover:text-[var(--color-secondary)]">Registro</a>
+                        <a href="{{ route('web.login') }}" class="storefront-nav-link @if (request()->routeIs('web.login') || request()->routeIs('web.password.*')) storefront-nav-link-active @endif">Mi cuenta</a>
+                        <a href="{{ route('web.register') }}" class="storefront-nav-link @if (request()->routeIs('web.register')) storefront-nav-link-active @endif">Registro</a>
                     @endif
                 </div>
             </div>
@@ -158,7 +158,7 @@
             <div class="navbar-categories">
                 <div class="container flex gap-3 overflow-x-auto py-3">
                     @foreach ($storefrontCategories as $category)
-                        <a href="{{ route('web.products', ['categoria' => $category->id]) }}" class="category-pill">
+                        <a href="{{ route('web.products', ['categoria' => $category->id]) }}" class="category-pill @if ((int) request('categoria') === (int) $category->id) category-pill-active @endif">
                             {{ $category->nombre }}
                         </a>
                     @endforeach
