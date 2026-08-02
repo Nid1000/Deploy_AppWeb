@@ -231,6 +231,77 @@
         color: #1c1917 !important;
     }
 
+    .theme-dark .feature-item,
+    .theme-dark .page-metric,
+    .theme-dark .page-hero-panel,
+    .theme-dark .catalog-summary,
+    .theme-dark .history-card,
+    .theme-dark .detail-panel,
+    .theme-dark .detail-note,
+    .theme-dark .empty-state,
+    .theme-dark .testimonial-card,
+    .theme-dark .contact-panel,
+    .theme-dark .product-card,
+    .theme-dark .category-spotlight,
+    .theme-dark .gallery-card,
+    .theme-dark .map-card,
+    .theme-dark .section-card .rounded-\[1\.5rem\],
+    .theme-dark .section-card .rounded-\[2rem\] {
+        background: rgba(30, 22, 19, 0.96) !important;
+        border-color: rgba(245, 158, 11, 0.55) !important;
+        color: var(--color-ink) !important;
+    }
+
+    .theme-dark .feature-item,
+    .theme-dark .btn-outline-secondary,
+    .theme-dark .category-pill,
+    .theme-dark .account-nav-link,
+    .theme-dark .social-link,
+    .theme-dark .badge-surface {
+        background: rgba(18, 13, 11, 0.92) !important;
+        border-color: rgba(245, 158, 11, 0.65) !important;
+        color: #fff7ed !important;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+    }
+
+    .theme-dark .feature-item:hover,
+    .theme-dark .btn-outline-secondary:hover,
+    .theme-dark .category-pill:hover,
+    .theme-dark .account-nav-link:hover,
+    .theme-dark .social-link:hover {
+        background: rgba(55, 36, 24, 0.98) !important;
+        border-color: rgba(251, 191, 36, 0.9) !important;
+        color: #ffd089 !important;
+    }
+
+    .theme-dark .section-card p,
+    .theme-dark .section-card li,
+    .theme-dark .product-card p,
+    .theme-dark .category-spotlight p,
+    .theme-dark .testimonial-card p,
+    .theme-dark .contact-panel p,
+    .theme-dark .page-hero p,
+    .theme-dark .detail-panel p,
+    .theme-dark .detail-note p,
+    .theme-dark .history-card p {
+        color: var(--muted-text) !important;
+    }
+
+    .theme-dark .section-card h1,
+    .theme-dark .section-card h2,
+    .theme-dark .section-card h3,
+    .theme-dark .section-card h4,
+    .theme-dark .product-card h1,
+    .theme-dark .product-card h2,
+    .theme-dark .product-card h3,
+    .theme-dark .product-card h4,
+    .theme-dark .category-spotlight h1,
+    .theme-dark .category-spotlight h2,
+    .theme-dark .category-spotlight h3,
+    .theme-dark .category-spotlight h4 {
+        color: #fffaf0 !important;
+    }
+
     .cart-pill {
         @apply inline-flex items-center gap-2 rounded-full border border-amber-200/80 bg-white/95 px-4 py-2 font-medium text-stone-700 shadow-sm shadow-amber-100/50;
     }
