@@ -2272,4 +2272,210 @@
         background: rgba(245, 158, 11, 0.18) !important;
         color: #fcd34d !important;
     }
+
+    /* Light theme polish: cleaner whites, stronger borders, and clearer hierarchy. */
+    .theme-light {
+        --color-primary: #b45309;
+        --color-secondary: #92400e;
+        --color-surface: #fff7ed;
+        --color-ink: #1f2937;
+        --panel-bg: rgba(255, 255, 255, 0.96);
+        --panel-border: rgba(217, 119, 6, 0.24);
+        --panel-shadow: rgba(146, 64, 14, 0.12);
+        --muted-text: #57534e;
+        --light-line: rgba(146, 64, 14, 0.18);
+        --light-line-strong: rgba(180, 83, 9, 0.45);
+        --light-soft: #fffaf3;
+        --light-raised: #ffffff;
+        --light-accent-soft: #ffedd5;
+    }
+
+    .theme-light .storefront-bg {
+        background:
+            radial-gradient(circle at 10% 0%, rgba(251, 191, 36, 0.18), transparent 22rem),
+            radial-gradient(circle at 90% 12%, rgba(56, 189, 248, 0.08), transparent 20rem),
+            radial-gradient(circle at 78% 100%, rgba(16, 185, 129, 0.08), transparent 24rem),
+            linear-gradient(180deg, #fffaf3 0%, #fff7ed 48%, #fffdf8 100%) !important;
+    }
+
+    .theme-light .navbar-shell,
+    .theme-light .topbar,
+    .theme-light .navbar-categories,
+    .theme-light .footer {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-color: var(--light-line) !important;
+        box-shadow: 0 14px 34px rgba(146, 64, 14, 0.08);
+    }
+
+    .theme-light .section-card,
+    .theme-light .hero-section,
+    .theme-light .page-hero,
+    .theme-light .page-hero-panel,
+    .theme-light .filter-card,
+    .theme-light .catalog-summary,
+    .theme-light .product-card,
+    .theme-light .category-spotlight,
+    .theme-light .gallery-card,
+    .theme-light .testimonial-card,
+    .theme-light .contact-panel,
+    .theme-light .map-card,
+    .theme-light .auth-shell,
+    .theme-light .register-shell,
+    .theme-light .register-section,
+    .theme-light .detail-panel,
+    .theme-light .detail-note,
+    .theme-light .orders-shell,
+    .theme-light .history-card,
+    .theme-light .empty-state {
+        background: var(--panel-bg) !important;
+        border-color: var(--panel-border) !important;
+        color: var(--color-ink) !important;
+        box-shadow: 0 18px 45px var(--panel-shadow) !important;
+    }
+
+    .theme-light .page-metric,
+    .theme-light .feature-item,
+    .theme-light .register-google-row,
+    .theme-light .register-submit-row,
+    .theme-light .register-pending-message,
+    .theme-light .checkbox-row,
+    .theme-light .hero-stat {
+        background: var(--light-soft) !important;
+        border-color: var(--light-line) !important;
+    }
+
+    .theme-light h1,
+    .theme-light h2,
+    .theme-light h3,
+    .theme-light h4,
+    .theme-light .headline,
+    .theme-light .section-title,
+    .theme-light strong,
+    .theme-light .font-semibold,
+    .theme-light .text-stone-900,
+    .theme-light .text-stone-950 {
+        color: #1f2937 !important;
+    }
+
+    .theme-light p,
+    .theme-light li,
+    .theme-light label,
+    .theme-light .subheadline,
+    .theme-light .text-stone-500,
+    .theme-light .text-stone-600,
+    .theme-light .text-stone-700 {
+        color: #57534e !important;
+    }
+
+    .theme-light .eyebrow,
+    .theme-light .badge-surface {
+        background: #fff7ed !important;
+        border-color: var(--light-line-strong) !important;
+        color: #92400e !important;
+    }
+
+    .theme-light .storefront-nav-link,
+    .theme-light .category-pill,
+    .theme-light .cart-icon-pill,
+    .theme-light .theme-icon-button,
+    .theme-light .cart-pill,
+    .theme-light .social-link,
+    .theme-light .account-nav-link,
+    .theme-light .pagination-link,
+    .theme-light .orders-tab,
+    .theme-light .btn-outline-secondary,
+    .theme-light .register-google-button,
+    .theme-light .register-secondary-button,
+    .theme-light .auth-shell > a {
+        background: #ffffff !important;
+        border-color: var(--light-line) !important;
+        color: #374151 !important;
+    }
+
+    .theme-light .storefront-nav-link:hover,
+    .theme-light .category-pill:hover,
+    .theme-light .cart-icon-pill:hover,
+    .theme-light .theme-icon-button:hover,
+    .theme-light .social-link:hover,
+    .theme-light .account-nav-link:hover,
+    .theme-light .pagination-link:hover,
+    .theme-light .btn-outline-secondary:hover,
+    .theme-light .register-google-button:hover,
+    .theme-light .register-secondary-button:hover,
+    .theme-light .auth-shell > a:hover {
+        background: var(--light-accent-soft) !important;
+        border-color: var(--light-line-strong) !important;
+        color: #92400e !important;
+    }
+
+    .theme-light .storefront-nav-link-active,
+    .theme-light .category-pill-active,
+    .theme-light .account-nav-link-active,
+    .theme-light .orders-tab-active {
+        background: #ffedd5 !important;
+        border-color: #d97706 !important;
+        color: #7c2d12 !important;
+        box-shadow: 0 8px 20px rgba(217, 119, 6, 0.14) !important;
+    }
+
+    .theme-light .btn-primary,
+    .theme-light .btn-order,
+    .theme-light .register-primary-button,
+    .theme-light .register-submit-button,
+    .theme-light .auth-shell button[type="submit"] {
+        background: linear-gradient(135deg, #b45309, #f59e0b) !important;
+        border-color: #d97706 !important;
+        color: #ffffff !important;
+        box-shadow: 0 14px 26px rgba(180, 83, 9, 0.2) !important;
+    }
+
+    .theme-light .input,
+    .theme-light input,
+    .theme-light select,
+    .theme-light textarea,
+    .theme-light .search-shell,
+    .theme-light .chat-assistant-input {
+        background: #ffffff !important;
+        border-color: rgba(120, 113, 108, 0.32) !important;
+        color: #1f2937 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .theme-light input:focus,
+    .theme-light select:focus,
+    .theme-light textarea:focus,
+    .theme-light .search-shell:focus-within {
+        border-color: #d97706 !important;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.14) !important;
+    }
+
+    .theme-light .badge-accent {
+        background: #1f2937 !important;
+        color: #ffffff !important;
+    }
+
+    .theme-light .badge-warning {
+        background: #fef3c7 !important;
+        border: 1px solid #f59e0b;
+        color: #92400e !important;
+    }
+
+    .theme-light .badge-danger {
+        background: #dc2626 !important;
+        border-color: #b91c1c !important;
+        color: #ffffff !important;
+    }
+
+    .theme-light .flash-success,
+    .theme-light .register-verified-message {
+        background: #ecfdf5 !important;
+        border-color: #34d399 !important;
+        color: #065f46 !important;
+    }
+
+    .theme-light .flash-error {
+        background: #fff1f2 !important;
+        border-color: #fb7185 !important;
+        color: #991b1b !important;
+    }
 }
