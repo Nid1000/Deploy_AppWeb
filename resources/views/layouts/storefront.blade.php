@@ -140,7 +140,7 @@
                             Historial
                         </a>
                         <a href="{{ route('web.profile') }}" class="storefront-nav-link hidden xl:inline-flex @if (request()->routeIs('web.profile')) storefront-nav-link-active @endif">
-                            {{ trim(($storefrontUser['nombre'] ?? '') . ' ' . ($storefrontUser['apellido'] ?? '')) ?: 'Mi cuenta' }}
+                            {{ trim((string) ($storefrontUser['nombre'] ?? '')) ?: 'Mi cuenta' }}
                         </a>
                         <form action="{{ route('web.logout') }}" method="POST">
                             @csrf
