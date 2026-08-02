@@ -192,9 +192,18 @@
         background-color: rgba(37, 29, 25, 0.94) !important;
     }
 
+    .theme-dark .storefront-body [class*="bg-amber-50"],
+    .theme-dark .storefront-body [class*="bg-amber-100"],
+    .theme-dark .storefront-body [class*="bg-stone-50"],
+    .theme-dark .storefront-body [class*="bg-stone-100"] {
+        background-color: rgba(20, 14, 12, 0.96) !important;
+        color: #fff7ed !important;
+    }
+
     .theme-dark .storefront-body [class*="border-amber-100"],
     .theme-dark .storefront-body [class*="border-amber-200"],
-    .theme-dark .storefront-body [class*="border-stone-200"] {
+    .theme-dark .storefront-body [class*="border-stone-200"],
+    .theme-dark .storefront-body [class*="border-stone-300"] {
         border-color: rgba(245, 158, 11, 0.45) !important;
     }
 
@@ -202,7 +211,7 @@
     .theme-dark .storefront-body .text-stone-500,
     .theme-dark .storefront-body .text-stone-600,
     .theme-dark .storefront-body .text-stone-700 {
-        color: var(--muted-text) !important;
+        color: #f3dfc9 !important;
     }
 
     .theme-dark .storefront-body .text-stone-800,
@@ -217,6 +226,13 @@
     .theme-dark .storefront-body .eyebrow,
     .theme-dark .storefront-body .history-card-total {
         color: var(--color-secondary) !important;
+    }
+
+    .theme-dark .storefront-body .eyebrow {
+        background: rgba(255, 247, 237, 0.96) !important;
+        border-color: rgba(251, 191, 36, 0.9) !important;
+        color: #9a3412 !important;
+        text-shadow: none;
     }
 
     .theme-dark .storefront-body .btn-primary,
@@ -300,6 +316,34 @@
     .theme-dark .category-spotlight h3,
     .theme-dark .category-spotlight h4 {
         color: #fffaf0 !important;
+    }
+
+    .theme-dark .page-hero-panel > p,
+    .theme-dark .page-hero-panel > div,
+    .theme-dark .page-metric span,
+    .theme-dark .filter-card .label,
+    .theme-dark .filter-card span,
+    .theme-dark .catalog-summary > p,
+    .theme-dark .product-card,
+    .theme-dark .product-card p,
+    .theme-dark .product-card span,
+    .theme-dark .product-card a,
+    .theme-dark .empty-state,
+    .theme-dark .empty-state p {
+        color: #fff1dc !important;
+    }
+
+    .theme-dark .input,
+    .theme-dark .input option,
+    .theme-dark .chat-assistant-input {
+        color: #fff7ed !important;
+        caret-color: #ffd089;
+    }
+
+    .theme-dark .input::placeholder,
+    .theme-dark .chat-assistant-input::placeholder {
+        color: #d9b894 !important;
+        opacity: 1;
     }
 
     .cart-pill {
