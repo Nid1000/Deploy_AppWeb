@@ -21,7 +21,7 @@
         ></script>
         <style>
             .izipay-smart-shell {
-                max-width: 390px;
+                max-width: 340px;
                 margin: 0 auto;
                 border: 1px solid #d7f0ea;
                 border-radius: 10px;
@@ -41,7 +41,7 @@
             }
 
             .izipay-smart-brand {
-                font-size: 30px;
+                font-size: 26px;
                 line-height: 1;
                 font-weight: 800;
                 letter-spacing: -.04em;
@@ -60,7 +60,7 @@
             }
 
             .izipay-smart-body {
-                padding: 16px 20px 14px;
+                padding: 12px 14px 12px;
             }
 
             .izipay-smart-shell .kr-smart-form {
@@ -79,7 +79,7 @@
             .izipay-smart-shell .kr-smart-form .kr-form {
                 display: grid;
                 width: 100%;
-                gap: 12px;
+                gap: 8px;
             }
 
             .izipay-smart-shell .kr-smart-form .kr-field,
@@ -93,14 +93,16 @@
             .izipay-smart-shell .kr-smart-form input,
             .izipay-smart-shell .kr-smart-form select {
                 width: 100% !important;
-                min-height: 48px !important;
+                min-height: 42px !important;
+                height: 42px !important;
+                max-height: 42px !important;
                 margin: 0 !important;
                 border: 1px solid #d7dedc !important;
                 border-radius: 8px !important;
                 background-color: #ffffff !important;
                 color: #1f2937 !important;
-                font-size: 15px !important;
-                line-height: 20px !important;
+                font-size: 14px !important;
+                line-height: 18px !important;
                 box-shadow: 0 1px 2px rgba(15, 23, 42, .05) !important;
             }
 
@@ -114,8 +116,14 @@
             .izipay-smart-shell .kr-smart-form .kr-first-installment-delay {
                 display: flex !important;
                 align-items: center !important;
-                padding: 0 12px !important;
+                padding: 0 10px !important;
                 overflow: hidden !important;
+            }
+
+            .izipay-smart-shell .kr-smart-form iframe {
+                min-height: 40px !important;
+                height: 40px !important;
+                max-height: 40px !important;
             }
 
             .izipay-smart-shell .kr-smart-form .kr-expiry,
@@ -125,7 +133,7 @@
 
             .izipay-smart-shell .kr-smart-form select,
             .izipay-smart-shell .kr-smart-form input {
-                padding: 0 12px !important;
+                padding: 0 10px !important;
                 outline: none !important;
             }
 
@@ -143,7 +151,7 @@
             }
 
             .izipay-smart-shell .kr-smart-form .kr-pan {
-                margin-top: 4px !important;
+                margin-top: 2px !important;
             }
 
             .izipay-smart-shell .kr-smart-form .kr-expiry + .kr-security-code,
@@ -154,7 +162,7 @@
             .izipay-smart-shell .kr-smart-form label,
             .izipay-smart-shell .kr-smart-form .kr-label {
                 display: block;
-                margin: 2px 0 6px;
+                margin: 0 0 4px;
                 color: #6b7280;
                 font-size: 12px;
                 font-weight: 600;
@@ -162,8 +170,8 @@
 
             .izipay-smart-shell .kr-payment-button {
                 width: 100%;
-                min-height: 48px;
-                margin-top: 14px;
+                min-height: 44px;
+                margin-top: 10px;
                 border: 0;
                 border-radius: 8px;
                 background: #16a6a0;
