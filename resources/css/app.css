@@ -37,7 +37,7 @@
         --panel-bg: rgba(38, 28, 24, 0.88);
         --panel-border: rgba(122, 78, 40, 0.65);
         --panel-shadow: rgba(0, 0, 0, 0.35);
-        --muted-text: #d0c0b2;
+        --muted-text: #ead7c4;
     }
 }
 
@@ -61,6 +61,10 @@
             radial-gradient(circle at 85% 8%, rgba(255, 208, 137, 0.08), transparent 18rem),
             radial-gradient(circle at bottom right, rgba(124, 45, 18, 0.28), transparent 22rem),
             linear-gradient(180deg, #17110f 0%, #201613 45%, #120d0b 100%);
+    }
+
+    .theme-dark .storefront-body {
+        color: var(--color-ink);
     }
 
     .storefront-glow {
@@ -87,6 +91,14 @@
     .theme-dark .navbar-shell {
         @apply border-amber-900/40 bg-stone-950/72;
         box-shadow: 0 18px 45px rgba(0, 0, 0, 0.3);
+    }
+
+    .theme-dark .navbar-brand h1,
+    .theme-dark .navbar-shell nav a,
+    .theme-dark .navbar-actions > a,
+    .theme-dark .topbar,
+    .theme-dark .topbar a {
+        color: var(--color-ink) !important;
     }
 
     .topbar {
@@ -174,6 +186,49 @@
 
     .theme-dark .search-input::placeholder {
         color: var(--muted-text);
+    }
+
+    .theme-dark .storefront-body [class*="bg-white"] {
+        background-color: rgba(37, 29, 25, 0.94) !important;
+    }
+
+    .theme-dark .storefront-body [class*="border-amber-100"],
+    .theme-dark .storefront-body [class*="border-amber-200"],
+    .theme-dark .storefront-body [class*="border-stone-200"] {
+        border-color: rgba(245, 158, 11, 0.45) !important;
+    }
+
+    .theme-dark .storefront-body .text-stone-400,
+    .theme-dark .storefront-body .text-stone-500,
+    .theme-dark .storefront-body .text-stone-600,
+    .theme-dark .storefront-body .text-stone-700 {
+        color: var(--muted-text) !important;
+    }
+
+    .theme-dark .storefront-body .text-stone-800,
+    .theme-dark .storefront-body .text-stone-900,
+    .theme-dark .storefront-body .text-stone-950,
+    .theme-dark .storefront-body strong,
+    .theme-dark .storefront-body .font-semibold {
+        color: var(--color-ink) !important;
+    }
+
+    .theme-dark .storefront-body .text-\[var\(--color-secondary\)\],
+    .theme-dark .storefront-body .eyebrow,
+    .theme-dark .storefront-body .history-card-total {
+        color: var(--color-secondary) !important;
+    }
+
+    .theme-dark .storefront-body .btn-primary,
+    .theme-dark .storefront-body .btn-primary * {
+        color: #ffffff !important;
+    }
+
+    .theme-dark .storefront-body .btn-order,
+    .theme-dark .storefront-body .account-nav-link-active,
+    .theme-dark .storefront-body .register-primary-button,
+    .theme-dark .storefront-body .register-submit-button {
+        color: #1c1917 !important;
     }
 
     .cart-pill {
