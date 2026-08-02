@@ -48,6 +48,10 @@ class CheckoutWebController extends Controller
         ]);
 
         $data['numero_documento'] = $this->normalizeDocumentNumber((string) $data['numero_documento']);
+        $request->session()->put('checkout_document', [
+            'tipo_documento' => $data['tipo_documento'],
+            'numero_documento' => $data['numero_documento'],
+        ]);
 
         if ($data['comprobante_tipo'] === 'factura' && $data['tipo_documento'] !== 'RUC') {
             return back()->withInput()->with('error', 'Para emitir factura, el documento debe ser RUC.');
@@ -272,6 +276,12 @@ class CheckoutWebController extends Controller
             ], 404);
         }
 
+        $request->session()->put('checkout_document', [
+            'tipo_documento' => $data['tipo_documento'],
+            'numero_documento' => $number,
+            'cliente_nombre' => $name,
+        ]);
+
         return response()->json([
             'ok' => true,
             'message' => $name !== ''
@@ -302,6 +312,7 @@ class CheckoutWebController extends Controller
             'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.png')),
             'yapePhone' => env('YAPE_PHONE', '974268690'),
             'izipayPayment' => $izipayPayment,
+            'checkoutDocument' => $request->session()->get('checkout_document', []),
         ];
     }
 

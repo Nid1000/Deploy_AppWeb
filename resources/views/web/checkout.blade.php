@@ -3,6 +3,9 @@
 @php
     $izipayPayment = $izipayPayment ?? null;
     $selectedPayment = old('metodo_pago', $izipayPayment['method'] ?? ($izipayPayment ? 'izipay' : 'contra_entrega'));
+    $checkoutDocument = $checkoutDocument ?? [];
+    $documentType = old('tipo_documento', $checkoutDocument['tipo_documento'] ?? 'DNI');
+    $documentNumber = old('numero_documento', $checkoutDocument['numero_documento'] ?? '');
 @endphp
 
 @if ($izipayPayment)
@@ -304,7 +307,12 @@
                         <textarea id="notas" name="notas" rows="3" class="input min-h-28" placeholder="Instrucciones adicionales">{{ old('notas') }}</textarea>
                     </div>
 
-                    <div class="grid gap-4 md:grid-cols-[1fr_1fr_1.45fr]" data-document-validation data-document-url="{{ route('web.checkout.validate-document') }}">
+                    <div
+                        class="grid gap-4 md:grid-cols-[1fr_1fr_1.45fr]"
+                        data-document-validation
+                        data-document-url="{{ route('web.checkout.validate-document') }}"
+                        data-saved-document-key="{{ $documentType && $documentNumber ? $documentType . ':' . preg_replace('/\D+/', '', (string) $documentNumber) : '' }}"
+                    >
                         <div>
                             <label for="comprobante_tipo" class="label">Comprobante</label>
                             <select id="comprobante_tipo" name="comprobante_tipo" required class="input">
@@ -315,14 +323,14 @@
                         <div>
                             <label for="tipo_documento" class="label">Documento</label>
                             <select id="tipo_documento" name="tipo_documento" required class="input">
-                                <option value="DNI" @selected(old('tipo_documento', 'DNI') === 'DNI')>DNI</option>
-                                <option value="RUC" @selected(old('tipo_documento') === 'RUC')>RUC</option>
+                                <option value="DNI" @selected($documentType === 'DNI')>DNI</option>
+                                <option value="RUC" @selected($documentType === 'RUC')>RUC</option>
                             </select>
                         </div>
                         <div>
                             <label for="numero_documento" class="label">Número</label>
                             <div class="flex gap-2">
-                                <input id="numero_documento" name="numero_documento" type="text" required value="{{ old('numero_documento') }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
+                                <input id="numero_documento" name="numero_documento" type="text" required value="{{ $documentNumber }}" class="input min-w-[9ch] flex-1" inputmode="numeric" autocomplete="off">
                                 <button type="button" class="btn btn-outline-secondary shrink-0" data-document-lookup>Validar</button>
                             </div>
                         </div>
@@ -353,7 +361,11 @@
                             </label>
                         </div>
 
-                        <div class="mt-4 {{ $selectedPayment === 'izipay' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay">
+                        <div class="mt-4 hidden rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-sm text-stone-700" data-card-document-guard>
+                            Ingresa y valida tu DNI/RUC para guardar el documento antes de mostrar el pago con tarjeta.
+                        </div>
+
+                        <div class="mt-4 {{ $selectedPayment === 'izipay' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay" data-requires-saved-document>
                             <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
                                 <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Al aprobarse el pago se emitirá la boleta automáticamente.</p>
@@ -431,18 +443,7 @@
 
             const form = document.querySelector('[data-document-validation]');
             const paymentBox = document.querySelector('[data-payment-box]');
-            const syncPayment = () => {
-                const selected = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
-                document.querySelectorAll('[data-payment-panel]').forEach((panel) => {
-                    panel.classList.toggle('hidden', panel.dataset.paymentPanel !== selected);
-                });
-            };
-            document.querySelectorAll('input[name="metodo_pago"]').forEach((input) => {
-                input.addEventListener('change', syncPayment);
-            });
-            if (paymentBox) {
-                syncPayment();
-            }
+            const cardDocumentGuard = document.querySelector('[data-card-document-guard]');
 
             if (!form) return;
 
@@ -457,6 +458,7 @@
             const csrf = document.querySelector('input[name="_token"]')?.value || '';
             let lookupTimer = null;
             let lookupKey = '';
+            let savedDocumentKey = form.dataset.savedDocumentKey || '';
 
             const onlyDigits = (value) => value.replace(/\D+/g, '');
             const validRuc = (value) => {
@@ -570,6 +572,28 @@
                 ? /^\d{8}$/.test(number.value)
                 : validRuc(number.value);
 
+            const currentDocumentKey = () => `${type.value}:${number.value}`;
+
+            const isCardDocumentSaved = () => {
+                if ({{ $izipayPayment ? 'true' : 'false' }}) return true;
+                return hasValidFormat() && savedDocumentKey === currentDocumentKey();
+            };
+
+            const syncPayment = () => {
+                const selected = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
+                const cardReady = isCardDocumentSaved();
+
+                document.querySelectorAll('[data-payment-panel]').forEach((panel) => {
+                    const isSelected = panel.dataset.paymentPanel === selected;
+                    const needsDocument = panel.hasAttribute('data-requires-saved-document');
+                    panel.classList.toggle('hidden', !isSelected || (needsDocument && !cardReady));
+                });
+
+                if (cardDocumentGuard) {
+                    cardDocumentGuard.classList.toggle('hidden', selected !== 'izipay' || cardReady);
+                }
+            };
+
             const sync = () => {
                 if (syncDocumentRequirement()) {
                     return;
@@ -582,6 +606,10 @@
                 number.value = onlyDigits(number.value).slice(0, type.value === 'RUC' ? 11 : 8);
                 const ok = hasValidFormat();
                 lookupKey = '';
+                if (savedDocumentKey !== currentDocumentKey()) {
+                    savedDocumentKey = '';
+                    form.dataset.savedDocumentKey = '';
+                }
                 clearDetails();
                 clearInlineName();
 
@@ -597,6 +625,7 @@
                 if (lookupTimer) {
                     clearTimeout(lookupTimer);
                 }
+                syncPayment();
             };
 
             const validateWithProvider = async () => {
@@ -641,6 +670,8 @@
                             : 'error'
                     );
                     if (response.ok && payload.ok && !payload.validation_unavailable) {
+                        savedDocumentKey = currentDocumentKey();
+                        form.dataset.savedDocumentKey = savedDocumentKey;
                         setInlineName(payload);
                         setDetails(payload);
                     } else {
@@ -654,17 +685,45 @@
                     setMessage('No se pudo conectar con el servicio de validación.', 'error');
                 } finally {
                     lookup.disabled = false;
+                    syncPayment();
                 }
             };
 
-            receipt.addEventListener('change', sync);
-            type.addEventListener('change', sync);
-            number.addEventListener('input', sync);
+            const maybeValidateCardDocument = () => {
+                const selected = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
+                if (selected !== 'izipay' || !hasValidFormat() || isCardDocumentSaved()) {
+                    syncPayment();
+                    return;
+                }
+
+                if (lookupTimer) {
+                    clearTimeout(lookupTimer);
+                }
+                lookupTimer = setTimeout(validateWithProvider, 350);
+                syncPayment();
+            };
+
+            receipt.addEventListener('change', () => {
+                sync();
+                maybeValidateCardDocument();
+            });
+            type.addEventListener('change', () => {
+                sync();
+                maybeValidateCardDocument();
+            });
+            number.addEventListener('input', () => {
+                sync();
+                maybeValidateCardDocument();
+            });
             lookup.addEventListener('click', validateWithProvider);
             document.querySelectorAll('input[name="metodo_pago"]').forEach((input) => {
-                input.addEventListener('change', sync);
+                input.addEventListener('change', () => {
+                    sync();
+                    maybeValidateCardDocument();
+                });
             });
             sync();
+            maybeValidateCardDocument();
         });
     </script>
 @endsection
