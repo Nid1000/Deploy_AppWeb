@@ -1,4 +1,4 @@
-@extends('layouts.storefront', ['title' => 'Menu'])
+@extends('layouts.storefront', ['title' => 'Productos'])
 
 @php
     $currentPage = max(1, (int) ($pagination['pagina'] ?? request()->integer('pagina', 1)));
@@ -47,7 +47,7 @@
     <section class="page-hero">
         <div class="page-hero-split">
             <div class="max-w-3xl">
-                <span class="eyebrow">Menu Delicias</span>
+                <span class="eyebrow">Productos Delicias</span>
             <h2 class="mt-4 text-3xl font-semibold leading-tight text-stone-950 sm:text-4xl" style="font-family: 'Poppins', var(--font-sans);">
                 Nuestros productos artesanales estan listos para que explores sabores, categorias y favoritos de la casa.
             </h2>
