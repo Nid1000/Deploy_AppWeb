@@ -55,6 +55,25 @@
         </div>
     </section>
 
+    <aside class="home-ad" aria-label="Promoción de Delicias">
+        <a href="{{ route('web.products') }}" class="home-ad-link">
+            <img
+                src="{{ asset('images/banners/anuncio-delicias.gif') }}"
+                alt="Panes y postres artesanales de Delicias"
+                class="home-ad-image"
+                width="900"
+                height="473"
+            >
+            <span class="home-ad-overlay" aria-hidden="true"></span>
+            <span class="home-ad-content">
+                <span class="home-ad-label">Promoción de la semana</span>
+                <strong class="home-ad-title">Momentos dulces, recién horneados</strong>
+                <span class="home-ad-copy">Descubre panes, postres y favoritos preparados para ti.</span>
+                <span class="home-ad-button">Ordenar ahora</span>
+            </span>
+        </a>
+    </aside>
+
     <section id="categorias" class="section-space">
         <div class="max-w-2xl">
             <span class="eyebrow">Categorías</span>
