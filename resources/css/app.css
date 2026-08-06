@@ -2478,4 +2478,120 @@
         border-color: #fb7185 !important;
         color: #991b1b !important;
     }
+
+    .home-promo {
+        width: min(100% - 2rem, 92rem);
+        margin: clamp(1.25rem, 3vw, 2.5rem) auto 0;
+    }
+
+    .home-promo-link {
+        position: relative;
+        display: block;
+        min-height: clamp(12rem, 22vw, 18rem);
+        overflow: hidden;
+        border: 1px solid rgba(251, 146, 60, 0.3);
+        border-radius: clamp(1.25rem, 2.5vw, 2rem);
+        background: #431407;
+        box-shadow: 0 24px 55px rgba(120, 53, 15, 0.2);
+        isolation: isolate;
+    }
+
+    .home-promo-image,
+    .home-promo-shade {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .home-promo-image {
+        object-fit: cover;
+        animation: home-promo-zoom 9s ease-in-out infinite alternate;
+    }
+
+    .home-promo-shade {
+        z-index: 1;
+        background: linear-gradient(90deg, rgba(28, 25, 23, 0.9) 0%, rgba(67, 20, 7, 0.72) 42%, rgba(67, 20, 7, 0.08) 78%);
+    }
+
+    .home-promo-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        min-height: clamp(12rem, 22vw, 18rem);
+        max-width: 40rem;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding: clamp(1.5rem, 5vw, 4rem);
+        color: #fff;
+    }
+
+    .home-promo-label {
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        padding: 0.35rem 0.8rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        backdrop-filter: blur(8px);
+    }
+
+    .home-promo-title {
+        color: #fff !important;
+        font-family: 'Poppins', var(--font-sans);
+        font-size: clamp(1.55rem, 3.1vw, 2.75rem);
+        line-height: 1.08;
+    }
+
+    .home-promo-copy {
+        margin-top: 0.8rem;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+    }
+
+    .home-promo-button {
+        margin-top: 1.25rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        padding: 0.75rem 1.2rem;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        box-shadow: 0 12px 28px rgba(245, 158, 11, 0.3);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .home-promo-link:hover .home-promo-button {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(245, 158, 11, 0.4);
+    }
+
+    @keyframes home-promo-zoom {
+        from { transform: scale(1); }
+        to { transform: scale(1.06); }
+    }
+
+    @media (max-width: 640px) {
+        .home-promo-shade {
+            background: linear-gradient(90deg, rgba(28, 25, 23, 0.9), rgba(67, 20, 7, 0.55));
+        }
+
+        .home-promo-content {
+            max-width: 90%;
+        }
+
+        .home-promo-copy {
+            max-width: 18rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .home-promo-image {
+            animation: none;
+        }
+    }
 }

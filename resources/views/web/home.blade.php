@@ -55,6 +55,25 @@
         </div>
     </section>
 
+    <aside class="home-promo" aria-label="Promoción destacada">
+        <a href="{{ route('web.products') }}" class="home-promo-link">
+            <img
+                src="{{ asset('images/banners/baners7.jpg') }}"
+                alt="Promociones de Panadería Delicias"
+                class="home-promo-image"
+                width="1400"
+                height="280"
+            >
+            <span class="home-promo-shade" aria-hidden="true"></span>
+            <span class="home-promo-content">
+                <span class="home-promo-label">Promoción especial</span>
+                <strong class="home-promo-title">Momentos dulces, recién horneados</strong>
+                <span class="home-promo-copy">Descubre nuestros favoritos y haz tu pedido hoy.</span>
+                <span class="home-promo-button">Ordenar ahora</span>
+            </span>
+        </a>
+    </aside>
+
     <section id="categorias" class="section-space">
         <div class="max-w-2xl">
             <span class="eyebrow">Categorías</span>
