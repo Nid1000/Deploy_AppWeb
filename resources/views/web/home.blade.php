@@ -57,13 +57,23 @@
 
     <aside class="home-ad" aria-label="Promoción de Delicias">
         <a href="{{ route('web.products') }}" class="home-ad-link">
-            <img
-                src="{{ asset('images/banners/anuncio-delicias.gif') }}"
-                alt="Panes y postres artesanales de Delicias"
-                class="home-ad-image"
-                width="900"
-                height="473"
-            >
+            <span class="home-ad-slides" aria-hidden="true">
+                @foreach ([
+                    'images/banners/anuncio-delicias.gif',
+                    'images/banners/baners7.jpg',
+                    'images/banners/baners 8.jpg',
+                    'images/banners/baners 9.jpg',
+                ] as $bannerImage)
+                    <img
+                        src="{{ asset($bannerImage) }}"
+                        alt=""
+                        class="home-ad-image"
+                        width="1200"
+                        height="1200"
+                        loading="{{ $loop->first ? 'eager' : 'lazy' }}"
+                    >
+                @endforeach
+            </span>
             <span class="home-ad-overlay" aria-hidden="true"></span>
             <span class="home-ad-content">
                 <span class="home-ad-label">Promoción de la semana</span>
