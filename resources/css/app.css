@@ -2380,6 +2380,11 @@
         color: #1f2937 !important;
     }
 
+    .theme-light .category-image-title,
+    .theme-dark .category-image-title {
+        color: #ffffff !important;
+    }
+
     .theme-light p,
     .theme-light li,
     .theme-light label,
