@@ -946,6 +946,29 @@
         @apply relative overflow-hidden rounded-[2rem] border border-amber-200/80 bg-white/92 shadow-lg shadow-amber-100/30;
     }
 
+    .category-image-title {
+        display: inline-flex;
+        max-width: 100%;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 0.9rem;
+        background: rgba(67, 20, 7, 0.92);
+        padding: 0.55rem 1rem;
+        color: #fff !important;
+        font-family: 'Poppins', var(--font-sans);
+        font-size: clamp(1rem, 2vw, 1.35rem);
+        font-weight: 700;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+        box-shadow: 0 8px 22px rgba(28, 25, 23, 0.34);
+        backdrop-filter: blur(8px);
+    }
+
+    .category-image-title-compact {
+        padding: 0.45rem 0.8rem;
+        font-size: 0.95rem;
+    }
+
     .category-spotlight::after {
         @apply pointer-events-none absolute inset-x-0 bottom-0 h-28;
         content: '';

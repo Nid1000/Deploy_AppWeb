@@ -98,7 +98,7 @@
                     <div class="relative aspect-[4/3] overflow-hidden">
                         <img src="{{ $category->imagen_url }}" alt="{{ $category->nombre }}" class="h-full w-full object-cover">
                         <div class="absolute inset-x-0 bottom-0 z-10 p-5">
-                            <h4 class="text-2xl font-semibold text-white">{{ $category->nombre }}</h4>
+                            <h4 class="category-image-title">{{ $category->nombre }}</h4>
                         </div>
                     </div>
                     <div class="p-5">

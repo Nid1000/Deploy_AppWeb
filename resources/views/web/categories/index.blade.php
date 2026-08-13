@@ -25,7 +25,7 @@
                             <img src="{{ $category->imagen_url }}" alt="{{ $category->nombre }}" class="h-full w-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent"></div>
                             <div class="absolute inset-x-0 bottom-0 p-4">
-                                <span class="inline-flex rounded-xl bg-white/85 px-3 py-1 text-sm font-semibold text-stone-900 shadow-sm backdrop-blur-sm">
+                                <span class="category-image-title category-image-title-compact">
                                     {{ $category->nombre }}
                                 </span>
                             </div>
