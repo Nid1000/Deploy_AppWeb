@@ -56,7 +56,7 @@
     </section>
 
     <aside class="home-ad" aria-label="Promoción de Delicias">
-        <a href="{{ route('web.products') }}" class="home-ad-link">
+        <a href="#destacados" class="home-ad-link">
             <span class="home-ad-slides" aria-hidden="true">
                 @foreach ([
                     'images/banners/anuncio-delicias.gif',
