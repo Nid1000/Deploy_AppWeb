@@ -131,8 +131,6 @@ class CheckoutWebController extends Controller
                     ->with('error', $this->api->errorMessage($paymentResponse, 'No se pudo iniciar el pago con Izipay.'));
             }
 
-            StorefrontCart::clear($request);
-
             $payment = $paymentResponse->json();
             $formToken = (string) data_get($payment, 'formToken', '');
             $publicKey = (string) data_get($payment, 'publicKey', '');
@@ -141,6 +139,16 @@ class CheckoutWebController extends Controller
                     ->with('success', 'Pedido creado correctamente.')
                     ->with('error', 'Izipay no devolvió los datos para mostrar el formulario de pago.');
             }
+
+            $pendingPayments = (array) $request->session()->get('pending_izipay_orders', []);
+            $pendingPayments[(string) $pedidoId] = $cartItems
+                ->map(fn ($item) => [
+                    'id' => (int) $item->id,
+                    'cantidad' => (int) $item->cantidad,
+                ])
+                ->values()
+                ->all();
+            $request->session()->put('pending_izipay_orders', $pendingPayments);
 
             $backendUrl = rtrim((string) config('services.backend.url'), '/');
             $defaultJsUrl = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';

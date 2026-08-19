@@ -121,6 +121,18 @@ class OrdersWebController extends Controller
         $response = $this->api->get('pedidos/' . $id);
         abort_unless($response->successful(), 404);
         $order = (object) $this->api->okData($response, 'pedido', []);
+
+        if (mb_strtolower((string) ($order->estado_pago ?? '')) === 'pagado') {
+            $pendingPayments = (array) $request->session()->get('pending_izipay_orders', []);
+            $orderKey = (string) $id;
+
+            if (isset($pendingPayments[$orderKey]) && is_array($pendingPayments[$orderKey])) {
+                StorefrontCart::consume($request, $pendingPayments[$orderKey]);
+                unset($pendingPayments[$orderKey]);
+                $request->session()->put('pending_izipay_orders', $pendingPayments);
+                $request->session()->flash('success', 'Pago confirmado. Los productos pagados fueron retirados del carrito.');
+            }
+        }
         $details = collect($this->api->okData($response, 'detalles', []))->map(function ($detail) {
             $detail = (object) $detail;
             $detail->precio_unitario = (float) ($detail->precio_unitario ?? 0);
