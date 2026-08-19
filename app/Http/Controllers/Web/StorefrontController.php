@@ -23,11 +23,12 @@ class StorefrontController extends Controller
 
     public function home(Request $request): View
     {
-        $productsResponse = $this->api->get('productos', ['limite' => 12]);
+        $productsResponse = $this->api->get('productos', ['limite' => 1000]);
         $categoriesResponse = $this->api->get('categorias');
         $products = collect($this->api->okData($productsResponse, 'productos', []));
         $categories = collect($this->api->okData($categoriesResponse, null, []));
 
+        $bannerProducts = $this->mapProducts($products);
         $featuredProducts = $this->mapProducts(
             $products->sortByDesc(fn ($item) => !empty($item['destacado'] ?? false))->take(5)
         );
@@ -36,6 +37,7 @@ class StorefrontController extends Controller
 
         return view('web.home', [
             'user' => $request->session()->get('web_user'),
+            'bannerProducts' => $bannerProducts,
             'featuredProducts' => $featuredProducts,
             'homeCategories' => $homeCategories,
             'galleryImages' => [

@@ -57,22 +57,28 @@
 
     <aside class="home-ad" aria-label="Promoción de Delicias">
         <a href="#destacados" class="home-ad-link">
-            <span class="home-ad-slides" aria-hidden="true">
-                @foreach ([
-                    'images/banners/anuncio-delicias.gif',
-                    'images/banners/baners7.jpg',
-                    'images/banners/baners 8.jpg',
-                    'images/banners/baners 9.jpg',
-                ] as $bannerImage)
+            <span class="home-ad-slides" data-home-ad-slides aria-hidden="true">
+                @forelse ($bannerProducts as $product)
                     <img
-                        src="{{ asset($bannerImage) }}"
+                        src="{{ $product->imagen_url }}"
                         alt=""
-                        class="home-ad-image"
+                        class="home-ad-image @if ($loop->first) home-ad-image-active @endif"
+                        data-home-ad-slide
                         width="1200"
                         height="1200"
                         loading="{{ $loop->first ? 'eager' : 'lazy' }}"
                     >
-                @endforeach
+                @empty
+                    <img
+                        src="{{ asset('images/banners/anuncio-delicias.gif') }}"
+                        alt=""
+                        class="home-ad-image home-ad-image-active"
+                        data-home-ad-slide
+                        width="1200"
+                        height="1200"
+                        loading="eager"
+                    >
+                @endforelse
             </span>
             <span class="home-ad-overlay" aria-hidden="true"></span>
             <span class="home-ad-content">

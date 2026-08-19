@@ -16,6 +16,23 @@ const savedTheme = localStorage.getItem(storageKey);
 const preferredTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 applyTheme(preferredTheme);
 
+document.querySelectorAll('[data-home-ad-slides]').forEach((banner) => {
+    const slides = [...banner.querySelectorAll('[data-home-ad-slide]')];
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (slides.length < 2 || reducedMotion) {
+        return;
+    }
+
+    let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains('home-ad-image-active')));
+
+    window.setInterval(() => {
+        slides[activeIndex].classList.remove('home-ad-image-active');
+        activeIndex = (activeIndex + 1) % slides.length;
+        slides[activeIndex].classList.add('home-ad-image-active');
+    }, 5000);
+});
+
 document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-theme-toggle]');
     if (!button) {

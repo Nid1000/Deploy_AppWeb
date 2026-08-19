@@ -2545,37 +2545,13 @@
 
     .home-ad-slides .home-ad-image {
         opacity: 0;
-        animation: home-ad-slide 20s infinite;
         transform: scale(1.03);
+        transition: opacity 700ms ease, transform 5s ease;
     }
 
-    .home-ad-slides .home-ad-image:nth-child(2) {
-        animation-delay: 5s;
-    }
-
-    .home-ad-slides .home-ad-image:nth-child(3) {
-        animation-delay: 10s;
-    }
-
-    .home-ad-slides .home-ad-image:nth-child(4) {
-        animation-delay: 15s;
-    }
-
-    @keyframes home-ad-slide {
-        0%, 20% {
-            opacity: 1;
-            transform: scale(1.03);
-        }
-
-        25%, 95% {
-            opacity: 0;
-            transform: scale(1.08);
-        }
-
-        100% {
-            opacity: 1;
-            transform: scale(1.03);
-        }
+    .home-ad-slides .home-ad-image-active {
+        opacity: 1;
+        transform: scale(1.08);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -2585,7 +2561,7 @@
             transform: none;
         }
 
-        .home-ad-slides .home-ad-image:first-child {
+        .home-ad-slides .home-ad-image-active {
             opacity: 1;
         }
     }
