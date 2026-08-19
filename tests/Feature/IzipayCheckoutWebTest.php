@@ -59,6 +59,12 @@ class IzipayCheckoutWebTest extends TestCase
             ->assertViewHas('izipayPayment')
             ->assertSee('Ambiente de prueba');
 
+        $this->assertSame(1, session('storefront_cart.0.cantidad'));
+        $this->assertSame(
+            [['id' => 10, 'cantidad' => 1]],
+            session('pending_izipay_orders.123')
+        );
+
         Http::assertSent(function ($request): bool {
             return $request->url() === 'https://api.saborcentral.com/api/pagos/izipay/crear'
                 && $request['pedido_id'] === 123
@@ -68,5 +74,43 @@ class IzipayCheckoutWebTest extends TestCase
                 && $request['emitir_comprobante_al_confirmar'] === true
                 && $request['modo_prueba'] === true;
         });
+    }
+
+    public function test_paid_order_consumes_only_the_items_saved_for_that_payment(): void
+    {
+        Http::fake([
+            '*/api/auth/verify' => Http::response(['tipo' => 'usuario']),
+            '*/api/pedidos/123' => Http::response([
+                'pedido' => [
+                    'id' => 123,
+                    'estado' => 'confirmado',
+                    'estado_pago' => 'pagado',
+                ],
+                'detalles' => [],
+            ]),
+            '*/api/facturacion/mis-comprobantes' => Http::response(['comprobantes' => []]),
+        ]);
+
+        $response = $this
+            ->withSession([
+                'web_user' => ['id' => 1],
+                'auth_token' => 'test-auth-token',
+                'auth_tipo' => 'usuario',
+                'storefront_cart' => [[
+                    'id' => 10,
+                    'nombre' => 'Producto de prueba',
+                    'precio' => 1,
+                    'cantidad' => 3,
+                    'stock' => 10,
+                ]],
+                'pending_izipay_orders' => [
+                    '123' => [['id' => 10, 'cantidad' => 1]],
+                ],
+            ])
+            ->get('/orders/123');
+
+        $response->assertOk();
+        $this->assertSame(2, session('storefront_cart.0.cantidad'));
+        $this->assertSame([], session('pending_izipay_orders'));
     }
 }

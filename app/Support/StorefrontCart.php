@@ -105,6 +105,35 @@ class StorefrontCart
     {
         $request->session()->forget('storefront_cart');
     }
+
+    public static function consume(Request $request, array $purchasedItems): void
+    {
+        $purchased = collect($purchasedItems)
+            ->filter(fn ($item) => is_array($item) && (int) ($item['id'] ?? 0) > 0)
+            ->mapWithKeys(fn ($item) => [
+                (int) $item['id'] => max(0, (int) ($item['cantidad'] ?? 0)),
+            ]);
+
+        $cart = collect($request->session()->get('storefront_cart', []))
+            ->map(function ($item) use ($purchased) {
+                $productId = (int) ($item['id'] ?? 0);
+                $quantity = (int) ($item['cantidad'] ?? 0) - (int) $purchased->get($productId, 0);
+
+                if ($quantity <= 0) {
+                    return null;
+                }
+
+                $item['cantidad'] = $quantity;
+
+                return $item;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        $request->session()->put('storefront_cart', $cart);
+    }
+
     private static function fetchProduct(Request $request, int $productId): ?array
     {
         $response = app(BackendApiClient::class)->get('productos/' . $productId);
