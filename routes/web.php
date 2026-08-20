@@ -100,9 +100,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/conductores/{id}/control', [AdminWebController::class, 'driversUpdate'])->whereNumber('id')->name('web.admin.drivers.update');
 
         Route::get('/comprobantes', [AdminWebController::class, 'receiptsIndex'])->name('web.admin.receipts.index');
-        Route::get('/reservas', [AdminWebController::class, 'reservationsIndex'])->name('web.admin.reservations.index');
-        Route::post('/reservas/{id}/estado', [AdminWebController::class, 'reservationsUpdateState'])->whereNumber('id')->name('web.admin.reservations.state');
-        Route::get('/reservas/exportar', [AdminWebController::class, 'reservationsExport'])->name('web.admin.reservations.export');
         Route::get('/almacen', [AdminWebController::class, 'warehouseIndex'])->name('web.admin.warehouse.index');
         Route::post('/almacen/movimientos', [AdminWebController::class, 'warehouseStore'])->name('web.admin.warehouse.store');
         Route::get('/almacen/exportar', [AdminWebController::class, 'warehouseExport'])->name('web.admin.warehouse.export');

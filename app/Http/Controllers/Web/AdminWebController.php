@@ -737,48 +737,6 @@ class AdminWebController extends Controller
         ]);
     }
 
-    public function reservationsIndex(Request $request): View
-    {
-        $filters = [
-            'buscar' => trim((string) $request->query('buscar', '')),
-            'estado' => (string) $request->query('estado', ''),
-            'desde' => (string) $request->query('desde', ''),
-            'hasta' => (string) $request->query('hasta', ''),
-        ];
-        $response = $this->api->get('reservas/admin/todas', array_filter([
-            'pagina' => (int) $request->query('pagina', 1),
-            'limite' => 20,
-            'buscar' => $filters['buscar'] ?: null,
-            'estado' => $filters['estado'] ?: null,
-            'desde' => $filters['desde'] ?: null,
-            'hasta' => $filters['hasta'] ?: null,
-        ], fn ($value) => $value !== null && $value !== ''));
-
-        return view('admin.reservations.index', [
-            'reservations' => collect($this->api->okData($response, 'reservas', []))->map(fn ($item) => (object) $item),
-            'filters' => $filters,
-            'pagination' => (array) $this->api->okData($response, 'pagination', []),
-        ]);
-    }
-
-    public function reservationsUpdateState(Request $request, int $id): RedirectResponse
-    {
-        $data = $request->validate([
-            'estado' => ['required', 'in:pendiente,confirmada,asistio,cancelada'],
-        ]);
-        $response = $this->api->patch('reservas/admin/' . $id . '/estado', $data);
-        if (!$response->successful()) {
-            return back()->with('error', $this->api->errorMessage($response, 'No se pudo actualizar la reserva.'));
-        }
-
-        return back()->with('success', 'Reserva actualizada.');
-    }
-
-    public function reservationsExport(Request $request)
-    {
-        return $this->downloadFromApi('reservas/admin/exportar', $request->only(['buscar', 'estado', 'desde', 'hasta']));
-    }
-
     public function warehouseIndex(Request $request): View
     {
         $filters = [
@@ -971,14 +929,6 @@ class AdminWebController extends Controller
     private function resolveExportReport(string $path): array
     {
         return match ($path) {
-            'reservas/admin/exportar' => [
-                'key' => 'reservas',
-                'title' => 'REPORTE DE RESERVAS',
-                'accent' => '#7c3aed',
-                'accent_dark' => '#5b21b6',
-                'accent_soft' => '#f3e8ff',
-                'filename' => 'reporte-reservas-' . now()->format('Y-m-d') . '.xls',
-            ],
             'almacen/admin/exportar' => [
                 'key' => 'almacen',
                 'title' => 'REPORTE DE ALMACEN',
@@ -1213,7 +1163,6 @@ class AdminWebController extends Controller
             'pedidos' => 'Reporte de pedidos organizado para seguimiento y revision de estados.',
             'productos' => 'Catalogo de productos con informacion para analisis y control.',
             'almacen' => 'Movimientos de almacen ordenados por fecha, producto y tipo.',
-            'reservas' => 'Listado de reservas con control visual para gestion diaria.',
             default => 'Reporte general listo para revision e impresion.',
         };
     }
@@ -1273,13 +1222,6 @@ class AdminWebController extends Controller
             $summary[] = [
                 'label' => (string) ($headers[$index] ?? 'Valor'),
                 'value' => 'S/ ' . number_format($sum, 2),
-            ];
-        }
-
-        if ($reportKey === 'reservas') {
-            $summary[] = [
-                'label' => 'Nota',
-                'value' => 'Reporte de reservas',
             ];
         }
 
