@@ -42,6 +42,32 @@ class AppServiceProvider extends ServiceProvider
                         $row->createdAt = !empty($row->createdAt ?? null)
                             ? Carbon::parse($row->createdAt)
                             : (!empty($row->created_at ?? null) ? Carbon::parse($row->created_at) : null);
+                        $notificationRoute = mb_strtolower((string) (
+                            data_get($item, 'route')
+                            ?? data_get($item, 'ruta')
+                            ?? ''
+                        ));
+                        $isOrderNotification = str_contains(mb_strtolower($row->title), 'pedido')
+                            || preg_match('/pedido\s*#\d+/iu', $row->body)
+                            || in_array($notificationRoute, ['pedido', 'order', 'orders', 'web.orders.show'], true);
+                        $orderId = $isOrderNotification
+                            ? (int) (
+                                data_get($item, 'targetId')
+                                ?? data_get($item, 'target_id')
+                                ?? data_get($item, 'pedido_id')
+                                ?? data_get($item, 'pedidoId')
+                                ?? data_get($item, 'data.pedido_id')
+                                ?? 0
+                            )
+                            : 0;
+
+                        if ($orderId <= 0 && preg_match('/pedido\s*#(\d+)/iu', $row->body, $matches)) {
+                            $orderId = (int) $matches[1];
+                        }
+
+                        $row->url = $orderId > 0
+                            ? route('web.orders.show', $orderId)
+                            : null;
 
                         return $row;
                     })

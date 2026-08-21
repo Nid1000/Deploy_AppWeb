@@ -123,13 +123,23 @@
 
                                 <div class="mt-4 space-y-3">
                                     @forelse (($storefrontNotifications ?? collect()) as $notification)
-                                        <article class="rounded-2xl border border-amber-100 bg-amber-50/60 p-3">
-                                            <p class="text-sm font-semibold text-stone-900">{{ $notification->title }}</p>
-                                            <p class="mt-1 text-sm text-stone-600">{{ $notification->body }}</p>
-                                            @if ($notification->createdAt)
-                                                <p class="mt-2 text-xs text-stone-500">{{ $notification->createdAt->format('d/m/Y H:i') }}</p>
-                                            @endif
-                                        </article>
+                                        @if ($notification->url)
+                                            <a href="{{ $notification->url }}" class="block rounded-2xl border border-amber-100 bg-amber-50/60 p-3 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400">
+                                                <p class="text-sm font-semibold text-stone-900">{{ $notification->title }}</p>
+                                                <p class="mt-1 text-sm text-stone-600">{{ $notification->body }}</p>
+                                                @if ($notification->createdAt)
+                                                    <p class="mt-2 text-xs text-stone-500">{{ $notification->createdAt->format('d/m/Y H:i') }}</p>
+                                                @endif
+                                            </a>
+                                        @else
+                                            <article class="rounded-2xl border border-amber-100 bg-amber-50/60 p-3">
+                                                <p class="text-sm font-semibold text-stone-900">{{ $notification->title }}</p>
+                                                <p class="mt-1 text-sm text-stone-600">{{ $notification->body }}</p>
+                                                @if ($notification->createdAt)
+                                                    <p class="mt-2 text-xs text-stone-500">{{ $notification->createdAt->format('d/m/Y H:i') }}</p>
+                                                @endif
+                                            </article>
+                                        @endif
                                     @empty
                                         <p class="text-sm text-stone-500">No hay notificaciones pendientes.</p>
                                     @endforelse

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Web\AdminAuthWebController;
-use App\Http\Controllers\Web\AdminStorageWebController;
 use App\Http\Controllers\Web\AdminWebController;
 use App\Http\Controllers\Web\AuthWebController;
 use App\Http\Controllers\Web\CartWebController;
@@ -103,8 +102,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/almacen', [AdminWebController::class, 'warehouseIndex'])->name('web.admin.warehouse.index');
         Route::post('/almacen/movimientos', [AdminWebController::class, 'warehouseStore'])->name('web.admin.warehouse.store');
         Route::get('/almacen/exportar', [AdminWebController::class, 'warehouseExport'])->name('web.admin.warehouse.export');
-        Route::get('/storage', [AdminStorageWebController::class, 'index'])->name('web.admin.storage.index');
-        Route::post('/storage', [AdminStorageWebController::class, 'store'])->name('web.admin.storage.store');
         Route::get('/reportes', [AdminWebController::class, 'reportsIndex'])->name('web.admin.reports.index');
         Route::get('/reportes/exportar/{tipo}', [AdminWebController::class, 'reportsExport'])->name('web.admin.reports.export');
 
