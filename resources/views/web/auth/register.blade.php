@@ -116,7 +116,7 @@
                     </div>
                     <div>
                         <label for="telefono" class="label">Teléfono <span class="text-stone-400">(opcional)</span></label>
-                        <input id="telefono" name="telefono" type="tel" value="{{ old('telefono') }}" class="input" placeholder="987654321" autocomplete="tel">
+                        <input id="telefono" name="telefono" type="tel" value="{{ old('telefono') }}" class="input" placeholder="987654321" autocomplete="tel" inputmode="numeric" maxlength="9" pattern="9[0-9]{8}" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)">
                         @error('telefono')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                 </div>

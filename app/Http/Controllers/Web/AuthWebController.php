@@ -326,7 +326,7 @@ class AuthWebController extends Controller
             'apellido' => ['required', 'string', 'min:2', 'max:191'],
             'email' => ['required', 'email', 'max:191'],
             'password' => ['required', 'confirmed', PasswordRules::userPassword()],
-            'telefono' => ['nullable', 'string', 'max:20'],
+            'telefono' => ['nullable', 'regex:/^9\d{8}$/'],
             'direccion' => ['required', 'string'],
             'distrito' => ['required', 'string', 'min:2', 'max:120'],
             'numero_casa' => ['required', 'string', 'max:20'],

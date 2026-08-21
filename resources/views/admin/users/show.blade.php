@@ -20,7 +20,7 @@
                 </div>
                 <div>
                     <label class="label" for="telefono">Teléfono</label>
-                    <input id="telefono" name="telefono" value="{{ old('telefono', $user->telefono) }}" class="input">
+                    <input id="telefono" name="telefono" type="tel" value="{{ old('telefono', $user->telefono) }}" class="input" inputmode="numeric" maxlength="9" pattern="9[0-9]{8}" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)">
                 </div>
                 <div>
                     <label class="label" for="numero_casa">Número de casa</label>

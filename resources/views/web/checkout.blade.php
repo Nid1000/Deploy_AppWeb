@@ -302,7 +302,7 @@
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <label for="telefono_contacto" class="label">Teléfono</label>
-                            <input id="telefono_contacto" name="telefono_contacto" type="tel" required value="{{ old('telefono_contacto', $user['telefono'] ?? '') }}" class="input" placeholder="9XXXXXXXX">
+                            <input id="telefono_contacto" name="telefono_contacto" type="tel" required value="{{ old('telefono_contacto', $user['telefono'] ?? '') }}" class="input" placeholder="9XXXXXXXX" inputmode="numeric" maxlength="9" pattern="9[0-9]{8}" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)">
                         </div>
                         <div>
                             <label for="fecha_entrega" class="label">Fecha de entrega</label>

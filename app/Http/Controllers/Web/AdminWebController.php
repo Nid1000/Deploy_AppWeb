@@ -491,7 +491,7 @@ class AdminWebController extends Controller
             'nombre' => ['required', 'string', 'min:2'],
             'apellido' => ['required', 'string', 'min:2'],
             'email' => ['required', 'email'],
-            'telefono' => ['nullable', 'string', 'max:20'],
+            'telefono' => ['nullable', 'regex:/^9\d{8}$/'],
             'direccion' => ['nullable', 'string'],
             'distrito' => ['nullable', 'string', 'max:120'],
             'numero_casa' => ['nullable', 'string', 'max:20'],
