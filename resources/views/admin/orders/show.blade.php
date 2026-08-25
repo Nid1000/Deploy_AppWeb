@@ -72,7 +72,7 @@
                     @csrf
                     <div class="rounded-2xl border border-stone-200 bg-white p-4">
                         <p class="font-semibold text-stone-900">Registro de conductor</p>
-                        <p class="mt-1 text-sm text-stone-500">Guarda el responsable y el control de salida/regreso del reparto.</p>
+                        <p class="mt-1 text-sm text-stone-500">Guarda el responsable del reparto. La hora de salida se registra automaticamente al marcar el pedido como listo.</p>
                     </div>
                     <div>
                         <label class="label" for="conductor">Conductor</label>
@@ -86,15 +86,9 @@
                         <label class="label" for="vehiculo">Vehiculo</label>
                         <input id="vehiculo" name="vehiculo" value="{{ $order->vehiculo ?? '' }}" class="input" placeholder="Moto, auto o placa">
                     </div>
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label class="label" for="salida_reparto_at">Hora de salida</label>
-                            <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" value="{{ ($order->salida_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input">
-                        </div>
-                        <div>
-                            <label class="label" for="regreso_reparto_at">Hora de regreso</label>
-                            <input id="regreso_reparto_at" name="regreso_reparto_at" type="datetime-local" value="{{ ($order->regreso_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->regreso_reparto_at, 0, 16)) : '' }}" class="input">
-                        </div>
+                    <div>
+                        <label class="label" for="salida_reparto_at">Hora de salida</label>
+                        <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" value="{{ ($order->salida_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input" readonly>
                     </div>
                     <button class="btn btn-primary w-full justify-center">Guardar reparto</button>
                 </form>

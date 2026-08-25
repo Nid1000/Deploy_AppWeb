@@ -5,12 +5,10 @@
         $stateLabels = [
             'sin_salida' => 'Sin salida',
             'en_ruta' => 'En ruta',
-            'retornado' => 'Retornado',
         ];
         $stateBadges = [
             'sin_salida' => 'badge-surface',
             'en_ruta' => 'badge-warning',
-            'retornado' => 'badge-accent',
         ];
         $dateTimeValue = function ($value) {
             $value = trim((string) $value);
@@ -18,7 +16,7 @@
         };
     @endphp
 
-    <section class="grid gap-4 md:grid-cols-4">
+    <section class="grid gap-4 md:grid-cols-3">
         <article class="admin-card">
             <p class="text-sm text-stone-500">Pedidos programados</p>
             <p class="mt-2 text-3xl font-semibold text-stone-950">{{ $metrics['programados'] }}</p>
@@ -30,10 +28,6 @@
         <article class="admin-card">
             <p class="text-sm text-stone-500">En ruta</p>
             <p class="mt-2 text-3xl font-semibold text-stone-950">{{ $metrics['en_ruta'] }}</p>
-        </article>
-        <article class="admin-card">
-            <p class="text-sm text-stone-500">Retornados</p>
-            <p class="mt-2 text-3xl font-semibold text-stone-950">{{ $metrics['retornados'] }}</p>
         </article>
     </section>
 
@@ -82,9 +76,7 @@
             <tbody class="divide-y divide-stone-100">
                 @forelse ($orders as $order)
                     @php
-                        $state = !empty($order->regreso_reparto_at ?? null)
-                            ? 'retornado'
-                            : (!empty($order->salida_reparto_at ?? null) ? 'en_ruta' : 'sin_salida');
+                        $state = !empty($order->salida_reparto_at ?? null) ? 'en_ruta' : 'sin_salida';
                     @endphp
                     <tr>
                         <td>
@@ -102,7 +94,6 @@
                         </td>
                         <td>
                             <p class="text-sm">Salida: {{ ($order->salida_reparto_at ?? '') ?: 'Pendiente' }}</p>
-                            <p class="text-sm">Ingreso: {{ ($order->regreso_reparto_at ?? '') ?: 'Pendiente' }}</p>
                         </td>
                         <td>
                             <span class="badge {{ $stateBadges[$state] ?? 'badge-surface' }}">{{ $stateLabels[$state] ?? 'Sin salida' }}</span>
@@ -114,10 +105,7 @@
                                     <input name="conductor" value="{{ old('conductor', $order->conductor ?? '') }}" class="input" placeholder="Conductor">
                                     <input name="conductor_dni" value="{{ old('conductor_dni', $order->conductor_dni ?? '') }}" class="input" inputmode="numeric" maxlength="8" placeholder="DNI">
                                 </div>
-                                <div class="grid gap-2 md:grid-cols-2">
-                                    <input name="salida_reparto_at" type="datetime-local" value="{{ old('salida_reparto_at', $dateTimeValue($order->salida_reparto_at ?? null)) }}" class="input">
-                                    <input name="regreso_reparto_at" type="datetime-local" value="{{ old('regreso_reparto_at', $dateTimeValue($order->regreso_reparto_at ?? null)) }}" class="input">
-                                </div>
+                                <input name="salida_reparto_at" type="datetime-local" value="{{ old('salida_reparto_at', $dateTimeValue($order->salida_reparto_at ?? null)) }}" class="input" readonly title="Se registra automaticamente cuando el pedido cambia a listo">
                                 <div class="flex gap-2">
                                     <input name="vehiculo" value="{{ old('vehiculo', $order->vehiculo ?? '') }}" class="input" placeholder="Vehiculo">
                                     <button class="btn btn-primary shrink-0">Guardar</button>

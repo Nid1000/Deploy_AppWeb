@@ -175,10 +175,6 @@ class AdminWebController extends Controller
 
     private function driverControlState(object $order): string
     {
-        if (!empty($order->regreso_reparto_at ?? null)) {
-            return 'retornado';
-        }
-
         if (!empty($order->salida_reparto_at ?? null)) {
             return 'en_ruta';
         }
@@ -189,7 +185,6 @@ class AdminWebController extends Controller
     private function driverControlDate(object $order): ?Carbon
     {
         foreach ([
-            $order->regreso_reparto_at ?? null,
             $order->salida_reparto_at ?? null,
             $order->fecha_entrega ?? null,
             $order->created_at ?? null,
@@ -608,7 +603,6 @@ class AdminWebController extends Controller
             'programados' => $orders->count(),
             'sin_salida' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'sin_salida')->count(),
             'en_ruta' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'en_ruta')->count(),
-            'retornados' => $orders->filter(fn ($order) => $this->driverControlState($order) === 'retornado')->count(),
         ];
 
         return view('admin.drivers.index', [
@@ -622,7 +616,6 @@ class AdminWebController extends Controller
     {
         $data = $request->validate([
             'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
-            'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:salida_reparto_at'],
             'conductor' => ['nullable', 'string', 'max:191'],
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
@@ -664,6 +657,24 @@ class AdminWebController extends Controller
             return back()->with('error', $this->api->errorMessage($response, 'No se pudo actualizar el estado.'));
         }
 
+        if ($data['estado'] === 'listo') {
+            $orderResponse = $this->api->get('pedidos/admin/' . $id);
+            $order = (array) $this->api->okData($orderResponse, 'pedido', []);
+
+            if ($orderResponse->successful() && empty($order['salida_reparto_at'])) {
+                $shippingResponse = $this->api->put('pedidos/admin/' . $id . '/reparto', [
+                    'salida_reparto_at' => now()->format('Y-m-d\TH:i'),
+                    'conductor' => $order['conductor'] ?? null,
+                    'conductor_dni' => $order['conductor_dni'] ?? null,
+                    'vehiculo' => $order['vehiculo'] ?? null,
+                ]);
+
+                if (!$shippingResponse->successful()) {
+                    return back()->with('error', 'El pedido quedo listo, pero no se pudo registrar automaticamente la hora de salida.');
+                }
+            }
+        }
+
         return back()->with('success', 'Estado del pedido actualizado.');
     }
 
@@ -671,7 +682,6 @@ class AdminWebController extends Controller
     {
         $data = $request->validate([
             'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
-            'regreso_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:salida_reparto_at'],
             'conductor' => ['nullable', 'string', 'max:191'],
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
