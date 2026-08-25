@@ -64,7 +64,7 @@
                 <form action="{{ route('web.admin.orders.delivery', $order->id) }}" method="POST" class="mt-4 space-y-3">
                     @csrf
                     <label class="label" for="fecha_entrega">Fecha de entrega</label>
-                    <input id="fecha_entrega" name="fecha_entrega" type="date" value="{{ $order->fecha_entrega }}" class="input">
+                    <input id="fecha_entrega" name="fecha_entrega" type="date" min="{{ today()->format('Y-m-d') }}" value="{{ $order->fecha_entrega }}" class="input">
                     <button class="btn btn-outline-secondary w-full justify-center">Actualizar fecha</button>
                 </form>
 

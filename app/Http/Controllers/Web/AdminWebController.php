@@ -701,7 +701,9 @@ class AdminWebController extends Controller
     public function ordersUpdateDeliveryDate(Request $request, int $id): RedirectResponse
     {
         $data = $request->validate([
-            'fecha_entrega' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_entrega' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
+        ], [
+            'fecha_entrega.after_or_equal' => 'La fecha de entrega no puede pertenecer a un día anterior.',
         ]);
         $response = $this->api->put('pedidos/admin/' . $id . '/fecha-entrega', $data);
         if (!$response->successful()) {
