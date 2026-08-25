@@ -105,7 +105,7 @@
                                     <input name="conductor" value="{{ old('conductor', $order->conductor ?? '') }}" class="input" placeholder="Conductor">
                                     <input name="conductor_dni" value="{{ old('conductor_dni', $order->conductor_dni ?? '') }}" class="input" inputmode="numeric" maxlength="8" placeholder="DNI">
                                 </div>
-                                <input name="salida_reparto_at" type="datetime-local" value="{{ old('salida_reparto_at', $dateTimeValue($order->salida_reparto_at ?? null)) }}" class="input">
+                                <input name="salida_reparto_at" type="datetime-local" min="{{ now()->startOfDay()->format('Y-m-d\TH:i') }}" value="{{ old('salida_reparto_at', $dateTimeValue($order->salida_reparto_at ?? null)) }}" class="input">
                                 <div class="flex gap-2">
                                     <input name="vehiculo" value="{{ old('vehiculo', $order->vehiculo ?? '') }}" class="input" placeholder="Vehiculo">
                                     <button class="btn btn-primary shrink-0">Guardar</button>

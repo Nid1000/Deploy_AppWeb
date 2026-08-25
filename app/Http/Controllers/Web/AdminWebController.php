@@ -615,12 +615,13 @@ class AdminWebController extends Controller
     public function driversUpdate(Request $request, int $id): RedirectResponse
     {
         $data = $request->validate([
-            'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:today'],
             'conductor' => ['nullable', 'string', 'max:191'],
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
         ], [
             'conductor_dni.regex' => 'El DNI del conductor debe tener 8 dígitos.',
+            'salida_reparto_at.after_or_equal' => 'La hora de salida no puede pertenecer a un día anterior.',
         ]);
 
         $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
@@ -681,12 +682,13 @@ class AdminWebController extends Controller
     public function ordersUpdateShipping(Request $request, int $id): RedirectResponse
     {
         $data = $request->validate([
-            'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'salida_reparto_at' => ['nullable', 'date_format:Y-m-d\TH:i', 'after_or_equal:today'],
             'conductor' => ['nullable', 'string', 'max:191'],
             'conductor_dni' => ['nullable', 'regex:/^\d{8}$/'],
             'vehiculo' => ['nullable', 'string', 'max:191'],
         ], [
             'conductor_dni.regex' => 'El DNI del conductor debe tener 8 dígitos.',
+            'salida_reparto_at.after_or_equal' => 'La hora de salida no puede pertenecer a un día anterior.',
         ]);
         $response = $this->api->put('pedidos/admin/' . $id . '/reparto', $data);
         if (!$response->successful()) {

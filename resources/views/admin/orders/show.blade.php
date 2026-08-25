@@ -88,7 +88,7 @@
                     </div>
                     <div>
                         <label class="label" for="salida_reparto_at">Hora de salida</label>
-                        <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" value="{{ ($order->salida_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input">
+                        <input id="salida_reparto_at" name="salida_reparto_at" type="datetime-local" min="{{ now()->startOfDay()->format('Y-m-d\TH:i') }}" value="{{ ($order->salida_reparto_at ?? null) ? str_replace(' ', 'T', substr((string) $order->salida_reparto_at, 0, 16)) : '' }}" class="input">
                     </div>
                     <button class="btn btn-primary w-full justify-center">Guardar reparto</button>
                 </form>
