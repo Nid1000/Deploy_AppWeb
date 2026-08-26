@@ -276,7 +276,7 @@
                 <p class="eyebrow">Entrega y comprobante</p>
                 <h3 class="mt-3 text-3xl font-semibold text-stone-900">Datos del pedido</h3>
 
-                <form action="{{ route('web.checkout.submit') }}" method="POST" class="mt-6 space-y-4">
+                <form id="checkout-form" action="{{ route('web.checkout.submit') }}" method="POST" class="mt-6 space-y-4">
                     @csrf
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
@@ -351,7 +351,7 @@
 
                     <div class="rounded-[1.5rem] border border-amber-100 bg-amber-50/60 p-5" data-payment-box>
                         <p class="eyebrow">Pago</p>
-                        <div class="mt-4 grid gap-3 md:grid-cols-3">
+                        <div class="mt-4 grid gap-3 md:grid-cols-2">
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="contra_entrega" class="mr-2" @checked($selectedPayment === 'contra_entrega') @disabled($izipayPayment)>
                                 <span class="font-semibold text-stone-900">Efectivo</span>
@@ -361,11 +361,6 @@
                                 <input type="radio" name="metodo_pago" value="izipay" class="mr-2" @checked($selectedPayment === 'izipay') @disabled($izipayPayment)>
                                 <span class="font-semibold text-stone-900">Tarjeta</span>
                                 <span class="mt-1 block text-xs text-stone-500">Pago seguro con tarjeta.</span>
-                            </label>
-                            <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
-                                <input type="radio" name="metodo_pago" value="yape" class="mr-2" @checked($selectedPayment === 'yape') @disabled($izipayPayment)>
-                                <span class="font-semibold text-stone-900">Yape</span>
-                                <span class="mt-1 block text-xs text-stone-500">Escanea el QR.</span>
                             </label>
                         </div>
 
@@ -406,20 +401,6 @@
                             @endif
                         </div>
 
-                        <div class="mt-4 {{ $selectedPayment === 'yape' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="yape">
-                            <p class="font-semibold text-stone-900">Pago con Yape</p>
-                            <div class="mt-4 grid gap-4 rounded-2xl border border-purple-100 bg-purple-50/40 p-4 md:grid-cols-[190px_1fr] md:items-center">
-                                <div class="rounded-2xl border border-purple-100 bg-white p-3 shadow-sm">
-                                    <img src="{{ $yapeQrUrl }}" alt="QR de Yape Delicias del centro" class="mx-auto aspect-square w-full max-w-[170px] rounded-xl object-contain">
-                                </div>
-                                <div>
-                                    <p class="text-sm text-stone-600">Escanea el QR y paga al número:</p>
-                                    <p class="mt-1 text-2xl font-semibold text-purple-900">{{ $yapePhone }}</p>
-                                    <p class="mt-3 text-sm text-stone-600">Luego confirma el pedido. Delicias verificará el pago y lo marcará como pagado.</p>
-                                </div>
-                            </div>
-                        </div>
-
                         <label class="mt-4 flex items-start gap-3 text-sm text-stone-700">
                             <input type="checkbox" name="acepta_pago" value="1" required class="mt-1" @checked(old('acepta_pago') || $izipayPayment) @disabled($izipayPayment)>
                             <span>Acepto que Delicias registre este método de pago y confirme el pedido según disponibilidad.</span>
@@ -447,6 +428,49 @@
                 };
                 deliveryDate.addEventListener('change', enforceMinDeliveryDate);
                 enforceMinDeliveryDate();
+            }
+
+            const checkoutForm = document.getElementById('checkout-form');
+            if (checkoutForm) {
+                const orderSummaryLines = [
+                    @foreach ($cartItems as $item)
+                        '{{ $item->cantidad }}x {{ addslashes($item->nombre) }} — S/ {{ number_format($item->subtotal, 2) }}',
+                    @endforeach
+                ];
+                const orderTotalLine = 'Total: S/ {{ number_format($cartTotal, 2) }}';
+
+                checkoutForm.addEventListener('submit', (event) => {
+                    if (checkoutForm.dataset.submitted === '1') {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    if (checkoutForm.dataset.confirmed !== '1') {
+                        event.preventDefault();
+                        const summary = [
+                            '¿Confirmas este pedido?',
+                            '',
+                            ...orderSummaryLines,
+                            '',
+                            orderTotalLine,
+                            '',
+                            'Una vez confirmado, si necesitas cancelarlo debes comunicarte con el administrador.',
+                        ].join('\n');
+
+                        if (window.confirm(summary)) {
+                            checkoutForm.dataset.confirmed = '1';
+                            checkoutForm.requestSubmit();
+                        }
+                        return;
+                    }
+
+                    checkoutForm.dataset.submitted = '1';
+                    const submitButton = checkoutForm.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.textContent = 'Procesando pedido...';
+                    }
+                });
             }
 
             const form = document.querySelector('[data-document-validation]');

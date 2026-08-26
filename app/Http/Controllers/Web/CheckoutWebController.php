@@ -39,7 +39,7 @@ class CheckoutWebController extends Controller
             'comprobante_tipo' => ['required', 'in:boleta,factura'],
             'tipo_documento' => ['required', 'in:DNI,RUC'],
             'numero_documento' => ['required', 'string'],
-            'metodo_pago' => ['required', 'in:contra_entrega,tarjeta,izipay,yape'],
+            'metodo_pago' => ['required', 'in:contra_entrega,izipay'],
             'acepta_pago' => ['accepted'],
         ], [
             'fecha_entrega.after_or_equal' => 'La fecha de entrega debe ser desde manana en adelante.',
@@ -102,7 +102,6 @@ class CheckoutWebController extends Controller
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => match ($data['metodo_pago']) {
                 'izipay' => 'Pago con tarjeta Izipay pendiente',
-                'yape' => 'Pago por Yape pendiente',
                 default => 'Pago contra entrega',
             },
         ]);
@@ -317,8 +316,6 @@ class CheckoutWebController extends Controller
             'distritos' => $this->mapDistricts($this->api->okData($districtsResponse, 'distritos', [])),
             'user' => $request->session()->get('web_user'),
             'minDeliveryDate' => now()->addDay()->toDateString(),
-            'yapeQrUrl' => env('YAPE_QR_URL', asset('images/payments/yape-qr.png')),
-            'yapePhone' => env('YAPE_PHONE', '974268690'),
             'izipayPayment' => $izipayPayment,
             'checkoutDocument' => $request->session()->get('checkout_document', []),
         ];

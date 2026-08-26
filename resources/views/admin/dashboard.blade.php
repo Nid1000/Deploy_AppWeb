@@ -71,17 +71,44 @@
         </article>
         <article class="dashboard-stat-card dashboard-reveal" style="--reveal-delay: 270ms">
             <div class="dashboard-stat-icon dashboard-stat-icon-violet">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
             </div>
             <div>
-                <p class="text-sm text-stone-500">Ticket promedio</p>
-                <p class="mt-2 text-3xl font-semibold text-stone-950"
-                    data-dashboard-counter="{{ $metrics['ticketPromedio'] }}"
-                    data-counter-prefix="S/ "
-                    data-counter-decimals="2">S/ {{ number_format($metrics['ticketPromedio'], 2) }}</p>
-                <p class="mt-2 text-xs text-stone-500">Promedio de los últimos 14 días</p>
+                <p class="text-sm text-stone-500">Última compra</p>
+                <p class="mt-2 text-xl font-semibold text-stone-950 truncate">{{ $metrics['ultimaCompraCliente'] ?? 'Sin compras aún' }}</p>
+                <p class="mt-2 text-xs text-stone-500">{{ $metrics['ultimaCompraFecha'] ?: 'Sin fecha' }}</p>
             </div>
         </article>
+    </section>
+
+    <section class="admin-card dashboard-reveal mt-6" style="--reveal-delay: 300ms">
+        <p class="text-sm text-stone-500">Hora peruana (America/Lima)</p>
+        <h3 class="mt-1 text-xl font-semibold text-stone-950">Ventas de los últimos 5 días</h3>
+        <div class="table-shell mt-5">
+            <table class="table-ui">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th class="text-right">Pedidos</th>
+                        <th class="text-right">Ventas confirmadas</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    @forelse ($last5DaysSales as $day)
+                        <tr>
+                            <td class="capitalize">{{ $day->fechaFormateada }}</td>
+                            <td class="text-right">{{ $day->pedidos }}</td>
+                            <td class="text-right font-semibold">S/ {{ number_format($day->total, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="py-6 text-center text-stone-500">Sin datos en los últimos 5 días.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <p class="mt-3 text-xs text-stone-500">Las ventas contra entrega se suman aquí recién cuando el pedido pasa a "Entregado".</p>
     </section>
 
     <section class="mt-6 grid gap-6 xl:grid-cols-[1.55fr_0.75fr]">

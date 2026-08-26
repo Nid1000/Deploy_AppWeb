@@ -85,12 +85,6 @@ class AdminWebController extends Controller
                     return $order;
                 })
             : collect();
-        $activeOrders = $orders->reject(fn ($order) => ($order->estado ?? null) === 'cancelado');
-        $ordersLast14Days = $activeOrders->filter(function ($order) use ($today) {
-            $createdAt = data_get($order, 'created_at');
-
-            return $this->dashboardDateIsOnOrAfter($createdAt, $today->copy()->subDays(13));
-        });
         $ordersToday = $orders->filter(function ($order) use ($today) {
             $createdAt = data_get($order, 'created_at');
 
@@ -120,6 +114,24 @@ class AdminWebController extends Controller
             'factura' => (int) $receipts->where('tipo', 'factura')->count(),
         ];
 
+        // $orders ya viene ordenado por created_at desc desde la API, asi que el primero es la compra mas reciente.
+        $lastOrder = $orders->first();
+        $lastOrderCustomer = $lastOrder
+            ? trim((string) data_get($lastOrder, 'usuario.nombre', '') . ' ' . (string) data_get($lastOrder, 'usuario.apellido', ''))
+            : '';
+
+        // Tabla de los ultimos 5 dias (hoy primero), en hora peruana (config('app.timezone') = America/Lima).
+        $last5DaysSales = $salesSeries->slice(-5)->reverse()->values()->map(function ($day) use ($orders) {
+            $date = Carbon::parse($day->fecha);
+
+            return (object) [
+                'fecha' => $day->fecha,
+                'fechaFormateada' => $date->locale('es')->isoFormat('dddd D [de] MMMM YYYY'),
+                'total' => $day->total,
+                'pedidos' => $orders->filter(fn ($order) => $this->dashboardDateIsSameDay(data_get($order, 'created_at'), $date) && ($order->estado ?? null) !== 'cancelado')->count(),
+            ];
+        });
+
         return view('admin.dashboard', [
             'metrics' => [
                 'productos' => (int) data_get($productsResponse->json(), 'pagination.total', 0),
@@ -128,15 +140,15 @@ class AdminWebController extends Controller
                 'ventasSemana' => $currentWeekSales,
                 'crecimientoVentas' => $salesGrowth,
                 'pedidosHoy' => $ordersToday,
-                'ticketPromedio' => $ordersLast14Days->count() > 0
-                    ? (float) $salesSeries->sum('total') / $ordersLast14Days->count()
-                    : 0.0,
+                'ultimaCompraCliente' => $lastOrderCustomer !== '' ? $lastOrderCustomer : null,
+                'ultimaCompraFecha' => $lastOrder ? $this->formatDashboardDate($lastOrder->created_at ?? null) : null,
                 'pedidosPeriodo' => $ordersResponse
                     ? (int) data_get($ordersResponse->json(), 'pagination.total', $orders->count())
                     : 0,
             ],
             'salesSeries' => $salesSeries,
             'salesChartMax' => max(1, (float) $salesSeries->max('total')),
+            'last5DaysSales' => $last5DaysSales,
             'orderStatuses' => $orderStatuses,
             'recentOrders' => $orders->take(5),
             'topProducts' => $topProducts,
