@@ -413,8 +413,33 @@
                         <button type="submit" class="btn btn-primary w-full justify-center">Confirmar pedido</button>
                     @endif
                 </form>
+
+                @if ($izipayPayment)
+                    <form id="izipay-cancel-form" action="{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}" method="POST" class="mt-3" onsubmit="return confirm('¿Cancelar el pedido #{{ $izipayPayment['pedidoId'] }}? Se liberará el stock reservado y no se completará el pago.');">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary w-full justify-center">Cancelar pedido</button>
+                    </form>
+                    <p class="mt-2 text-center text-xs text-stone-500">Tu pedido #{{ $izipayPayment['pedidoId'] }} ya está registrado con el stock reservado. Termina el pago con la tarjeta o cancélalo con el botón de arriba antes de salir de esta página.</p>
+                @endif
             </div>
         </section>
+    @endif
+
+    @if ($izipayPayment)
+        <script>
+            // Pedido #{{ $izipayPayment['pedidoId'] }} ya existe con estado "pendiente" y el stock ya fue
+            // reservado; si el cliente cierra/retrocede sin pagar ni cancelar, el pedido queda colgado.
+            // Avisamos al salir y dejamos que el envio del propio formulario de cancelar pase sin aviso.
+            let izipayLeavingIntentionally = false;
+            document.getElementById('izipay-cancel-form')?.addEventListener('submit', () => {
+                izipayLeavingIntentionally = true;
+            });
+            window.addEventListener('beforeunload', (event) => {
+                if (izipayLeavingIntentionally) return;
+                event.preventDefault();
+                event.returnValue = '';
+            });
+        </script>
     @endif
 
     <script>

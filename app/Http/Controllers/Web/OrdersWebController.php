@@ -164,6 +164,11 @@ class OrdersWebController extends Controller
             return back()->with('error', $this->api->errorMessage($response, 'No se pudo cancelar el pedido.'));
         }
 
-        return back()->with('success', 'Pedido cancelado correctamente.');
+        $requiereReembolso = (bool) data_get($response->json(), 'requiere_reembolso', false);
+        $message = $requiereReembolso
+            ? 'Pedido cancelado. Como el pago ya se realizó con tarjeta, nos comunicaremos contigo para coordinar la devolución. También puedes escribirnos al 993560096.'
+            : 'Pedido cancelado correctamente. El stock fue restablecido.';
+
+        return back()->with('success', $message);
     }
 }

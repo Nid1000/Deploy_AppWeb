@@ -93,7 +93,7 @@
                             <p class="text-xs text-stone-500">{{ ($order->vehiculo ?? '') ?: 'Sin vehiculo' }}</p>
                         </td>
                         <td>
-                            <p class="text-sm">Salida: {{ ($order->salida_reparto_at ?? '') ?: 'Pendiente' }}</p>
+                            <p class="text-sm">Salida: {{ ($order->salida_reparto_at ?? null) ? \Illuminate\Support\Carbon::parse($order->salida_reparto_at)->format('d/m/Y H:i') : 'Pendiente' }}</p>
                         </td>
                         <td>
                             <span class="badge {{ $stateBadges[$state] ?? 'badge-surface' }}">{{ $stateLabels[$state] ?? 'Sin salida' }}</span>

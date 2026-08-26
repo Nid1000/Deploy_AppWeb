@@ -77,7 +77,7 @@
                         <div class="history-card-actions">
                             <a href="{{ route('web.orders.show', $order->id) }}" class="btn btn-primary">Ver detalle</a>
                             @if (!in_array($order->estado, ['cancelado', 'listo', 'entregado'], true))
-                                <form action="{{ route('web.orders.cancel', $order->id) }}" method="POST">
+                                <form action="{{ route('web.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de cancelar el pedido #{{ $order->id }}? Si necesitas cancelarlo por otro motivo o ya fue enviado, comunícate mejor con el administrador.');">
                                     @csrf
                                     <button type="submit" class="btn btn-outline-secondary">Cancelar</button>
                                 </form>

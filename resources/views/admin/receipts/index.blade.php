@@ -38,7 +38,7 @@
                     <tr>
                         <td>
                             <p class="font-semibold text-stone-900">{{ $receipt->numero_formateado }}</p>
-                            <p class="text-xs text-stone-500">{{ $receipt->created_at }}</p>
+                            <p class="text-xs text-stone-500">{{ $receipt->created_at ? \Illuminate\Support\Carbon::parse($receipt->created_at)->format('d/m/Y H:i') : 'Sin fecha' }}</p>
                         </td>
                         <td>{{ data_get($receipt, 'cliente.nombre', 'Cliente') }}</td>
                         <td><span class="badge badge-surface">{{ ucfirst($receipt->tipo) }}</span></td>

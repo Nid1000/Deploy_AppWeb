@@ -132,6 +132,39 @@ class AdminWebController extends Controller
             ];
         });
 
+        // Ultimas 5 personas que compraron hoy (hora peruana), mas recientes primero.
+        $lastBuyersToday = $orders
+            ->filter(fn ($order) => $this->dashboardDateIsSameDay(data_get($order, 'created_at'), $today) && ($order->estado ?? null) !== 'cancelado')
+            ->take(5)
+            ->map(function ($order) {
+                $cliente = trim((string) data_get($order, 'usuario.nombre', '') . ' ' . (string) data_get($order, 'usuario.apellido', ''));
+
+                return (object) [
+                    'id' => $order->id,
+                    'cliente' => $cliente !== '' ? $cliente : 'Cliente',
+                    'total' => (float) ($order->total ?? 0),
+                    'hora' => $this->formatDashboardDate($order->created_at ?? null),
+                ];
+            })
+            ->values();
+
+        // Pedidos contra entrega aun no entregados (ni cancelados): lo que el cliente pagara al recibir.
+        $codPendingOrders = $orders->filter(function ($order) {
+            return (string) ($order->metodo_pago ?? '') === 'contra_entrega'
+                && !in_array($order->estado ?? null, ['entregado', 'cancelado'], true);
+        })->values();
+        $codPendingList = $codPendingOrders->map(function ($order) {
+            $cliente = trim((string) data_get($order, 'usuario.nombre', '') . ' ' . (string) data_get($order, 'usuario.apellido', ''));
+
+            return (object) [
+                'id' => $order->id,
+                'cliente' => $cliente !== '' ? $cliente : 'Cliente',
+                'total' => (float) ($order->total ?? 0),
+                'estado' => $order->estado ?? 'pendiente',
+            ];
+        });
+        $codPendingTotal = (float) $codPendingOrders->sum('total');
+
         return view('admin.dashboard', [
             'metrics' => [
                 'productos' => (int) data_get($productsResponse->json(), 'pagination.total', 0),
@@ -149,6 +182,9 @@ class AdminWebController extends Controller
             'salesSeries' => $salesSeries,
             'salesChartMax' => max(1, (float) $salesSeries->max('total')),
             'last5DaysSales' => $last5DaysSales,
+            'lastBuyersToday' => $lastBuyersToday,
+            'codPendingList' => $codPendingList,
+            'codPendingTotal' => $codPendingTotal,
             'orderStatuses' => $orderStatuses,
             'recentOrders' => $orders->take(5),
             'topProducts' => $topProducts,

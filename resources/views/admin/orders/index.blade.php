@@ -49,7 +49,7 @@
                     <tr>
                         <td>
                             <p class="font-semibold text-stone-900">#{{ $order->id }}</p>
-                            <p class="text-xs text-stone-500">{{ $order->created_at }}</p>
+                            <p class="text-xs text-stone-500">{{ $order->created_at ? \Illuminate\Support\Carbon::parse($order->created_at)->format('d/m/Y H:i') : 'Sin fecha' }}</p>
                         </td>
                         <td>
                             <p>{{ data_get($order, 'usuario.nombre') }} {{ data_get($order, 'usuario.apellido') }}</p>
@@ -61,8 +61,8 @@
                         </td>
                         <td>
                             <p class="font-medium text-stone-800">{{ $order->conductor ?: 'Sin conductor' }}</p>
-                            <p class="text-xs text-stone-500">Sale: {{ $order->salida_reparto_at ?: 'Sin hora' }}</p>
-                            <p class="text-xs text-stone-500">Regresa: {{ ($order->regreso_reparto_at ?? null) ?: 'Sin hora' }}</p>
+                            <p class="text-xs text-stone-500">Sale: {{ $order->salida_reparto_at ? \Illuminate\Support\Carbon::parse($order->salida_reparto_at)->format('d/m/Y H:i') : 'Sin hora' }}</p>
+                            <p class="text-xs text-stone-500">Regresa: {{ ($order->regreso_reparto_at ?? null) ? \Illuminate\Support\Carbon::parse($order->regreso_reparto_at)->format('d/m/Y H:i') : 'Sin hora' }}</p>
                         </td>
                         <td>S/ {{ number_format((float) $order->total, 2) }}</td>
                         <td><span class="badge badge-surface">{{ ucfirst($order->estado) }}</span></td>
