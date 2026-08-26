@@ -371,7 +371,9 @@
                         <div class="mt-4 {{ $selectedPayment === 'izipay' ? '' : 'hidden' }} rounded-2xl border border-stone-200 bg-white p-4" data-payment-panel="izipay" data-requires-saved-document>
                             <p class="font-semibold text-stone-900">Pago seguro con tarjeta</p>
                             @if ($izipayPayment)
-                                <p class="mt-1 text-sm text-stone-600">Pedido #{{ $izipayPayment['pedidoId'] }} creado. Al aprobarse el pago se emitirá la boleta automáticamente.</p>
+                                <div class="mt-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+                                    Elige una opción: culmina el pago con tu tarjeta abajo, o cancela el pedido con el botón de más abajo.
+                                </div>
                                 @if (!empty($izipayPayment['testMode']))
                                     <div class="mt-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
                                         <strong>Ambiente de prueba:</strong> usa una tarjeta de prueba habilitada en tu Backoffice Izipay. No uses una tarjeta bancaria real.
@@ -415,11 +417,12 @@
                 </form>
 
                 @if ($izipayPayment)
-                    <form id="izipay-cancel-form" action="{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}" method="POST" class="mt-3" onsubmit="return confirm('¿Cancelar el pedido #{{ $izipayPayment['pedidoId'] }}? Se liberará el stock reservado y no se completará el pago.');">
+                    <form id="izipay-cancel-form" action="{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}" method="POST" class="mt-3" onsubmit="return confirm('¿Cancelar por completo? El pedido #{{ $izipayPayment['pedidoId'] }} no se registrará y se liberará el stock reservado.');">
                         @csrf
+                        <input type="hidden" name="abandono" value="1">
                         <button type="submit" class="btn btn-outline-secondary w-full justify-center">Cancelar pedido</button>
                     </form>
-                    <p class="mt-2 text-center text-xs text-stone-500">Tu pedido #{{ $izipayPayment['pedidoId'] }} ya está registrado con el stock reservado. Termina el pago con la tarjeta o cancélalo con el botón de arriba antes de salir de esta página.</p>
+                    <p class="mt-2 text-center text-xs text-stone-500">Tu pedido #{{ $izipayPayment['pedidoId'] }} tiene el stock reservado mientras no termines de pagar. Culmina el pago con la tarjeta o cancélalo con el botón de arriba: al cancelar no queda registrado en ningún lado.</p>
                 @endif
             </div>
         </section>
@@ -461,6 +464,7 @@
                 if (izipayActionTaken) return;
                 const data = new FormData();
                 data.append('_token', '{{ csrf_token() }}');
+                data.append('abandono', '1');
                 navigator.sendBeacon('{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}', data);
             });
         </script>

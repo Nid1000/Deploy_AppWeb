@@ -113,45 +113,51 @@
 
     <section class="mt-6 grid gap-6 lg:grid-cols-2">
         <article class="admin-card dashboard-reveal" style="--reveal-delay: 320ms">
-            <p class="text-sm text-stone-500">Hoy</p>
-            <h3 class="mt-1 text-xl font-semibold text-stone-950">Últimas 5 compras del día</h3>
-            <div class="mt-5 space-y-3">
-                @forelse ($lastBuyersToday as $buyer)
-                    <a href="{{ route('web.admin.orders.show', $buyer->id) }}" class="dashboard-order-row">
-                        <div>
-                            <p class="font-semibold text-stone-900">{{ $buyer->cliente }}</p>
-                            <p class="mt-1 text-xs text-stone-500">Pedido #{{ $buyer->id }} · {{ $buyer->hora ?: 'Sin hora' }}</p>
-                        </div>
-                        <p class="font-semibold text-stone-900">S/ {{ number_format($buyer->total, 2) }}</p>
-                    </a>
-                @empty
-                    <p class="text-sm text-stone-500">Todavía no hay compras registradas hoy.</p>
-                @endforelse
-            </div>
+            <details>
+                <summary class="cursor-pointer select-none list-item">
+                    <span class="text-sm text-stone-500">Hoy</span>
+                    <h3 class="mt-1 inline text-xl font-semibold text-stone-950">Últimas 5 compras del día ({{ $lastBuyersToday->count() }})</h3>
+                </summary>
+                <div class="mt-5 space-y-3">
+                    @forelse ($lastBuyersToday as $buyer)
+                        <a href="{{ route('web.admin.orders.show', $buyer->id) }}" class="dashboard-order-row">
+                            <div>
+                                <p class="font-semibold text-stone-900">{{ $buyer->cliente }}</p>
+                                <p class="mt-1 text-xs text-stone-500">Pedido #{{ $buyer->id }} · {{ $buyer->hora ?: 'Sin hora' }}</p>
+                            </div>
+                            <p class="font-semibold text-stone-900">S/ {{ number_format($buyer->total, 2) }}</p>
+                        </a>
+                    @empty
+                        <p class="text-sm text-stone-500">Todavía no hay compras registradas hoy.</p>
+                    @endforelse
+                </div>
+            </details>
         </article>
 
         <article class="admin-card dashboard-reveal" style="--reveal-delay: 320ms">
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <p class="text-sm text-stone-500">Por cobrar al entregar</p>
-                    <h3 class="mt-1 text-xl font-semibold text-stone-950">Contra entrega pendientes</h3>
+            <details>
+                <summary class="flex cursor-pointer select-none list-item items-center justify-between gap-3">
+                    <div>
+                        <span class="text-sm text-stone-500">Por cobrar al entregar</span>
+                        <h3 class="mt-1 inline text-xl font-semibold text-stone-950">Contra entrega pendientes ({{ $codPendingList->count() }})</h3>
+                    </div>
+                    <span class="text-xl font-semibold text-amber-700">S/ {{ number_format($codPendingTotal, 2) }}</span>
+                </summary>
+                <div class="mt-5 space-y-3">
+                    @forelse ($codPendingList as $pending)
+                        <a href="{{ route('web.admin.orders.show', $pending->id) }}" class="dashboard-order-row">
+                            <div>
+                                <p class="font-semibold text-stone-900">{{ $pending->cliente }}</p>
+                                <p class="mt-1 text-xs text-stone-500">Pedido #{{ $pending->id }} · {{ ucfirst($pending->estado) }}</p>
+                            </div>
+                            <p class="font-semibold text-stone-900">S/ {{ number_format($pending->total, 2) }}</p>
+                        </a>
+                    @empty
+                        <p class="text-sm text-stone-500">No hay pedidos contra entrega pendientes.</p>
+                    @endforelse
                 </div>
-                <p class="text-xl font-semibold text-amber-700">S/ {{ number_format($codPendingTotal, 2) }}</p>
-            </div>
-            <div class="mt-5 space-y-3">
-                @forelse ($codPendingList as $pending)
-                    <a href="{{ route('web.admin.orders.show', $pending->id) }}" class="dashboard-order-row">
-                        <div>
-                            <p class="font-semibold text-stone-900">{{ $pending->cliente }}</p>
-                            <p class="mt-1 text-xs text-stone-500">Pedido #{{ $pending->id }} · {{ ucfirst($pending->estado) }}</p>
-                        </div>
-                        <p class="font-semibold text-stone-900">S/ {{ number_format($pending->total, 2) }}</p>
-                    </a>
-                @empty
-                    <p class="text-sm text-stone-500">No hay pedidos contra entrega pendientes.</p>
-                @endforelse
-            </div>
-            <p class="mt-3 text-xs text-stone-500">Se actualiza solo: al cambiar el estado del pedido a "Entregado" o "Cancelado" desaparece de esta lista.</p>
+                <p class="mt-3 text-xs text-stone-500">Se actualiza solo: al cambiar el estado del pedido a "Entregado" o "Cancelado" desaparece de esta lista.</p>
+            </details>
         </article>
     </section>
 

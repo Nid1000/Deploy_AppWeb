@@ -159,9 +159,18 @@ class OrdersWebController extends Controller
 
     public function cancel(Request $request, int $id): RedirectResponse
     {
-        $response = $this->api->put('pedidos/' . $id . '/cancelar');
+        // "abandono" solo lo manda el checkout cuando el cliente cancela un pago con Izipay que
+        // nunca termino de pagar: ahi el pedido se borra por completo (no un simple estado "cancelado").
+        $response = $this->api->put('pedidos/' . $id . '/cancelar', [
+            'abandono' => $request->boolean('abandono'),
+        ]);
         if (!$response->successful()) {
             return back()->with('error', $this->api->errorMessage($response, 'No se pudo cancelar el pedido.'));
+        }
+
+        $eliminado = (bool) data_get($response->json(), 'eliminado', false);
+        if ($eliminado) {
+            return back()->with('success', 'Pedido cancelado por completo: no quedó registrado en ningún lado y el stock fue liberado.');
         }
 
         $requiereReembolso = (bool) data_get($response->json(), 'requiere_reembolso', false);
