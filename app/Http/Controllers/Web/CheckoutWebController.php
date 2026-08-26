@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Services\BackendApiClient;
 use App\Support\StorefrontCart;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CheckoutWebController extends Controller
 {
@@ -17,12 +17,21 @@ class CheckoutWebController extends Controller
     ) {
     }
 
-    public function show(Request $request): View
+    public function show(Request $request): Response
     {
-        return view('web.checkout', $this->checkoutViewData($request));
+        // Sin cache: si no, al volver con el boton "atras" el navegador restaura la version
+        // vieja de esta pagina (carrito lleno) en vez de pedirle al servidor el estado actual.
+        return $this->noStoreView('web.checkout', $this->checkoutViewData($request));
     }
 
-    public function store(Request $request): View|RedirectResponse
+    private function noStoreView(string $view, array $data): Response
+    {
+        return response()->view($view, $data)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
+    }
+
+    public function store(Request $request): Response|RedirectResponse
     {
         $cartItems = StorefrontCart::items($request);
         if ($cartItems->isEmpty()) {
@@ -160,7 +169,7 @@ class CheckoutWebController extends Controller
                 $cssUrl = (string) preg_replace('/\.js(\?.*)?$/', '.css$1', $jsUrl);
             }
 
-            return view('web.checkout', $this->checkoutViewData($request, $cartItems, [
+            return $this->noStoreView('web.checkout', $this->checkoutViewData($request, $cartItems, [
                 'pedidoId' => $pedidoId,
                 'orderId' => (string) data_get($payment, 'orderId', 'PEDIDO-'.$pedidoId),
                 'formToken' => $formToken,

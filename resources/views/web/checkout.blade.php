@@ -425,19 +425,43 @@
         </section>
     @endif
 
+    <script>
+        // Si el navegador restaura esta pagina desde su cache (boton "atras"/"adelante"), el HTML
+        // que se ve puede quedar desactualizado (ej: carrito ya vaciado por una compra contra entrega
+        // que se acaba de registrar). Forzamos una recarga real para que siempre se vea el estado actual.
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
+
     @if ($izipayPayment)
         <script>
             // Pedido #{{ $izipayPayment['pedidoId'] }} ya existe con estado "pendiente" y el stock ya fue
-            // reservado; si el cliente cierra/retrocede sin pagar ni cancelar, el pedido queda colgado.
-            // Avisamos al salir y dejamos que el envio del propio formulario de cancelar pase sin aviso.
-            let izipayLeavingIntentionally = false;
-            document.getElementById('izipay-cancel-form')?.addEventListener('submit', () => {
-                izipayLeavingIntentionally = true;
-            });
+            // reservado antes de que el cliente termine de pagar con Izipay. Si sale de esta pagina sin
+            // pagar (formulario de Izipay) ni cancelar a mano (boton de arriba), cancelamos el pedido
+            // automaticamente para no dejarlo colgado con stock reservado y sin pagar.
+            let izipayActionTaken = false;
+
+            document.addEventListener('submit', (event) => {
+                const target = event.target;
+                if (target && (target.id === 'izipay-cancel-form' || target.closest?.('.kr-smart-form'))) {
+                    izipayActionTaken = true;
+                }
+            }, true);
+
             window.addEventListener('beforeunload', (event) => {
-                if (izipayLeavingIntentionally) return;
+                if (izipayActionTaken) return;
                 event.preventDefault();
                 event.returnValue = '';
+            });
+
+            window.addEventListener('pagehide', () => {
+                if (izipayActionTaken) return;
+                const data = new FormData();
+                data.append('_token', '{{ csrf_token() }}');
+                navigator.sendBeacon('{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}', data);
             });
         </script>
     @endif
