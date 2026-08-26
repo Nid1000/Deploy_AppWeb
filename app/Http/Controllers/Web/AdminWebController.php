@@ -873,7 +873,7 @@ class AdminWebController extends Controller
                 }),
                 'total' => (float) data_get($item, 'total', 0),
             ];
-        });
+        })->reverse()->values(); // El API la devuelve de mas antigua a mas reciente; aqui mostramos hoy primero.
         $topProducts = collect($this->api->okData($productsResponse, 'data', []))->map(fn ($item) => $this->mapProduct($item));
         $topCategories = collect($this->api->okData($categoriesResponse, 'data', []))->map(fn ($item) => (object) $item);
 
