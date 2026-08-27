@@ -98,7 +98,6 @@
                     @php($tipoComp = data_get($receipt, 'tipo') ?? '')
                     @php($numeroFmt = data_get($receipt, 'numero_formateado') ?? data_get($receipt, 'numeroFormateado') ?? '')
                     @php($pdfUrl = data_get($receipt, 'pdf_url') ?? data_get($receipt, 'archivos.pdf'))
-                    @php($xmlUrl = data_get($receipt, 'xml_url') ?? data_get($receipt, 'archivos.xml'))
                     @php($imgUrl = data_get($receipt, 'img_url') ?? data_get($receipt, 'archivos.img'))
                     <article class="history-card">
                         <div class="history-card-main">
@@ -112,9 +111,6 @@
                         <div class="history-card-actions">
                             @if (!empty($pdfUrl))
                                 <a href="{{ $pdfUrl }}" target="_blank" class="btn btn-primary">PDF</a>
-                            @endif
-                            @if (!empty($xmlUrl))
-                                <a href="{{ $xmlUrl }}" target="_blank" class="btn btn-outline-secondary">XML</a>
                             @endif
                             @if (!empty($imgUrl))
                                 <a href="{{ $imgUrl }}" target="_blank" class="btn btn-outline-secondary">Imagen</a>

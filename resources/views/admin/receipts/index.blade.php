@@ -48,9 +48,6 @@
                                 @if ($receipt->pdf_url)
                                     <a href="{{ $receipt->pdf_url }}" target="_blank" class="btn btn-outline-secondary">PDF</a>
                                 @endif
-                                @if ($receipt->xml_url)
-                                    <a href="{{ $receipt->xml_url }}" target="_blank" class="btn btn-outline-secondary">XML</a>
-                                @endif
                                 @if ($receipt->img_url)
                                     <a href="{{ $receipt->img_url }}" target="_blank" class="btn btn-outline-secondary">Vista</a>
                                 @endif

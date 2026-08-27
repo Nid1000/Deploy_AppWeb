@@ -85,7 +85,6 @@
                     <h3 class="mt-3 text-3xl font-semibold text-stone-900">{{ strtoupper($receipt->tipo) }} {{ $receipt->numero_formateado }}</h3>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="{{ $receipt->pdf_url }}" target="_blank" class="btn btn-primary">Abrir PDF</a>
-                        <a href="{{ $receipt->xml_url }}" target="_blank" class="btn btn-outline-secondary">Descargar XML</a>
                         <a href="{{ $receipt->img_url }}" target="_blank" class="btn btn-outline-secondary">Ver imagen</a>
                     </div>
                 </section>
