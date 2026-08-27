@@ -360,7 +360,7 @@
                             <label class="rounded-2xl border border-stone-200 bg-white p-4 cursor-pointer">
                                 <input type="radio" name="metodo_pago" value="izipay" class="mr-2" @checked($selectedPayment === 'izipay') @disabled($izipayPayment)>
                                 <span class="font-semibold text-stone-900">Tarjeta</span>
-                                <span class="mt-1 block text-xs text-stone-500">Pago seguro con tarjeta.</span>
+                                <span class="mt-1 block text-xs text-stone-500">Primero abriremos el formulario seguro de pago.</span>
                             </label>
                         </div>
 
@@ -403,18 +403,18 @@
                                     </div>
                                 </div>
                             @else
-                                <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aquí el formulario seguro de Izipay.</p>
+                                <p class="mt-1 text-sm text-stone-600">Al continuar mostraremos aquí el formulario seguro de Izipay. El pedido se confirma cuando el pago sea aprobado.</p>
                             @endif
                         </div>
 
                         <label class="mt-4 flex items-start gap-3 text-sm text-stone-700">
                             <input type="checkbox" name="acepta_pago" value="1" required class="mt-1" @checked(old('acepta_pago') || $izipayPayment) @disabled($izipayPayment)>
-                            <span>Acepto que Delicias registre este método de pago y confirme el pedido según disponibilidad.</span>
+                            <span>Acepto continuar con el método de pago seleccionado.</span>
                         </label>
                     </div>
 
                     @if (! $izipayPayment)
-                        <button type="submit" class="btn btn-primary w-full justify-center">Confirmar pedido</button>
+                        <button type="submit" class="btn btn-primary w-full justify-center" data-checkout-submit>Confirmar pedido</button>
                     @endif
                 </form>
 
@@ -491,6 +491,24 @@
             const checkoutForm = document.getElementById('checkout-form');
             if (checkoutForm) {
                 const orderTotalLine = 'Total: S/ {{ number_format($cartTotal, 2) }}';
+                const submitButton = checkoutForm.querySelector('[data-checkout-submit]');
+
+                const selectedPaymentMethod = () => checkoutForm.querySelector('input[name="metodo_pago"]:checked')?.value || 'contra_entrega';
+
+                const syncSubmitButton = () => {
+                    if (!submitButton) {
+                        return;
+                    }
+
+                    submitButton.textContent = selectedPaymentMethod() === 'izipay'
+                        ? 'Continuar al pago'
+                        : 'Confirmar pedido';
+                };
+
+                checkoutForm.querySelectorAll('input[name="metodo_pago"]').forEach((input) => {
+                    input.addEventListener('change', syncSubmitButton);
+                });
+                syncSubmitButton();
 
                 checkoutForm.addEventListener('submit', (event) => {
                     if (checkoutForm.dataset.submitted === '1') {
@@ -500,9 +518,8 @@
 
                     if (checkoutForm.dataset.confirmed !== '1') {
                         event.preventDefault();
-                        const payment = checkoutForm.querySelector('input[name="metodo_pago"]:checked')?.value === 'izipay'
-                            ? 'Tarjeta'
-                            : 'Contra entrega';
+                        const isCardPayment = selectedPaymentMethod() === 'izipay';
+                        const payment = isCardPayment ? 'Tarjeta' : 'Contra entrega';
                         const deliveryDate = checkoutForm.querySelector('[name="fecha_entrega"]')?.value || 'Por confirmar';
                         const address = [
                             checkoutForm.querySelector('[name="direccion_entrega"]')?.value,
@@ -510,13 +527,15 @@
                             checkoutForm.querySelector('[name="distrito_entrega"]')?.value,
                         ].filter(Boolean).join(', ');
                         const summary = [
-                            'Revisa antes de pagar:',
+                            isCardPayment ? 'Revisa antes de abrir el pago:' : 'Revisa antes de confirmar:',
                             `Entrega: ${deliveryDate}`,
                             `Direccion: ${address || 'Sin direccion'}`,
                             `Pago: ${payment}`,
                             orderTotalLine,
                             '',
-                            'Si todo esta correcto, continua.',
+                            isCardPayment
+                                ? 'Si todo esta correcto, continua al pago seguro.'
+                                : 'Si todo esta correcto, confirma el pedido.',
                         ].join('\n');
 
                         if (window.confirm(summary)) {
@@ -527,10 +546,11 @@
                     }
 
                     checkoutForm.dataset.submitted = '1';
-                    const submitButton = checkoutForm.querySelector('button[type="submit"]');
                     if (submitButton) {
                         submitButton.disabled = true;
-                        submitButton.textContent = 'Procesando pedido...';
+                        submitButton.textContent = selectedPaymentMethod() === 'izipay'
+                            ? 'Preparando pago...'
+                            : 'Procesando pedido...';
                     }
                 });
             }

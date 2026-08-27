@@ -159,7 +159,6 @@ class CheckoutWebController extends Controller
 
             if ($paymentResponse->failed()) {
                 return redirect()->route('web.orders.show', $pedidoId)
-                    ->with('success', 'Pedido creado correctamente.')
                     ->with('error', $this->api->errorMessage($paymentResponse, 'No se pudo iniciar el pago con Izipay.'));
             }
 
@@ -168,7 +167,6 @@ class CheckoutWebController extends Controller
             $publicKey = (string) data_get($payment, 'publicKey', '');
             if ($formToken === '' || $publicKey === '') {
                 return redirect()->route('web.orders.show', $pedidoId)
-                    ->with('success', 'Pedido creado correctamente.')
                     ->with('error', 'Izipay no devolvió los datos para mostrar el formulario de pago.');
             }
 
