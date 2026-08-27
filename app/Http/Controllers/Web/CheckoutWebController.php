@@ -100,6 +100,76 @@ class CheckoutWebController extends Controller
                     ? 'No se pudo obtener el nombre del DNI consultado.'
                     : 'No se pudo obtener la razon social del RUC consultado.');
         }
+
+        if ($data['metodo_pago'] === 'izipay') {
+            $paymentResponse = $this->api->post('pagos/izipay/crear', [
+                'productos' => $cartItems->map(fn ($item) => ['id' => $item->id, 'cantidad' => $item->cantidad])->values()->all(),
+                'fecha_entrega' => $data['fecha_entrega'],
+                'direccion_entrega' => $data['direccion_entrega'],
+                'distrito_entrega' => $data['distrito_entrega'],
+                'numero_casa_entrega' => $data['numero_casa_entrega'],
+                'telefono_contacto' => $data['telefono_contacto'],
+                'notas' => $data['notas'] ?? null,
+                'metodo_pago' => 'tarjeta',
+                'comprobante_tipo' => $data['comprobante_tipo'],
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+                'cliente_nombre' => $documentName,
+                'cliente' => [
+                    'nombre' => $documentName,
+                    'tipo_documento' => $data['tipo_documento'],
+                    'numero_documento' => $data['numero_documento'],
+                ],
+                'client' => [
+                    'rznSocial' => $documentName,
+                    'tipoDoc' => $data['tipo_documento'] === 'RUC' ? '6' : '1',
+                    'numDoc' => $data['numero_documento'],
+                ],
+                'emitir_comprobante_al_confirmar' => true,
+                'modo_prueba' => (bool) config('services.izipay.test_mode'),
+                'return_url' => route('web.orders', ['tab' => 'receipts']),
+            ]);
+
+            if ($paymentResponse->failed()) {
+                return back()
+                    ->withInput()
+                    ->with('error', $this->api->errorMessage($paymentResponse, 'No se pudo iniciar el pago con Izipay.'));
+            }
+
+            $payment = $paymentResponse->json();
+            $formToken = (string) data_get($payment, 'formToken', '');
+            $publicKey = (string) data_get($payment, 'publicKey', '');
+            if ($formToken === '' || $publicKey === '') {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Izipay no devolvió los datos para mostrar el formulario de pago.');
+            }
+
+            $backendUrl = rtrim((string) config('services.backend.url'), '/');
+            $defaultJsUrl = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
+            $jsUrl = (string) data_get($payment, 'jsUrl', $defaultJsUrl);
+            if ($jsUrl === '') {
+                $jsUrl = $defaultJsUrl;
+            }
+            $cssUrl = (string) data_get($payment, 'cssUrl', '');
+            if ($cssUrl === '') {
+                $cssUrl = (string) preg_replace('/\.js(\?.*)?$/', '.css$1', $jsUrl);
+            }
+
+            return $this->noStoreView('web.checkout', $this->checkoutViewData($request, $cartItems, [
+                'pedidoId' => data_get($payment, 'pedidoId'),
+                'orderId' => (string) data_get($payment, 'orderId', 'PAGO'),
+                'formToken' => $formToken,
+                'publicKey' => $publicKey,
+                'jsUrl' => $jsUrl,
+                'cssUrl' => $cssUrl,
+                'successUrl' => (string) data_get($payment, 'successUrl', $backendUrl.'/api/pagos/izipay/confirmar'),
+                'cancelUrl' => (string) data_get($payment, 'cancelUrl', $backendUrl.'/api/pagos/izipay/cancelado'),
+                'method' => $data['metodo_pago'],
+                'testMode' => (bool) data_get($payment, 'testMode', config('services.izipay.test_mode')),
+            ]));
+        }
+
         $orderResponse = $this->api->post('pedidos', [
             'productos' => $cartItems->map(fn ($item) => ['id' => $item->id, 'cantidad' => $item->cantidad])->values()->all(),
             'fecha_entrega' => $data['fecha_entrega'],
