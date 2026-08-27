@@ -72,6 +72,8 @@ class IzipayCheckoutWebTest extends TestCase
                 && $request['tipo_documento'] === 'DNI'
                 && $request['numero_documento'] === '12345678'
                 && $request['cliente_nombre'] === 'CLIENTE DE PRUEBA'
+                && $request['cliente']['nombre'] === 'CLIENTE DE PRUEBA'
+                && $request['client']['rznSocial'] === 'CLIENTE DE PRUEBA'
                 && $request['emitir_comprobante_al_confirmar'] === true
                 && $request['modo_prueba'] === true;
         });
@@ -81,7 +83,9 @@ class IzipayCheckoutWebTest extends TestCase
                 && $request['comprobante_tipo'] === 'boleta'
                 && $request['tipo_documento'] === 'DNI'
                 && $request['numero_documento'] === '12345678'
-                && $request['cliente_nombre'] === 'CLIENTE DE PRUEBA';
+                && $request['cliente_nombre'] === 'CLIENTE DE PRUEBA'
+                && $request['cliente']['nombre'] === 'CLIENTE DE PRUEBA'
+                && $request['client']['rznSocial'] === 'CLIENTE DE PRUEBA';
         });
     }
 

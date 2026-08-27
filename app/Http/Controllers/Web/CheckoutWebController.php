@@ -112,6 +112,16 @@ class CheckoutWebController extends Controller
             'tipo_documento' => $data['tipo_documento'],
             'numero_documento' => $data['numero_documento'],
             'cliente_nombre' => $documentName,
+            'cliente' => [
+                'nombre' => $documentName,
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+            ],
+            'client' => [
+                'rznSocial' => $documentName,
+                'tipoDoc' => $data['tipo_documento'] === 'RUC' ? '6' : '1',
+                'numDoc' => $data['numero_documento'],
+            ],
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => match ($data['metodo_pago']) {
                 'izipay' => 'Pago con tarjeta Izipay pendiente',
@@ -132,6 +142,16 @@ class CheckoutWebController extends Controller
                 'tipo_documento' => $data['tipo_documento'],
                 'numero_documento' => $data['numero_documento'],
                 'cliente_nombre' => $documentName,
+                'cliente' => [
+                    'nombre' => $documentName,
+                    'tipo_documento' => $data['tipo_documento'],
+                    'numero_documento' => $data['numero_documento'],
+                ],
+                'client' => [
+                    'rznSocial' => $documentName,
+                    'tipoDoc' => $data['tipo_documento'] === 'RUC' ? '6' : '1',
+                    'numDoc' => $data['numero_documento'],
+                ],
                 'emitir_comprobante_al_confirmar' => true,
                 'modo_prueba' => (bool) config('services.izipay.test_mode'),
                 'return_url' => route('web.orders', ['tab' => 'receipts']),
@@ -193,6 +213,16 @@ class CheckoutWebController extends Controller
             'tipo_documento' => $data['tipo_documento'],
             'numero_documento' => $data['numero_documento'],
             'cliente_nombre' => $documentName,
+            'cliente' => [
+                'nombre' => $documentName,
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+            ],
+            'client' => [
+                'rznSocial' => $documentName,
+                'tipoDoc' => $data['tipo_documento'] === 'RUC' ? '6' : '1',
+                'numDoc' => $data['numero_documento'],
+            ],
         ]);
 
         StorefrontCart::clear($request);
