@@ -157,6 +157,7 @@ class TicketController extends Controller
         return [
             'nombre' => data_get($receipt, 'cliente.nombre')
                 ?? data_get($requestPayload, 'cliente.nombre')
+                ?? data_get($requestPayload, 'cliente_nombre')
                 ?? data_get($requestPayload, 'client.rznSocial')
                 ?? data_get($requestPayload, 'cliente')
                 ?? 'Cliente',
@@ -212,6 +213,7 @@ class TicketController extends Controller
         $customer = (string) (
             data_get($receipt, 'cliente.nombre')
             ?: data_get($requestPayload, 'cliente.nombre')
+            ?: data_get($requestPayload, 'cliente_nombre')
             ?: data_get($requestPayload, 'client.rznSocial')
             ?: data_get($requestPayload, 'cliente')
             ?: 'Cliente'

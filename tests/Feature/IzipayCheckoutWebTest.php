@@ -71,8 +71,17 @@ class IzipayCheckoutWebTest extends TestCase
                 && $request['comprobante_tipo'] === 'boleta'
                 && $request['tipo_documento'] === 'DNI'
                 && $request['numero_documento'] === '12345678'
+                && $request['cliente_nombre'] === 'CLIENTE DE PRUEBA'
                 && $request['emitir_comprobante_al_confirmar'] === true
                 && $request['modo_prueba'] === true;
+        });
+
+        Http::assertSent(function ($request): bool {
+            return $request->url() === 'https://api.saborcentral.com/api/pedidos'
+                && $request['comprobante_tipo'] === 'boleta'
+                && $request['tipo_documento'] === 'DNI'
+                && $request['numero_documento'] === '12345678'
+                && $request['cliente_nombre'] === 'CLIENTE DE PRUEBA';
         });
     }
 

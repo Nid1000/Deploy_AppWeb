@@ -397,6 +397,10 @@
                                         </div>
                                     </div>
                                     <p class="mt-3 text-center text-xs text-stone-500">Recuerda activar tus compras por internet.</p>
+                                    <div class="mt-3 hidden rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" data-izipay-timeout>
+                                        Estamos verificando el pago. Si la pantalla no cambia, abre tu historial de boletas.
+                                        <a href="{{ route('web.orders', ['tab' => 'receipts']) }}" class="font-semibold underline underline-offset-4">Ver boletas</a>
+                                    </div>
                                 </div>
                             @else
                                 <p class="mt-1 text-sm text-stone-600">Al confirmar el pedido mostraremos aquí el formulario seguro de Izipay.</p>
@@ -409,9 +413,7 @@
                         </label>
                     </div>
 
-                    @if ($izipayPayment)
-                        <a href="{{ route('web.orders.show', $izipayPayment['pedidoId']) }}" class="btn btn-outline-secondary w-full justify-center">Ver pedido</a>
-                    @else
+                    @if (! $izipayPayment)
                         <button type="submit" class="btn btn-primary w-full justify-center">Confirmar pedido</button>
                     @endif
                 </form>
@@ -420,9 +422,9 @@
                     <form id="izipay-cancel-form" action="{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}" method="POST" class="mt-3" onsubmit="return confirm('¿Cancelar por completo? El pedido #{{ $izipayPayment['pedidoId'] }} no se registrará y se liberará el stock reservado.');">
                         @csrf
                         <input type="hidden" name="abandono" value="1">
-                        <button type="submit" class="btn btn-outline-secondary w-full justify-center">Cancelar pedido</button>
+                        <button type="submit" class="btn btn-outline-secondary w-full justify-center">Cancelar pago</button>
                     </form>
-                    <p class="mt-2 text-center text-xs text-stone-500">Tu pedido #{{ $izipayPayment['pedidoId'] }} tiene el stock reservado mientras no termines de pagar. Culmina el pago con la tarjeta o cancélalo con el botón de arriba: al cancelar no queda registrado en ningún lado.</p>
+                    <p class="mt-2 text-center text-xs text-stone-500">Tu pedido #{{ $izipayPayment['pedidoId'] }} esta reservado, pero aun no esta pagado. Completa el pago con tarjeta o cancela para liberar el stock.</p>
                 @endif
             </div>
         </section>
@@ -439,39 +441,42 @@
         });
     </script>
 
-    @if ($izipayPayment)
-        <script>
-            // Pedido #{{ $izipayPayment['pedidoId'] }} ya existe con estado "pendiente" y el stock ya fue
-            // reservado antes de que el cliente termine de pagar con Izipay. Si sale de esta pagina sin
-            // pagar (formulario de Izipay) ni cancelar a mano (boton de arriba), cancelamos el pedido
-            // automaticamente para no dejarlo colgado con stock reservado y sin pagar.
-            let izipayActionTaken = false;
-
-            document.addEventListener('submit', (event) => {
-                const target = event.target;
-                if (target && (target.id === 'izipay-cancel-form' || target.closest?.('.kr-smart-form'))) {
-                    izipayActionTaken = true;
-                }
-            }, true);
-
-            window.addEventListener('beforeunload', (event) => {
-                if (izipayActionTaken) return;
-                event.preventDefault();
-                event.returnValue = '';
-            });
-
-            window.addEventListener('pagehide', () => {
-                if (izipayActionTaken) return;
-                const data = new FormData();
-                data.append('_token', '{{ csrf_token() }}');
-                data.append('abandono', '1');
-                navigator.sendBeacon('{{ route('web.orders.cancel', $izipayPayment['pedidoId']) }}', data);
-            });
-        </script>
-    @endif
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            @if ($izipayPayment)
+                const izipayTimeoutMessage = document.querySelector('[data-izipay-timeout]');
+                const izipayOrderUrl = '{{ route('web.orders', ['tab' => 'receipts']) }}';
+                let izipayRedirectTimer = null;
+
+                const watchIzipayProcessing = () => {
+                    if (izipayRedirectTimer) {
+                        return;
+                    }
+
+                    window.setTimeout(() => {
+                        izipayTimeoutMessage?.classList.remove('hidden');
+                    }, 12000);
+
+                    izipayRedirectTimer = window.setTimeout(() => {
+                        window.location.href = izipayOrderUrl;
+                    }, 30000);
+                };
+
+                document.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target?.closest?.('.kr-payment-button')) {
+                        watchIzipayProcessing();
+                    }
+                }, true);
+
+                document.addEventListener('submit', (event) => {
+                    const target = event.target;
+                    if (target?.closest?.('.kr-smart-form')) {
+                        watchIzipayProcessing();
+                    }
+                }, true);
+            @endif
+
             const deliveryDate = document.getElementById('fecha_entrega');
             if (deliveryDate) {
                 const enforceMinDeliveryDate = () => {
@@ -485,11 +490,6 @@
 
             const checkoutForm = document.getElementById('checkout-form');
             if (checkoutForm) {
-                const orderSummaryLines = [
-                    @foreach ($cartItems as $item)
-                        '{{ $item->cantidad }}x {{ addslashes($item->nombre) }} — S/ {{ number_format($item->subtotal, 2) }}',
-                    @endforeach
-                ];
                 const orderTotalLine = 'Total: S/ {{ number_format($cartTotal, 2) }}';
 
                 checkoutForm.addEventListener('submit', (event) => {
@@ -500,14 +500,23 @@
 
                     if (checkoutForm.dataset.confirmed !== '1') {
                         event.preventDefault();
+                        const payment = checkoutForm.querySelector('input[name="metodo_pago"]:checked')?.value === 'izipay'
+                            ? 'Tarjeta'
+                            : 'Contra entrega';
+                        const deliveryDate = checkoutForm.querySelector('[name="fecha_entrega"]')?.value || 'Por confirmar';
+                        const address = [
+                            checkoutForm.querySelector('[name="direccion_entrega"]')?.value,
+                            checkoutForm.querySelector('[name="numero_casa_entrega"]')?.value,
+                            checkoutForm.querySelector('[name="distrito_entrega"]')?.value,
+                        ].filter(Boolean).join(', ');
                         const summary = [
-                            '¿Confirmas este pedido?',
-                            '',
-                            ...orderSummaryLines,
-                            '',
+                            'Revisa antes de pagar:',
+                            `Entrega: ${deliveryDate}`,
+                            `Direccion: ${address || 'Sin direccion'}`,
+                            `Pago: ${payment}`,
                             orderTotalLine,
                             '',
-                            'Una vez confirmado, si necesitas cancelarlo debes comunicarte con el administrador.',
+                            'Si todo esta correcto, continua.',
                         ].join('\n');
 
                         if (window.confirm(summary)) {

@@ -108,6 +108,10 @@ class CheckoutWebController extends Controller
             'numero_casa_entrega' => $data['numero_casa_entrega'],
             'telefono_contacto' => $data['telefono_contacto'],
             'notas' => $data['notas'] ?? null,
+            'comprobante_tipo' => $data['comprobante_tipo'],
+            'tipo_documento' => $data['tipo_documento'],
+            'numero_documento' => $data['numero_documento'],
+            'cliente_nombre' => $documentName,
             'metodo_pago' => $data['metodo_pago'],
             'pago_referencia' => match ($data['metodo_pago']) {
                 'izipay' => 'Pago con tarjeta Izipay pendiente',
@@ -130,7 +134,7 @@ class CheckoutWebController extends Controller
                 'cliente_nombre' => $documentName,
                 'emitir_comprobante_al_confirmar' => true,
                 'modo_prueba' => (bool) config('services.izipay.test_mode'),
-                'return_url' => route('web.orders.show', $pedidoId),
+                'return_url' => route('web.orders', ['tab' => 'receipts']),
             ]);
 
             if ($paymentResponse->failed()) {
@@ -188,6 +192,7 @@ class CheckoutWebController extends Controller
             'comprobante_tipo' => $data['comprobante_tipo'],
             'tipo_documento' => $data['tipo_documento'],
             'numero_documento' => $data['numero_documento'],
+            'cliente_nombre' => $documentName,
         ]);
 
         StorefrontCart::clear($request);
