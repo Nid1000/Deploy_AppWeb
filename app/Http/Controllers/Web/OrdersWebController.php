@@ -131,6 +131,9 @@ class OrdersWebController extends Controller
                 unset($pendingPayments[$orderKey]);
                 $request->session()->put('pending_izipay_orders', $pendingPayments);
                 $request->session()->flash('success', 'Pago confirmado. Los productos pagados fueron retirados del carrito.');
+            } else {
+                StorefrontCart::clear($request);
+                $request->session()->flash('success', 'Pago confirmado. El carrito fue actualizado.');
             }
         }
         $details = collect($this->api->okData($response, 'detalles', []))->map(function ($detail) {
